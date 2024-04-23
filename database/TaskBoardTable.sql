@@ -1,4 +1,4 @@
-drop database taskboard;
+-- drop database taskboard;
 create database taskBoard ;
 use taskBoard;
 
@@ -12,8 +12,7 @@ CREATE TABLE Tasks (
     updatedOn DATETIME default now() on update now() NOT NULL,
     CONSTRAINT check_taskTitle_not_empty CHECK (LENGTH(TRIM(taskTitle)) > 0),
     CONSTRAINT check_taskDescription_length CHECK (LENGTH(taskDescription) <= 500),
-    CONSTRAINT check_taskAssignees_length CHECK (LENGTH(taskAssignees) <= 120)
-);
+    CONSTRAINT check_taskAssignees_length CHECK (LENGTH(taskAssignees) <= 120));
 
 -- taskAssignees VARCHAR(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
 -- taskAssignees VARCHAR(30) CHARACTER SET utf8mb4 ,

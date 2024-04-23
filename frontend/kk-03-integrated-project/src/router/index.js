@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import FirstPage from '../components/FirstPage.vue'
+import TaskList from '../components/TaskList.vue'
+import NotFound from '../components/NotFound.vue'
 
 // set history of stor path when visit
 const history = createWebHistory()
@@ -7,9 +8,20 @@ const history = createWebHistory()
 // give roue paths
 const routes = [
   // first page & wait t. give endpoint
-  {path:'/' , 
-  name:'',
-  component:FirstPage},
+  {
+    path: '/',
+    redirect: '/task'
+  },
+  {
+    path: '/task',
+    name: 'taskList',
+    component: TaskList
+  },
+  {
+    path: '/:notfoundpath(.*)',
+    name: 'NotFound',
+    component: NotFound
+  }
 ]
 
 const router = createRouter({

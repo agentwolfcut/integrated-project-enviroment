@@ -1,17 +1,18 @@
 SELECT * FROM taskboard.tasks;
-
 INSERT INTO Tasks (taskTitle, taskDescription, taskAssignees, taskStatus) 
 VALUES 
-    ('Implement Login Page', 'Create HTML/CSS for the login page and integrate with backend',
-    'John', 'To Do');
-    
-UPDATE Tasks
-SET taskStatus = 'To Do'
-WHERE taskId = 1 ;
+    ('TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0',
+    'Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5',
+	'Assignees1Assignees2Assignees3','No Status') ;
+INSERT INTO Tasks (taskTitle, taskDescription, taskAssignees, taskStatus) 
+VALUES     ('Repository','','','To Do') ;
 
-    
-    
---     ('Design Database Schema', 'Define tables, relationships, and constraints for the database', 'Alice, Bob', 'Doing', NOW(), NOW()),
---     ('Refactor Codebase', 'Review existing code and refactor for better performance and readability', 'Carol', 'To Do', NOW(), NOW()),
---     ('Deploy Application to Production', 'Prepare deployment scripts and deploy the application to production servers', 'David', 'Doing', NOW(), NOW()),
---     ('Write User Documentation', 'Create user guides and documentation for the application', 'Emily', 'To Do', NOW(), NOW());
+INSERT INTO Tasks (taskTitle, taskDescription, taskAssignees, taskStatus) 
+VALUES     ('ดาต้าเบส','ສ້າງຖານຂໍ້ມູນ','あなた、彼、彼女','Doing');
+
+INSERT INTO Tasks (taskTitle, taskDescription, taskAssignees, taskStatus) 
+VALUES ('_Infrastructure_','_Setup containers_','ไก่งวง กับ เพนกวิน','Done') ;
+
+
+
+UPDATE Tasks SET taskStatus = 'Done' WHERE taskId = 1 ;

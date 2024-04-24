@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/itb-kk/v1/tasks")
+@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th:8080"
+
 public class TaskController {
     @Autowired
     private TaskService taskService;

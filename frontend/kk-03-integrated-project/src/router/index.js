@@ -17,6 +17,7 @@ const routes = [
     name: 'taskList',
     component: TaskList
   },
+
   {
     path: '/:notfoundpath(.*)',
     name: 'NotFound',

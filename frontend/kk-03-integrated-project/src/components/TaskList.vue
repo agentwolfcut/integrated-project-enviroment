@@ -104,6 +104,7 @@ onMounted(async () => {
                                         <p class="text-base font-medium leading-none text-gray-700 mr-4">
                                             {{ task.id }}
                                         </p>
+                                       
                                         <p class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
                                             {{ task.title }}
                                         </p>
@@ -115,8 +116,12 @@ onMounted(async () => {
                                     </div>
                                 </td>
                                 <td class="itbkk-status">
-                                    <div
-                                        class="py-3 px-3 text-sm focus:outline-none leading-none text-green-700 bg-green-100 rounded mr-4">
+                                    <div :class="{
+                                'text-green-500 bg-green-100 ': task.status === 'Done',
+                                'text-red-500 bg-red-100 ': task.status === 'To Do',
+                                'text-yellow-600 bg-yellow-100': task.status === 'Doing',
+                                'bg-slate-200': task.status === ''
+                            }" class="p-3 text-sm  leading-none w-16 rounded-md font-semibold mr-4">
                                         {{ task.status }}
                                     </div>
                                 </td>

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/itb-kk/tasks")
+@RequestMapping("/itb-kk/v1/tasks")
 public class TaskController {
     @Autowired
     private TaskService taskService;
@@ -24,9 +24,9 @@ public class TaskController {
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
-    @GetMapping("/{taskId}")
-    public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer taskId) {
-        TaskEntity task = taskService.getTaskById(taskId);
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer id) {
+        TaskEntity task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 }

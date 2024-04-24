@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class TaskEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "taskID")
     private int id;
 
     @Column(name = "taskTitle", length = 100, nullable = false)

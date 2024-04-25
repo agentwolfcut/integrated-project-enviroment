@@ -1,4 +1,3 @@
-const API_URL = "http://localhost:5000"
 // async task must wait , inside are promise
 async function getItems(url) { //ส่งurl
     try {
@@ -73,4 +72,4 @@ async function getItems(url) { //ส่งurl
   }
   
   // destructuring
-  export { getItems, getItemById, deleteItemById, addItem, editItem , API_URL }
+  export { getItems, getItemById, deleteItemById, addItem, editItem}

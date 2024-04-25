@@ -7,8 +7,8 @@ import { TaskManagement } from '@/libs/TaskManagement';
 const tasks = ref()
 onMounted(async () => {
     const taskRes = await getItems(
-        'http://localhost:5000/task'
-    )
+            'http://localhost:5000/task'
+        )
     tasks.value = taskRes // reverse and slice to show the most
 })
 
@@ -104,8 +104,9 @@ onMounted(async () => {
                                         <p class="text-base font-medium leading-none text-gray-700 mr-4">
                                             {{ task.id }}
                                         </p>
-                                       
-                                        <button class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
+
+                                        <button
+                                            class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
                                             {{ task.title }}
                                         </button>
 
@@ -118,11 +119,11 @@ onMounted(async () => {
                                 </td>
                                 <td class="itbkk-status">
                                     <div :class="{
-                                'text-green-500 bg-green-100 ': task.status === 'Done',
-                                'text-red-500 bg-red-100 ': task.status === 'To Do',
-                                'text-yellow-600 bg-yellow-100': task.status === 'Doing',
-                                'bg-slate-200': task.status === ''
-                            }" class="p-3 text-sm  leading-none w-16 rounded-md font-semibold mr-4">
+                                        'text-green-500 bg-green-100 ': task.status === 'Done',
+                                        'text-red-500 bg-red-100 ': task.status === 'To Do',
+                                        'text-yellow-600 bg-yellow-100': task.status === 'Doing',
+                                        'bg-slate-200': task.status === ''
+                                    }" class="p-3 text-sm  leading-none w-16 rounded-md font-semibold mr-4">
                                         {{ task.status }}
                                     </div>
                                 </td>

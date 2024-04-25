@@ -98,7 +98,7 @@
 .itbkk-timezone,
 .itbkk-created-on,
 .itbkk-updated-on {
-    border: 1px solid #4a5568; /* เพิ่มเส้นขอบสีเทาให้กับข้อมูลแต่ละช่อง */
+    background-color: #edf2f7;
     padding: 10px; /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
 }
 

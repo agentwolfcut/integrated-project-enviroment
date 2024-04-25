@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TaskList from '../components/TaskList.vue'
 import NotFound from '../components/NotFound.vue'
+import DetailModal from '@/components/DetailModal.vue'
 
 // set history of stor path when visit
 const history = createWebHistory()
@@ -22,6 +23,10 @@ const routes = [
     path: '/:notfoundpath(.*)',
     name: 'NotFound',
     component: NotFound
+  } ,
+  {
+    path : '/testModal',
+    component : DetailModal
   }
 ]
 

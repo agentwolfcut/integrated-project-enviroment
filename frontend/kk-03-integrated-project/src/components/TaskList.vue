@@ -72,7 +72,7 @@ onMounted(async () => {
                 <div class="mt-7 overflow-x-auto ">
                     <table class="w-full whitespace-nowrap rounded-md">
                         <thead class="bg-slate-200 text">
-                            <tr class="itbkk-item focus:outline-none h-16 border border-gray-100 rounded text-base">
+                            <tr class=" focus:outline-none h-16 border border-gray-100 rounded text-base">
                                 <td>
                                     <div class="flex items-center pl-5">
                                         <p class=" font-medium leading-none text-gray-700 ml-6">
@@ -105,12 +105,13 @@ onMounted(async () => {
                                             {{ task.id }}
                                         </p>
                                        
-                                        <p class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
+                                        <button class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
                                             {{ task.title }}
-                                        </p>
+                                        </button>
+
                                     </div>
                                 </td>
-                                <td class="itbkk-assignee">
+                                <td class="itbkk-assignees">
                                     <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                         {{ task.assignees }}
                                     </div>

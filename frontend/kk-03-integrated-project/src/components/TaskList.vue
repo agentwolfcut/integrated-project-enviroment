@@ -7,8 +7,8 @@ import { TaskManagement } from '@/libs/TaskManagement';
 const tasks = ref()
 onMounted(async () => {
     const taskRes = await getItems(
-            'http://localhost:5000/task'
-        )
+        'http://localhost:5000/task'
+    )
     tasks.value = taskRes // reverse and slice to show the most
 })
 
@@ -83,7 +83,7 @@ onMounted(async () => {
 
                                 <td>
                                     <div class=" font-medium leading-none text-gray-700 mr-2">
-                                        Assignee
+                                        Assignees
                                     </div>
                                 </td>
                                 <td>
@@ -91,7 +91,6 @@ onMounted(async () => {
                                         Status
                                     </div>
                                 </td>
-
                             </tr>
                         </thead>
 
@@ -112,9 +111,10 @@ onMounted(async () => {
 
                                     </div>
                                 </td>
-                                <td class="itbkk-assignees">
+                                <td class="itbkk-assignees" :class="{'italic':task.assignees === ''}" >
                                     <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                                        {{ task.assignees }}
+                                        <span v-if="task.assignees">{{ task.assignees }}</span>
+                                        <span v-else class="text-slate-300">Unassigned</span>
                                     </div>
                                 </td>
                                 <td class="itbkk-status">

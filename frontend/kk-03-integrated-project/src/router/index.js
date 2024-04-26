@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TaskList from '../components/TaskList.vue'
 import NotFound from '../components/NotFound.vue'
 import DetailModal from '@/components/DetailModal.vue'
-import { props } from 'cypress/types/bluebird'
 
 // set history of stor path when visit
 const history = createWebHistory()
@@ -30,10 +29,9 @@ const routes = [
     component : DetailModal
   } ,
   {
-    path:'task/:id', // add params
-    name : 'taskList',
-    component : DetailModal,
-    props : true
+    path : '/task/:id',
+    name : 'TaskDetails',
+    component : DetailModal
   }
 ]
 

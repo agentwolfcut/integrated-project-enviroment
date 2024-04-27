@@ -1,4 +1,13 @@
-FROM openjdk:20
+# Use Maven and OpenJDK 17 to build the application
+FROM maven:3.8.5-openjdk-17 AS build
+WORKDIR /spring-app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package
+
+# Use OpenJDK 17 to run the application
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=build /spring-app/target/*.jar app.jar
 EXPOSE 8080
-ADD target/spring-boot-docker.jar spring-boot-docker.jar
-ENTRYPOINT ["java","-jar","spring-boot-docker.jar"]
+CMD ["java", "-jar", "app.jar"]

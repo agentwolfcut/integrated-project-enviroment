@@ -1,8 +1,7 @@
 # Use Maven and OpenJDK 17 to build the application
 FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /spring-app
-COPY pom.xml .
-COPY src ./src
+COPY . ./spring-app
 RUN mvn clean package
 
 # Use OpenJDK 17 to run the application

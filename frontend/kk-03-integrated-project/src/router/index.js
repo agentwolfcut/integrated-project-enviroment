@@ -27,6 +27,11 @@ const routes = [
   {
     path : '/testModal',
     component : DetailModal
+  } ,
+  {
+    path : '/task/:id',
+    name : 'TaskDetails',
+    component : DetailModal
   }
 ]
 

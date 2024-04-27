@@ -1,14 +1,16 @@
 <script setup>
 
+
+
 </script>
 
 <template>
     <div class="bg-slate-600  h-screen flex justify-center items-center">
-        <div class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
+        <div v-if="task" class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
 
             <!-- head -->
             <div class="itbkk-title font-semibold text-2xl text-black m-4 pb-2 border-b border-slate-600">
-                titletitletitletitle
+                title
             </div>
 
             <!-- center -->

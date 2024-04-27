@@ -8,6 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
+    "cypress:open":"cypress open",
+    "cypress:run":"cypress run",
+    "e2e": "start-server-and-test dev http://localhost:5173 \"cypress open --e2e\"",
+    "e2e:headless": "start-server-and-test dev http://localhost:5173 \"cypress run --e2e\"",
+    
     "backend": "json-server --watch ./data/db.json --port 5000"
   },
   "dependencies": {

@@ -1,21 +1,25 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, provide, ref } from 'vue';
 import { getItems } from '../libs/fetchUtils';
 import { TaskManagement } from '@/libs/TaskManagement';
+import DetailModal from './DetailModal.vue';
 
 // solution 1
 const tasks = ref()
 onMounted(async () => {
     const taskRes = await getItems(
-            'http://localhost:5000/task'
-        )
+        'http://localhost:5000/task'
+    )
     tasks.value = taskRes // reverse and slice to show the most
 })
+
+
 
 </script>
 
 <template>
     <!-- space for html + tailwind -->
+
     <header>
         <div class="px-4 md:px-10 py-4 md:py-7">
             <div class="flex items-center justify-center italic font-bold text-2xl text-slate-900">
@@ -23,6 +27,7 @@ onMounted(async () => {
             </div>
         </div>
     </header>
+
 
     <main>
         <!-- component -->
@@ -83,7 +88,7 @@ onMounted(async () => {
 
                                 <td>
                                     <div class=" font-medium leading-none text-gray-700 mr-2">
-                                        Assignee
+                                        Assignees
                                     </div>
                                 </td>
                                 <td>
@@ -91,7 +96,6 @@ onMounted(async () => {
                                         Status
                                     </div>
                                 </td>
-
                             </tr>
                         </thead>
 
@@ -105,16 +109,22 @@ onMounted(async () => {
                                             {{ task.id }}
                                         </p>
 
+
+
                                         <button
                                             class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
-                                            {{ task.title }}
+                                            <router-link :to="{ name: 'TaskDetails', params: { id: task.id } }">
+                                                {{ task.title }}
+                                            </router-link>
                                         </button>
+
 
                                     </div>
                                 </td>
-                                <td class="itbkk-assignees">
+                                <td class="itbkk-assignees" :class="{ 'italic': task.assignees === '' }">
                                     <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                                        {{ task.assignees }}
+                                        <span v-if="task.assignees">{{ task.assignees }}</span>
+                                        <span v-else class="text-slate-300">Unassigned</span>
                                     </div>
                                 </td>
                                 <td class="itbkk-status">
@@ -133,8 +143,6 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
-
-
     </main>
 
 </template>

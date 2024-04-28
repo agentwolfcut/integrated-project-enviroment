@@ -22,11 +22,14 @@ class TaskManagement {
   }
 
   // map
-  updatetask(id, category, description) {
+  updatetask(id, title, description, assignees, status, createdOn, updatedOn) {
     this.tasks = this.tasks.map((task) => {
       return task.id === id // if id correct
         // destructuring and replace with new
-        ? { ...task, category: category, description: description }
+        ? {
+          ...task, title: title, description: description,
+          assignees: assignees, status: status, createdOn: createdOn, updatedOn: updatedOn
+        }
         : task
     })
   }

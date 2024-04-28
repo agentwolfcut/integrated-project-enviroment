@@ -15,7 +15,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/itb-kk/v1/tasks")
-@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th:8080")
+ // @CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th:8080")
+@CrossOrigin(origins = "http://localhost:5173")
 
 public class TaskController {
     @Autowired

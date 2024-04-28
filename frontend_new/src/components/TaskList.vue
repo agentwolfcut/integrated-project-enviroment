@@ -1,60 +1,22 @@
 <script setup>
-import { onMounted, provide, ref } from 'vue';
-import { getItems } from '../libs/fetchUtils';
-import { TaskManagement } from '@/libs/TaskManagement';
-import DetailModal from './DetailModal.vue';
-import Listing from './Listing.vue';
 
-
-// create object for import class 
-const taskMan = ref(new TaskManagement())
-//console.log(import.meta.env.VITE_BASE_URL);
-
-// solution 1
-//const tasks = ref()
-onMounted(async () => {
-    const taskRes = await getItems(
-        import.meta.env.VITE_BASE_URL
-    )
-    taskMan.value.addtasks(taskRes)
-    //tasks.value = taskRes // reverse and slice to show the most
+defineProps({
+    tasks: {
+        type: Array,
+        require: true
+    }
 })
 
+defineEmits(['showDetail'])
 
-const showDetail = ref(false)
-const editingTask = ref({
-    id: undefined,
-    title: '',
-    description: "",
-    assignees: "",
-    status: "",
-    createdOn: "",
-    updatedOn: ""
-})
-const openModalDetail = (task) => {
-    showDetail.value = true;
-    editingTask.value = task
+const openModalDetail = () => {
+
 }
-
 
 </script>
 
 <template>
-    <!-- space for html + tailwind -->
-
-    <header>
-        <div class="px-4 md:px-10 py-4 md:py-7">
-            <div class="flex items-center justify-center italic font-bold text-2xl text-slate-900">
-                IT-Bangmod Kradan Kanban
-            </div>
-        </div>
-    </header>
-
-    <Listing :tasks="taskMan.gettasks()"/>
-    
-
-    <main>
-        <!-- component -->
+    <div>
         <div class="sm:px-6 w-full ">
             <div class="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
                 <!-- head -->
@@ -94,10 +56,10 @@ const openModalDetail = (task) => {
                         class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
                         <p class="text-sm font-medium leading-none text-white">Add Task</p>
                     </button>
-
                 </div>
 
-                <!-- contents -->
+
+
                 <div class="mt-7 overflow-x-auto ">
                     <table class="w-full whitespace-nowrap rounded-md">
                         <thead class="bg-slate-200 text">
@@ -124,28 +86,29 @@ const openModalDetail = (task) => {
                         </thead>
 
                         <tbody>
-                            <!-- loop -->
-                            <tr v-for="task in taskMan" :key="taskMan.id"
+
+                            <tr v-for="task in tasks" :key="task.id"
                                 class="itbkk-item focus:outline-none h-16 border border-gray-100 rounded ">
                                 <td>
                                     <div class="flex items-center pl-5">
                                         <p class="text-base font-medium leading-none text-gray-700 mr-4">
-                                            {{ taskMan.id }}
+                                            {{ task.id }}
                                         </p>
 
-
-
-                                        <button
-                                            class="text-base font-medium leading-none text-gray-700 mr-2 itbkk-title">
-                                            <router-link :to="{ name: 'TaskDetails', params: { id: taskMan.id } }">
-                                                <button @click="showDetail === true">{{ taskMan.title }}</button>
-                                            </router-link>
+                                        <button class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
+                                            @click="openModalDetail, $emit('showDetail', task.id)">
+                                            {{ task.title }}
                                         </button>
+
+                                        <!-- <router-link :to="{ name: 'TaskDetail', params: { id: task.id } }"
+                                            :props="{ task: $emit('showDetail') }">
+                                            <button @click="$emit('showDetail', task.id)"> {{ task.title }}</button>
+                                        </router-link> -->
 
 
                                     </div>
                                 </td>
-                                <td class="itbkk-assignees" :class="{ 'italic': taskMan.assignees === '' }">
+                                <td class="itbkk-assignees" :class="{ 'italic': task.assignees === '' }">
                                     <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                         <span v-if="task.assignees">{{ task.assignees }}</span>
                                         <span v-else class="text-slate-300">Unassigned</span>
@@ -153,28 +116,23 @@ const openModalDetail = (task) => {
                                 </td>
                                 <td class="itbkk-status">
                                     <div :class="{
-                                        'text-green-500 bg-green-100 ': taskMan.status === 'Done',
-                                        'text-red-500 bg-red-100 ': taskMan.status === 'To Do',
-                                        'text-yellow-600 bg-yellow-100': taskMan.status === 'Doing',
-                                        'bg-slate-200': taskMan.status === ''
+                                        'text-green-500 bg-green-100 ': task.status === 'Done',
+                                        'text-red-500 bg-red-100 ': task.status === 'To Do',
+                                        'text-yellow-600 bg-yellow-100': task.status === 'Doing',
+                                        'bg-slate-200': task.status === ''
                                     }" class="p-3 text-sm  leading-none w-16 rounded-md font-semibold mr-4">
-                                        {{ taskMan.status }}
+                                        {{ task.status }}
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+
             </div>
         </div>
-    </main>
-
-    <detail-modal v-show="showDetail" :tasks="taskMan.gettasks()"  />
-
+    </div>
 </template>
 
-<style>
-.checkbox:checked+.check-icon {
-    display: flex;
-}
-</style>
+<style scoped></style>

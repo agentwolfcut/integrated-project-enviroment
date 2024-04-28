@@ -1,12 +1,30 @@
 <script setup>
+import { computed } from 'vue';
 
+
+const props = defineProps({
+    tasks: {
+        type: Object,
+        default: {
+            id: undefined,
+            title: '',
+            description: "",
+            assignees: "",
+            status: "",
+            createdOn: "",
+            updatedOn: ""
+        }
+    }
+})
+
+const previousTask = computed(() => props.tasks)
 
 
 </script>
 
 <template>
     <div class="bg-slate-600  h-screen flex justify-center items-center">
-        <div v-if="task" class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
+        <div class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
 
             <!-- head -->
             <div class="itbkk-title font-semibold text-2xl text-black m-4 pb-2 border-b border-slate-600">
@@ -70,11 +88,6 @@
                         class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">close</button>
                 </div>
             </div>
-
-
-
-
-
         </div>
     </div>
 </template>

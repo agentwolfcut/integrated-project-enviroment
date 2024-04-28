@@ -5,11 +5,7 @@ import dev.backendintegratedproject.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,4 +28,28 @@ public class TaskController {
         TaskEntity task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
+    // for add  edit delete 
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public TaskEntity addTask(@RequestBody TaskEntity task) {
+//        return taskService.addTask(task);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public TaskEntity editTask(@PathVariable Long id, @RequestBody TaskEntity task) {
+//        return taskService.editTask(id, task);
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteTask(@PathVariable Long id) {
+//        taskService.deleteTask(id);
+//    }
+//
+//    // Exception handler for TaskNotFoundException
+//    @ExceptionHandler(TaskNotFoundException.class)
+//    public ResponseEntity<String> handleTaskNotFound(TaskNotFoundException ex) {
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+//    }
 }
+

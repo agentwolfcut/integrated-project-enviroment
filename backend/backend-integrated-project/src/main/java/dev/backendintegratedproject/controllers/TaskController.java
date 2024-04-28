@@ -28,7 +28,7 @@ public class TaskController {
         TaskEntity task = taskService.getTaskById(id);
         return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
-    // for add  edit delete 
+    // for add  edit delete
 //    @PostMapping
 //    @ResponseStatus(HttpStatus.CREATED)
 //    public TaskEntity addTask(@RequestBody TaskEntity task) {

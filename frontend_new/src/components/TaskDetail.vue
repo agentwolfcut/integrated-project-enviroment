@@ -141,12 +141,20 @@ return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
 </template>
 
 <style scoped>
+.itbkk-title {
+    overflow-wrap: break-word;
+    word-wrap: break-word; 
+    word-break: break-word;
+}
 .itbkk-assignees {
     background-color: #edf2f7;
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
     margin-bottom: 10px;
     /* เพิ่มระยะห่างด้านล่าง */
+    overflow-wrap: break-word;
+    word-wrap: break-word; 
+    word-break: break-word;
 }
 
 /* เพิ่มสีพื้นหลังและสีตัวอักษรให้กับ status เพื่อให้ดูเด่น */
@@ -163,6 +171,9 @@ return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
     /* เพิ่มเส้นขอบสีเทาให้กับ description */
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+    overflow-wrap: break-word;
+    word-wrap: break-word; 
+    word-break: break-word;
 }
 
 .itbkk-timezone,
@@ -171,6 +182,9 @@ return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
     background-color: #edf2f7;
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+    overflow-wrap: break-word;
+    word-wrap: break-word; 
+    word-break: break-word;
 }
 
 .itbkk-button {

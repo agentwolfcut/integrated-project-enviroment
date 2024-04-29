@@ -25,9 +25,12 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer id) {
+    public ResponseEntity<?> getTaskById(@PathVariable Integer id) {
         TaskEntity task = taskService.getTaskById(id);
-        return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(task);
     }
     // for add  edit delete
 //    @PostMapping

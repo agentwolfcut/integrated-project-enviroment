@@ -140,4 +140,60 @@ return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.itbkk-assignees {
+    background-color: #edf2f7;
+    padding: 10px;
+    /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+    margin-bottom: 10px;
+    /* เพิ่มระยะห่างด้านล่าง */
+}
+
+/* เพิ่มสีพื้นหลังและสีตัวอักษรให้กับ status เพื่อให้ดูเด่น */
+.itbkk-status {
+    background-color: #edf2f7;
+    padding: 10px;
+    /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+    margin-top: 10px;
+    /* เพิ่มระยะห่างด้านบน */
+}
+
+.itbkk-description {
+    border: 2px solid #4a5568;
+    /* เพิ่มเส้นขอบสีเทาให้กับ description */
+    padding: 10px;
+    /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+}
+
+.itbkk-timezone,
+.itbkk-created-on,
+.itbkk-updated-on {
+    background-color: #edf2f7;
+    padding: 10px;
+    /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
+}
+
+.itbkk-button {
+    padding: 10px 20px;
+    /* ปรับขนาดของปุ่ม */
+    border: 1px solid #4a5568;
+    /* เพิ่มเส้นขอบสีเทาให้กับปุ่ม */
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    /* จัดวางปุ่มไปทางด้านสองข้างของพื้นที่ */
+    margin-top: 20px;
+    /* เพิ่มระยะห่างด้านบนระหว่างปุ่มกับส่วนข้างบน */
+}
+
+.buttons>button {
+    flex-grow: 0;
+    /* ปรับให้ปุ่มไม่ขยายตัว */
+    margin: 0 5px;
+    /* เพิ่มระยะห่างด้านซ้ายและขวาของปุ่ม */
+    width: calc(50% - 5px);
+    /* กำหนดขนาดของปุ่มให้เท่ากับครึ่งของพื้นที่ของ container และลบระยะห่าง */
+}
+</style>

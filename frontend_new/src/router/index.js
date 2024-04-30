@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import FirstPage from '@/components/FirstPage.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
 import AddTask from '@/components/AddTask.vue'
+import NotFoundId from '@/views/NotFoundId.vue'
 // set history of stor path when visit
 const history = createWebHistory()
 
@@ -20,17 +21,10 @@ const routes = [
   {
     path: '/task/:id',
     name: 'TaskDetail',
-    component: TaskDetail,
-    redirect: '/task',
-    // beforeEnter: (to, from, next) => {
-    //   const id = to.params.id;
-    //   if (id === '100') {
-    //     next('/task');
-    //   } else {
-    //     next();
-    //   }
-    // },
+    component: NotFoundId,
+    
   },
+
   { path: '/task/add', component: AddTask }
 ]
 const router = createRouter({

@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
 
 defineProps({
     tasks: {
@@ -9,9 +11,6 @@ defineProps({
 
 defineEmits(['showDetail', 'showAdd'])
 
-const openModalDetail = () => {
-
-}
 
 </script>
 
@@ -54,8 +53,19 @@ const openModalDetail = () => {
                     <!-- button -->
                     <button @click="$emit('showAdd')"
                         class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
-                        <p class="text-sm font-medium leading-none text-white">Add Task</p>
+                        <p class="text-sm font-medium leading-none text-white">Add Task modal</p>
                     </button>
+
+                    <router-link to="/task/add">
+                        <button @closeModal="close()">
+                            <div class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex
+                        items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none
+                        rounded">
+                                <p class="text-sm font-medium leading-none text-white">Add Task link</p>
+                            </div>
+                        </button>
+                    </router-link>
+
                 </div>
 
 

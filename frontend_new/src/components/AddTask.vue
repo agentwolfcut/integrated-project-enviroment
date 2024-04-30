@@ -1,8 +1,28 @@
 <script setup>
-import Close from '../assets/icons/LineMdCloseSmall.vue'
+import { ref } from 'vue'
 
-defineEmits(['saveModal', 'closeModal'])
+defineEmits(['saveModal' , 'addTask'])
 
+const props = defineProps({
+    task: {
+        type: Object,
+        default: {
+            id: undefined,
+            title: '',
+            description: "",
+            assignees: "",
+            status: "No Status",
+        },
+        require : true
+    },
+})
+
+const tasks = ref({ ...props.task })
+const save = () => {
+    const tmp = {...tasks.value}
+    tasks.value = {...props.task}
+    emit('addTask' , tmp)
+}
 
 </script>
 
@@ -30,11 +50,12 @@ defineEmits(['saveModal', 'closeModal'])
 
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="$emit('saveModal', false)"
+                        <button @click="save"
                             class="itbkk-button-confirm font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
                             ok
                         </button>
-                        <button @click="$emit('closeModal', false)"
+
+                        <button @click="$router.go(-1)"
                             class="itbkk-button-cancel font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             close
                         </button>

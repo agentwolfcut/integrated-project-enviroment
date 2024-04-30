@@ -9,15 +9,13 @@ class TaskManagement {
     )
   }
   // push
-  addtask(id, title, description, assignees, status, createdOn, updatedOn) {
+  addtask(id, title, description, assignees, status) {
     this.tasks.push({
       id: id,
       title: title,
       description: description,
       assignees: assignees,
-      status: status,
-      createdOn: createdOn,
-      updatedOn: updatedOn
+      status: status
     })
   }
 

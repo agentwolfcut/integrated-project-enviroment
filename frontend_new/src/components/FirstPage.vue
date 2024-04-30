@@ -46,38 +46,37 @@ const openDetails = async (id) => {
 }
 
 // UPDATE
-// const complete = async (newTask) => {
-//     // back
-//     if (newTask.id === undefined) {
-//         const addedTask = await addItem(import.meta.env.VITE_BASE_URL, {
-//             status: newTask.status
-//             // other that will add
-//         })
-//         console.log(addedTask);
-//         // front
-//         taskMan.value.addtask(newTask.id, newTask.title, newTask.description,
-//             newTask.assignees, newTask.status, newTask.createdOn, newTask.updatedOn)
+const addTasks = async (newTask) => {
+    // back
+    if (newTask.id === undefined) {
+        const addedTask = await addItem(import.meta.env.VITE_BASE_URL, {
+            status: newTask.status
+            // other that will add
+        })
+        console.log(addedTask);
+        // front
+        taskMan.value.addtask(newTask.id, newTask.title, newTask.description,
+            newTask.assignees, newTask.status)
 
-//     } else {
-//         // backend put (replace with new)
-//         const editTask = await editItem(import.meta.env.VITE_BASE_URL, newTask.id, newTask)
-//         // front
-//         taskMan.value.updatetask(newTask.id, newTask.title, newTask.description,
-//             newTask.assignees, newTask.status, newTask.createdOn, newTask.updatedOn)
-//     }
-
-//     // finish operation then clear value to old
-//     showModal.value = false // close after click
-//     selectTask.value = {
-//         id: undefined,
-//         title: '',
-//         description: "",
-//         assignees: "",
-//         status: "",
-//         createdOn: "",
-//         updatedOn: ""
-//     }
-// }
+    } else {
+        // backend put (replace with new)
+        const editTask = await editItem(import.meta.env.VITE_BASE_URL, newTask.id, newTask)
+        // front
+        taskMan.value.updatetask(newTask.id, newTask.title, newTask.description,
+            newTask.assignees, newTask.status, newTask.createdOn, newTask.updatedOn)
+    }
+    // finish operation then clear value to old
+    showModal.value = false // close after click
+    selectTask.value = {
+        id: undefined,
+        title: '',
+        description: "",
+        assignees: "",
+        status: "",
+        createdOn: "",
+        updatedOn: ""
+    }
+}
 
 const complete = (flag) => {
     showModal.value = flag
@@ -88,13 +87,9 @@ const cancel = (flag) => {
     openModalAdd.value = flag
 }
 
-
-// const openModalToEdit = (task) => {
-//     showModal.value = true
-//     selectTask.value = task
-// }
-
 const openModalAdd = ref(false)
+
+
 
 </script>
 
@@ -121,7 +116,7 @@ const openModalAdd = ref(false)
     <RouterLink to="/task/add">
         <Teleport to="#addTask">
             <div v-show="openModalAdd">
-                <AddTask @closeModal="cancel" />
+                <AddTask @addTask=addTasks />
             </div>
         </Teleport>
     </RouterLink>

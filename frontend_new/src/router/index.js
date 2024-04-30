@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import FirstPage from '@/components/FirstPage.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
+import AddTask from '@/components/AddTask.vue'
 // set history of stor path when visit
 const history = createWebHistory()
 
@@ -30,7 +31,7 @@ const routes = [
     //   }
     // },
   },
-
+  { path: '/task/add', component: AddTask }
 ]
 const router = createRouter({
   history,

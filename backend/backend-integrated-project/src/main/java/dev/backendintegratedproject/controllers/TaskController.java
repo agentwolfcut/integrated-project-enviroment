@@ -11,8 +11,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/itb-kk/v1/tasks")
- // @CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th:8080")
-@CrossOrigin(origins = "http://localhost:5173")
+ @CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
+//@CrossOrigin(origins = "http://localhost:5173")
 
 public class TaskController {
     @Autowired
@@ -25,12 +25,9 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById(@PathVariable Integer id) {
+    public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer id) {
         TaskEntity task = taskService.getTaskById(id);
-        if (task == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(task);
+        return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
     // for add  edit delete
 //    @PostMapping

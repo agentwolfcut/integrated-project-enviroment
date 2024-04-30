@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  database:
+    image: 'mysql:latest'
+    container_name: database
+    restart: always
+    ports:
+      - '3307:3306'
+    networks:
+      - backend_net
+    environment:
+      MYSQL_DATABASE: taskBoard
+      MYSQL_USER: gpm
+      MYSQL_PASSWORD: gpm@password
+      MYSQL_ROOT_PASSWORD: gpm
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/my.cnf:/etc/my.cnf
+  backend:
+    build: ./backend/backend-integrated-project/
+    container_name: backend
+    ports:
+      - '8080:8080'
+    restart: always
+    networks:
+      - backend_net
+      - frontend_net
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=taskBoard
+      - DB_USER=gpm
+      - DB_PASS=gpm@password
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - 80:80
+    networks:
+      - frontend_net
+    depends_on:
+      - backend
+
+networks:
+  backend_net:
+  frontend_net:
+

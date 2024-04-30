@@ -19,7 +19,7 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./database/my.cnf:/etc/my.cnf
   backend:
-    build: ./backend/backend-integrated-project/
+    build: ./backend
     container_name: backend
     ports:
       - '8080:8080'

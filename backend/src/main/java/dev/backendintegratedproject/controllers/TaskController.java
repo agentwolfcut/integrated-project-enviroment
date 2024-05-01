@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -27,30 +28,37 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer id) {
         TaskEntity task = taskService.getTaskById(id);
-        return new ResponseEntity<>(task, task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+        HttpStatus status = task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+        return new ResponseEntity<>(task, status);
     }
-    // for add  edit delete
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public TaskEntity addTask(@RequestBody TaskEntity task) {
-//        return taskService.addTask(task);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public TaskEntity editTask(@PathVariable Long id, @RequestBody TaskEntity task) {
-//        return taskService.editTask(id, task);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void deleteTask(@PathVariable Long id) {
-//        taskService.deleteTask(id);
-//    }
-//
-//    // Exception handler for TaskNotFoundException
-//    @ExceptionHandler(TaskNotFoundException.class)
-//    public ResponseEntity<String> handleTaskNotFound(TaskNotFoundException ex) {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-//    }
+    // Endpoint to add a task
+    @PostMapping("/add")
+    public ResponseEntity<TaskEntity> addTask(@RequestBody TaskEntity task) {
+        TaskEntity addedTask = taskService.addTask(task);
+        return new ResponseEntity<>(addedTask, HttpStatus.CREATED);
+    }
+
+    // Endpoint to delete a task by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
+        try {
+            taskService.deleteTask(id);
+            return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);
+        } catch (HttpClientErrorException.NotFound e) {
+            return new ResponseEntity<>("An error has occurred, the task does not exist", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    // Endpoint to edit a task by ID
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskEntity> editTask(@PathVariable Integer id, @RequestBody TaskEntity task) {
+        TaskEntity editedTask = taskService.editTask(id, task);
+        if (editedTask != null) {
+            return new ResponseEntity<>(editedTask, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
 

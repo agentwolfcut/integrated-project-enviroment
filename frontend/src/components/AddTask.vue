@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 
-defineEmits(['saveModal' , 'addTask'])
 
 const props = defineProps({
     task: {
@@ -18,11 +17,7 @@ const props = defineProps({
 })
 
 const tasks = ref({ ...props.task })
-const save = () => {
-    const tmp = {...tasks.value}
-    tasks.value = {...props.task}
-    emit('addTask' , tmp)
-}
+
 
 </script>
 
@@ -50,7 +45,7 @@ const save = () => {
 
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="save"
+                        <button
                             class="itbkk-button-confirm font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
                             ok
                         </button>

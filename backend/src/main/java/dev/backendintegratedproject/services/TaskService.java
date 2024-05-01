@@ -3,7 +3,9 @@ package dev.backendintegratedproject.services;
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Date;
 import java.util.List;
@@ -20,35 +22,30 @@ public class TaskService {
     public List<TaskEntity> getAllTasks() {
         return taskRepository.findAll();
     }
+    public TaskEntity addTask(TaskEntity task) {
+        task.setCreatedOn(new Date());
+        task.setUpdatedOn(new Date());
+        return taskRepository.save(task);
+    }
 
-    //public TaskEntity getTaskById(Long id) {
-    //        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-    //    }
+    public void deleteTask(Integer id) {
+        TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
+        taskRepository.delete(task);
+    }
 
-    //for add update delete
-//    public TaskEntity createTask(TaskEntity task) {
-//        task.setCreatedOn(new Date());
-//        task.setUpdatedOn(new Date());
-//        return taskRepository.save(task);
-//    }
-//
-//    public TaskEntity updateTask(Long id, TaskEntity updatedTask) {
-//        return taskRepository.findById(id)
-//                .map(task -> {
-//                    task.setTitle(updatedTask.getTitle());
-//                    task.setDescription(updatedTask.getDescription());
-//                    task.setAssignedTo(updatedTask.getAssignedTo());
-//                    task.setStatus(updatedTask.getStatus());
-//                    task.setUpdatedOn(new Date());
-//                    return taskRepository.save(task);
-//                })
-//                .orElseThrow(() -> new TaskNotFoundException(id));
-//    }
-//
-//    public void deleteTask(Long id) {
-//        if (!taskRepository.existsById(id)) {
-//            throw new TaskNotFoundException(id);
-//        }
-//        taskRepository.deleteById(id);
-//    }
+    public TaskEntity editTask(Integer id, TaskEntity task) {
+        TaskEntity existingTask = taskRepository.findById(id).orElse(null);
+        if (existingTask != null) {
+            // Update existing task's fields except for createdOn and updatedOn
+            existingTask.setTitle(task.getTitle());
+            existingTask.setDescription(task.getDescription());
+            existingTask.setAssignees(task.getAssignees());
+            existingTask.setStatus(task.getStatus());
+            existingTask.setUpdatedOn(new Date());
+            return taskRepository.save(existingTask);
+        }
+        return null; // Or throw an exception if required
+    }
+
 }

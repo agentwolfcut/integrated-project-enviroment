@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted, ref, toRaw } from 'vue';
-import { addItem, editItem, getItemById, getItems } from '../libs/fetchUtils';
+import { addItem, editItem, getItemById, getItems, deleteItemById } from '../libs/fetchUtils';
 import { TaskManagement } from '@/libs/TaskManagement';
 import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
-import { RouterLink, useRouter } from 'vue-router';
-import AddTask from './AddTask.vue';
+import Delete from '../components/Delete.vue';
+
 
 
 
@@ -84,11 +84,21 @@ const complete = (flag) => {
 
 const cancel = (flag) => {
     showModal.value = flag
-    openModalAdd.value = flag
 }
 
 
-
+const removeIdC = ref('')
+const deleteIdConfirm = (removeId) => {
+    removeIdC.value = removeId
+}
+const deleteTask = async (removeId) => {
+    removeId = removeIdC.value
+    const status = await deleteItemById(
+        import.meta.env.VITE_BASE_URL, removeId
+    )
+    taskMan.value.removetask(removeId)
+    
+}
 
 
 </script>
@@ -102,15 +112,16 @@ const cancel = (flag) => {
         </div>
     </header>
 
-    <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails"  />
+    <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
+        @deleteConfirm="deleteTask" />
 
     <!-- add task -->
     <Teleport to="#ViewTask">
         <div v-show="showModal">
-            <!-- <AddTask v-if="showAddModal" /> -->
             <TaskDetail :task='selectTask' @saveModal='complete' @close-modal="cancel" />
         </div>
     </Teleport>
+
 
 </template>
 

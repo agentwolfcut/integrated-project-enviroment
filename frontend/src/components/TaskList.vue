@@ -1,6 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
-
+import Trash from '@/assets/icons/CiTrashFull.vue';
+import Edit from '@/assets/icons/CiEditPencil01.vue'
+import { ref } from 'vue';
+import Delete from '../components/Delete.vue';
 
 defineProps({
     tasks: {
@@ -9,8 +12,13 @@ defineProps({
     }
 })
 
-defineEmits(['showDetail', 'showAdd'])
+const emits = defineEmits(['showDetail', 'deleteTask', 'deleteC' , 'deleteConfirm'])
 
+const showDeleteModal = ref(false)
+
+const cancelDelete = () => {
+    showDeleteModal.value = false
+}
 
 </script>
 
@@ -51,23 +59,18 @@ defineEmits(['showDetail', 'showAdd'])
                     </div>
 
                     <!-- button -->
-                    <button @click="$emit('showAdd')"
-                        class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
-                        <p class="text-sm font-medium leading-none text-white">Add Task modal</p>
-                    </button>
 
                     <router-link to="/task/add">
                         <button @closeModal="close()">
                             <div class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex
                         items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none
                         rounded">
-                                <p class="text-sm font-medium leading-none text-white">Add Task link</p>
+                                <p class="text-sm font-medium leading-none text-white">Add Task</p>
                             </div>
                         </button>
                     </router-link>
 
                 </div>
-
 
 
                 <div class="mt-7 overflow-x-auto ">
@@ -92,18 +95,23 @@ defineEmits(['showDetail', 'showAdd'])
                                         Status
                                     </div>
                                 </td>
+                                <td>
+
+                                </td>
                             </tr>
                         </thead>
 
                         <tbody>
-
                             <tr v-for="task in tasks" :key="task.id"
                                 class="itbkk-item focus:outline-none h-16 border border-gray-100 rounded ">
                                 <td>
                                     <div class="flex items-center pl-5">
-                                        <p class="text-base font-medium leading-none text-gray-700 mr-4">
-                                            {{ task.id }}
-                                        </p>
+                                        <div class="flex flex-row justify-start">
+                                            <p class="text-base font-medium leading-none text-gray-700 mr-4">
+                                                {{ task.id }}
+                                            </p>
+
+                                        </div>
 
                                         <button
                                             class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
@@ -111,36 +119,63 @@ defineEmits(['showDetail', 'showAdd'])
                                             {{ task.title }}
                                         </button>
 
-                                        <!-- <router-link :to="{ name: 'TaskDetail', params: { id: task.id } }"
-                                            :props="{ task: $emit('showDetail') }">
-                                            <button @click="$emit('showDetail', task.id)"> {{ task.title }}</button>
-                                        </router-link> -->
-
-
                                     </div>
                                 </td>
+
                                 <td class="itbkk-assignees" :class="{ 'italic': task.assignees === '' }">
                                     <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                         <span v-if="task.assignees">{{ task.assignees }}</span>
                                         <span v-else class="text-slate-300">Unassigned</span>
                                     </div>
                                 </td>
+
                                 <td class="itbkk-status">
                                     <div :class="{
                                         'text-green-500 bg-green-100 ': task.status === 'Done',
                                         'text-red-500 bg-red-100 ': task.status === 'To Do',
                                         'text-yellow-600 bg-yellow-100': task.status === 'Doing',
-                                        'bg-slate-200': task.status === ''
+                                        'text-slate-700 bg-slate-300 w-20': task.status === 'No Status'
                                     }" class="p-3 text-sm  leading-none w-16 rounded-md font-semibold mr-4">
                                         {{ task.status }}
                                     </div>
+                                </td>
+
+                                <td>
+                                    <button class="pr-2">
+                                        <Edit />
+                                    </button>
+                                    <button class="pr-1" @click="showDeleteModal = true, $emit('deleteC', task.id)">
+                                        <Trash />
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <div v-if="showDeleteModal">
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+            <div class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
+                <p class="mb-4 text-base font-medium">
+                    Are you sure , you want to <span
+                        class="text-base font-semibold italic text-red-600 px-3">delete</span>
+                    this task?
+                </p>
 
+                <div class="flex justify-end">
+                    <button @click="cancelDelete"
+                        class="transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
+                        Cancel
+                    </button>
+
+                    <button @click="$emit('deleteConfirm') , showDeleteModal=false"
+                        class="transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Delete
+                    </button>
+                </div>
             </div>
         </div>
     </div>

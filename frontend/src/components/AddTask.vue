@@ -18,78 +18,67 @@ const props = defineProps({
 
 const tasks = ref({ ...props.task })
 
-
 </script>
 
 <template>
 
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
-            class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
+            class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
 
             <div class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
                 <!-- head -->
+                <p class="font-bold text-3xl text-black flex justify-center m-3">Add Task</p>
 
-                <div class="itbkk-title font-semibold text-2xl text-black m-4 pb-2 border-b border-slate-600">
-                </div>
+                <input
+                    class="itbkk-title bg-slate-100 w-10/12 flex font-semibold text-xl text-black m-4 p-2 rounded-md border-slate-600"
+                    type="text">
+
+                </input>
                 <!-- center -->
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
-                        <div class="text-base  rounded-md py-1 w-6/6 h-12/12" type="text">
+                        <input class="text-base  rounded-md py-1 h-16 w-10/12 " type="text">
 
-                        </div>
-                      
+                        </input>
+
                     </div>
                     <div class="flex flex-col w-5/12">
-
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <div  class="text-base  rounded-md  w-6/6 border p-1 ">
+                                <input class="text-base  rounded-md border p-1 ">
 
-                                </div>
-                               
+                                </input>
+
                             </div>
                             <div class="itbkk-status">
-                                <p class="font-medium text-base">status</p>
-                                <div class="text-base  rounded-md  w-6/6 border p-1">
-                                </div>
+                                <form class="max-w-sm mx-auto">
+                                    <label for="status" class="block mb-2 text-base font-medium text-gray-900">
+                                        Status</label>
+                                    <select id="status"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                        <option selected>No Status</option>                                        
+                                        <option value="td">To Do</option>
+                                        <option value="do">Doing</option>
+                                        <option value="dn">Done</option>
+                                    </select>
+                                </form>
                             </div>
                         </div>
-                        <div class="flex flex-col mt-20 gap-1">
-                            <div class="itbkk-timezone flex flex-row items-center gap-3">
-                                <p class="font-medium text-base">timezone</p>
-                                <div class="text-sm  rounded-md  w-6/6 border px-1">
-
-                                </div>
-                            </div>
-
-                            <div class="itbkk-created-on flex flex-row items-center gap-3">
-                                <p class="font-medium text-base">created-on</p>
-                                <div class="text-sm  rounded-md  w-6/6 border px-1">
-                                </div>
-                            </div>
-
-                            <div class="itbkk-updated-on flex flex-row items-center gap-3">
-                                <p class="font-medium text-base">updated-on</p>
-                                <div class="text-sm  rounded-md  w-6/6 border px-1">
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        
                         <button class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
-                            ok
+                            save
                         </button>
-                        <button @click="$router.go(-1)" class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
-                            close
+                        <button @click="$router.go(-1)"
+                            class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
+                            cancel
                         </button>
                     </div>
                 </div>

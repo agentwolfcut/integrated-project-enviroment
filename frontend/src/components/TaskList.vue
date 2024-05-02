@@ -12,7 +12,7 @@ defineProps({
     }
 })
 
-const emits = defineEmits(['showDetail', 'deleteTask', 'deleteC' , 'deleteConfirm'])
+const emits = defineEmits(['showDetail', 'deleteTask', 'deleteC', 'deleteConfirm'])
 
 const showDeleteModal = ref(false)
 
@@ -61,7 +61,7 @@ const cancelDelete = () => {
                     <!-- button -->
 
                     <router-link to="/task/add">
-                        <button @closeModal="close()">
+                        <button >
                             <div class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex
                         items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none
                         rounded">
@@ -171,7 +171,7 @@ const cancelDelete = () => {
                         Cancel
                     </button>
 
-                    <button @click="$emit('deleteConfirm') , showDeleteModal=false"
+                    <button @click="$emit('deleteConfirm'), showDeleteModal = false"
                         class="transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                         Delete
                     </button>

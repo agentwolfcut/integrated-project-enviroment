@@ -1,12 +1,15 @@
 package dev.backendintegratedproject.controllers;
 
+import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.services.TaskService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,18 +21,20 @@ import java.util.List;
 public class TaskController {
     @Autowired
     private TaskService taskService;
-
+    @Autowired
+    private ModelMapper modelMapper;
     @GetMapping
     public ResponseEntity<List<TaskEntity>> getTasks() {
         List<TaskEntity> tasks = taskService.getAllTasks();
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskEntity> getTaskById(@PathVariable Integer id) {
-        TaskEntity task = taskService.getTaskById(id);
-        HttpStatus status = task == null ? HttpStatus.NOT_FOUND : HttpStatus.OK;
-        return new ResponseEntity<>(task, status);
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Integer taskId) {
+        TaskEntity task = taskService.getTaskById(taskId);
+        if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", taskId));
+        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
+        return new ResponseEntity<>(taskDto, HttpStatus.OK);
     }
     // Endpoint to add a task
     @PostMapping("/add")

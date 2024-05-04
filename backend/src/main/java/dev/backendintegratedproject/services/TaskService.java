@@ -22,10 +22,10 @@ public class TaskService {
     public List<TaskEntity> getAllTasks() {
         return taskRepository.findAll();
     }
-    public void addTask(TaskEntity task) {
+    public TaskEntity addTask(TaskEntity task) {
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
-        taskRepository.save(task);
+        return taskRepository.save(task);
     }
 
     public void deleteTask(Integer id) {

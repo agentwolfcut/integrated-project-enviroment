@@ -36,6 +36,8 @@ const saveTask = async () => {
         }
 
         const addedTask = await res.json();
+        // อันนี้return 201
+        console.log(res.status);
         // Reset task fields
         previousTask.value = {
             title: '',

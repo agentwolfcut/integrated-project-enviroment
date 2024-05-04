@@ -25,7 +25,8 @@ public class TaskService {
     public TaskEntity addTask(TaskEntity task) {
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
-        return taskRepository.save(task);
+        TaskEntity addedTask = taskRepository.save(task);
+        return addedTask;
     }
 
     public void deleteTask(Integer id) {

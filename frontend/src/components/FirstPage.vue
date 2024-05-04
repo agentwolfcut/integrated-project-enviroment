@@ -4,10 +4,7 @@ import { addItem, editItem, getItemById, getItems, deleteItemById } from '../lib
 import { TaskManagement } from '@/libs/TaskManagement';
 import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
-import AddTask from './AddTask2.vue'
-
-
-
+import Delete from './Delete.vue'
 
 const taskMan = ref(new TaskManagement())
 
@@ -33,9 +30,7 @@ const selectTask = ref({
     updatedOn: ""
 })
 
-// const router = useRouter();
 
-// READ
 const openDetails = async (id) => {
     //console.log(id);
     const item = await getItemById(
@@ -77,8 +72,7 @@ const deleteTask = async (removeId) => {
     </header>
 
     <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-        @deleteConfirm="deleteTask" />
-
+        @deleteConfirm="deleteTask"/>
 
     <!-- add task -->
     <Teleport to="#ViewTask">
@@ -87,8 +81,7 @@ const deleteTask = async (removeId) => {
         </div>
     </Teleport>
 
-
-
+  
 </template>
 
 <style scoped></style>

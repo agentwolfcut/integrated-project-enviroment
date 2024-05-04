@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import Trash from '@/assets/icons/CiTrashFull.vue';
 import Edit from '@/assets/icons/CiEditPencil01.vue'
 import { ref } from 'vue';
-import Delete from '../components/Delete.vue';
+import Alert from '@/components/Alert.vue'
 
 defineProps({
     tasks: {
@@ -19,6 +19,14 @@ const showDeleteModal = ref(false)
 const cancelDelete = () => {
     showDeleteModal.value = false
 }
+
+const showAlert = ref(false)
+const handleTaskAdded = (statusCode) => {
+    showAlert.value = true
+    console.log('Task added with status code:', statusCode);
+}
+
+const taskToDelete = ref(undefined)
 
 </script>
 
@@ -61,7 +69,7 @@ const cancelDelete = () => {
                     <!-- button -->
 
 
-                    <router-link to="/task/add">
+                    <router-link to="/task/add" @taskAdded="handleTaskAdded">
                         <button>
                             <div class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex
                         items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none
@@ -70,11 +78,7 @@ const cancelDelete = () => {
                             </div>
                         </button>
                     </router-link>
-
-
-
                 </div>
-
 
                 <div class="mt-7 overflow-x-auto ">
                     <table class="w-full whitespace-nowrap rounded-md">
@@ -147,7 +151,7 @@ const cancelDelete = () => {
                                     <button class="pr-2">
                                         <Edit />
                                     </button>
-                                    <button class="pr-1" @click="showDeleteModal = true, $emit('deleteC', task.id)">
+                                    <button class="pr-1" @click="showDeleteModal = true, taskToDelete=task , $emit('deleteC', task.id)">
                                         <Trash />
                                     </button>
                                 </td>
@@ -163,9 +167,11 @@ const cancelDelete = () => {
         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
             <div class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
                 <p class="mb-4 text-base font-medium">
-                    Are you sure , you want to <span
-                        class="text-base font-semibold italic text-red-600 px-3">delete</span>
-                    this task?
+                    Are you sure , you want to delete
+                    <span class="text-base font-semibold italic text-red-600 px-3">
+                        {{ taskToDelete.title }}
+                    </span>
+                    task?
                 </p>
 
                 <div class="flex justify-end">
@@ -182,6 +188,11 @@ const cancelDelete = () => {
             </div>
         </div>
     </div>
+
+    <Teleport to="#showAlert">
+        <Alert v-show="showAlert" />
+    </Teleport>
+
 </template>
 
 <style scoped></style>

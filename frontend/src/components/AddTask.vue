@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { addItem } from '../libs/fetchUtils';
-import { TaskManagement } from '@/libs/TaskManagement';
 import router from '@/router';
+
+const emit = defineEmits(['taskAdded']); // Define the custom event
 
 const props = defineProps({
     task: {
@@ -18,45 +18,43 @@ const props = defineProps({
     },
 })
 
-let previousTask = ref({...props.task })
+let previousTask = ref({ ...props.task })
 // const previousTask = ref(props.task)
 
-//const taskMan = ref(new TaskManagement())
+const saveTask = async () => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(previousTask.value)
+        });
 
-const saveTask = async (newTask) => {
-    newTask = previousTask.value
-    const addedTask = await addItem(`${import.meta.env.VITE_BASE_URL}/add`, {
-        title: newTask.title,
-        description: newTask.description,
-        assignees: newTask.assignees,
-        status: newTask.status
-    })
-    router.back()
-    previousTask.value = {
-        id: undefined,
-        title: '',
-        description: "",
-        assignees: "",
-        status: "No Status"
-    }
+        if (!res.ok) {
+            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+        }
+
+        const addedTask = await res.json();
+        // Reset task fields
+        previousTask.value = {
+            title: '',
+            description: '',
+            assignees: '',
+            status: 'No Status'
+        };
+        router.back();
+    }    // Navigate back
+    catch (error) {
+        console.error('Error adding task:', error);
+        // Handle error as needed
+    };
 }
 
 
-const saveTasks = async (newTask) => {
-  try {
-    const response = await addItem(newTask);
-    if (response.status === 201) {
-      alert("The task has been successfully added");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 </script>
-
 <template>
-
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
@@ -95,10 +93,10 @@ const saveTasks = async (newTask) => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option selected>No Status</option>
-                                        <option value="td">To Do</option>
-                                        <option value="do">Doing</option>
-                                        <option value="dn">Done</option>
+                                        <option value="No Status" selected>No Status</option>
+                                        <option value="To Do">To Do</option>
+                                        <option value="Doing">Doing</option>
+                                        <option value="Done">Done</option>
                                     </select>
                                 </form>
                             </div>
@@ -109,7 +107,8 @@ const saveTasks = async (newTask) => {
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="saveTask"
+                        <button @click="saveTask" :disabled="!previousTask.title"
+                            :class="{ 'opacity-50 cursor-not-allowed bg-slate-600 text-slate-900': !previousTask.title }"
                             class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
                             save
                         </button>

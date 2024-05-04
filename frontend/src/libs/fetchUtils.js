@@ -21,7 +21,8 @@ async function getItemById(url, id) {
 }
 
 async function deleteItemById(url, id) {
-  console.log(`${url}/${id}`)
+  //console.log(`${url}/${id}`)
+
   try {
     const res = await fetch(`${url}/${id}`, {
       method: 'DELETE'

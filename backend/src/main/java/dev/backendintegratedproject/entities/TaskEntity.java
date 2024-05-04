@@ -14,7 +14,7 @@ import java.util.Date;
 public class TaskEntity {
     @Id
     @Column(name = "taskID")
-    private Integer id;
+    private int id;
 
     @Column(name = "taskTitle", length = 100, nullable = false)
     private String title;

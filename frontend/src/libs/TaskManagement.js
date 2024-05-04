@@ -4,8 +4,15 @@ class TaskManagement {
   }
   addtasks(newtasks) {
     newtasks.forEach((newtask) =>
-      this.addtask(newtask.id, newtask.title, newtask.description,
-        newtask.assignees, newtask.status, newtask.createdOn, newtask.updatedOn)
+      this.addtask(
+        newtask.id,
+        newtask.title,
+        newtask.description,
+        newtask.assignees,
+        newtask.status,
+        newtask.createdOn,
+        newtask.updatedOn
+      )
     )
   }
   // push
@@ -15,7 +22,7 @@ class TaskManagement {
       title: title,
       description: description,
       assignees: assignees,
-      status: status
+      status: status,
     })
   }
 
@@ -23,11 +30,16 @@ class TaskManagement {
   updatetask(id, title, description, assignees, status, createdOn, updatedOn) {
     this.tasks = this.tasks.map((task) => {
       return task.id === id // if id correct
-        // destructuring and replace with new
-        ? {
-          ...task, title: title, description: description,
-          assignees: assignees, status: status, createdOn: createdOn, updatedOn: updatedOn
-        }
+        ? // destructuring and replace with new
+          {
+            ...task,
+            title: title,
+            description: description,
+            assignees: assignees,
+            status: status,
+            createdOn: createdOn,
+            updatedOn: updatedOn,
+          }
         : task
     })
   }

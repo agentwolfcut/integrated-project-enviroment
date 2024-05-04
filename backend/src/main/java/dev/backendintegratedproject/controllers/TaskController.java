@@ -38,9 +38,10 @@ public class TaskController {
     }
     // Endpoint to add a task
     @PostMapping("/add")
-    public ResponseEntity<TaskEntity> addTask(@RequestBody TaskEntity task) {
+    public ResponseEntity<TaskDTO> addTask(@RequestBody TaskEntity task) {
         TaskEntity addedTask = taskService.addTask(task);
-        return new ResponseEntity<>(addedTask, HttpStatus.CREATED);
+        TaskDTO addedTaskDto = modelMapper.map(addedTask, TaskDTO.class);
+        return new ResponseEntity<>(addedTaskDto, HttpStatus.CREATED);
     }
 
     // Endpoint to delete a task by ID

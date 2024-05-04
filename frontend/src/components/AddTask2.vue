@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { addItem } from '../libs/fetchUtils';
-import { TaskManagement } from '@/libs/TaskManagement';
-import router from '@/router';
+import { computed } from 'vue'
+
+
+defineEmits(['closeModal' , 'saveTask'])
 
 const props = defineProps({
     task: {
@@ -12,46 +12,12 @@ const props = defineProps({
             title: '',
             description: "",
             assignees: "",
-            status: "No Status",
-        },
-        require: true
-    },
+            status: '',
+        }
+    }
 })
 
-let previousTask = ref({...props.task })
-// const previousTask = ref(props.task)
-
-//const taskMan = ref(new TaskManagement())
-
-const saveTask = async (newTask) => {
-    newTask = previousTask.value
-    const addedTask = await addItem(`${import.meta.env.VITE_BASE_URL}/add`, {
-        title: newTask.title,
-        description: newTask.description,
-        assignees: newTask.assignees,
-        status: newTask.status
-    })
-    router.back()
-    previousTask.value = {
-        id: undefined,
-        title: '',
-        description: "",
-        assignees: "",
-        status: "No Status"
-    }
-}
-
-
-const saveTasks = async (newTask) => {
-  try {
-    const response = await addItem(newTask);
-    if (response.status === 201) {
-      alert("The task has been successfully added");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
+const previousTask = computed(() => props.task)
 
 </script>
 
@@ -65,7 +31,7 @@ const saveTasks = async (newTask) => {
                 <!-- head -->
                 <p class="font-bold text-3xl text-black flex justify-center m-3">Add Task</p>
 
-                <input v-model="previousTask.title"
+                <input v-model.trim="previousTask.title"
                     class="itbkk-title bg-slate-100 w-10/12 flex font-semibold text-xl text-black m-4 p-2 rounded-md border-slate-600"
                     type="text">
 
@@ -74,8 +40,7 @@ const saveTasks = async (newTask) => {
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 "
-                            type="text">
+                        <input v-model.trim="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 " type="text">
 
                         </input>
 
@@ -84,7 +49,7 @@ const saveTasks = async (newTask) => {
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <input v-model="previousTask.assignees" class="text-base rounded-md border p-1 ">
+                                <input v-model.trim="previousTask.assignees" class="text-base  rounded-md border p-1 ">
 
                                 </input>
 
@@ -93,9 +58,9 @@ const saveTasks = async (newTask) => {
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
-                                    <select id="status" v-model="previousTask.status"
+                                    <select v-model="previousTask.status" id="status" 
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option selected>No Status</option>
+                                        <option selected>No Status</option>                                        
                                         <option value="td">To Do</option>
                                         <option value="do">Doing</option>
                                         <option value="dn">Done</option>
@@ -109,11 +74,10 @@ const saveTasks = async (newTask) => {
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="saveTask"
-                            class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
+                        <button @click="$emit('saveTask' , previousTask)" class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
                             save
                         </button>
-                        <button @click="$router.go(-1)"
+                        <button @click="$emit('closeModal')"  
                             class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

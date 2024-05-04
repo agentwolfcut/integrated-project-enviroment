@@ -25,7 +25,7 @@ const routes = [
     
   },
 
-  { path: '/task/add', component: AddTask }
+  { path: '/task/add', component: AddTask , name:'AddTask' }
 ]
 const router = createRouter({
   history,

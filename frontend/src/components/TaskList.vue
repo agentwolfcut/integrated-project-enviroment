@@ -60,15 +60,18 @@ const cancelDelete = () => {
 
                     <!-- button -->
 
+
                     <router-link to="/task/add">
-                        <button >
+                        <button>
                             <div class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex
                         items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none
                         rounded">
-                                <p class="text-sm font-medium leading-none text-white">Add Task</p>
+                                <button class="text-sm font-medium leading-none text-white">Add Task</button>
                             </div>
                         </button>
                     </router-link>
+
+
 
                 </div>
 

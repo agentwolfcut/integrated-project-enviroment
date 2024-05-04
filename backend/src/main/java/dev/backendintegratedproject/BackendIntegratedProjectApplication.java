@@ -13,15 +13,18 @@ public class BackendIntegratedProjectApplication {
 		SpringApplication.run(BackendIntegratedProjectApplication.class, args);
 	}
 
-//	@Bean
-//	public WebMvcConfigurer corsConfigurer() {
-//		return new WebMvcConfigurer() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/itb-kk/v1/**").allowedOrigins("http://localhost:5173",
-//						"ip23kk3@sit.kmutt.ac.th");
-//			}
-//		};
-//	}
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry reg) {
+				reg.addMapping("/*/*")
+						.allowedOrigins("http://localhost:5173", "ip23kk3@sit.kmutt.ac.th")
+						.allowedMethods("GET", "POST", "PUT", "DELETE")
+						.allowedHeaders("*")
+						.allowCredentials(true);
+			}
+		};
+	}
 
 }

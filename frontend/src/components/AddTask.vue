@@ -38,8 +38,7 @@ const saveTask = async () => {
             console.log('The task has been successfully added')
              alert('The task has been successfully added', 'success')
         }
-
-        const addedTask = await res.json();
+        const addedTask = await res.json(); //respondจากbackend        
         // อันนี้return 201
         console.log(res.status);
         

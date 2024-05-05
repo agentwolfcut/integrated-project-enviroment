@@ -141,7 +141,7 @@ const taskToDelete = ref(undefined)
 
                     <button
                       class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
-                      @click="openModalDetail, $emit('showDetail', index + 1)"
+                      @click="openModalDetail, $emit('showDetail', task.id)"
                     >
                       {{ task.title }}
                     </button>
@@ -184,7 +184,7 @@ const taskToDelete = ref(undefined)
                     @click="
                       ;(showDeleteModal = true),
                         (taskToDelete = task),
-                        $emit('deleteC', index + 1)
+                        $emit('deleteC', task.id)
                     "
                   >
                     <Trash />

@@ -58,7 +58,10 @@ const deleteTask = async (removeId) => {
         import.meta.env.VITE_BASE_URL, removeId
     )
     taskMan.value.removetask(removeId)
+    //console.log(taskMan.value);
 }
+
+
 
 </script>
 
@@ -72,7 +75,7 @@ const deleteTask = async (removeId) => {
     </header>
 
     <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-        @deleteConfirm="deleteTask"/>
+        @deleteConfirm="deleteTask" />
 
     <!-- add task -->
     <Teleport to="#ViewTask">
@@ -81,7 +84,7 @@ const deleteTask = async (removeId) => {
         </div>
     </Teleport>
 
-  
+
 </template>
 
 <style scoped></style>

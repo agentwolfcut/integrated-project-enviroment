@@ -28,7 +28,7 @@ let previousTask = ref({ ...props.task })
 
 const saveTask = async () => {
     try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/add`, {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ const saveTask = async () => {
     catch (error) {
         console.error('Error adding task:', error);
         // Handle error as needed
-        toaster.error(`sdifjsodifo`)
+        toaster.error(`The task can't add please try again`)
     };
 }
 

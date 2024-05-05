@@ -39,6 +39,8 @@ public class TaskController {
     // Endpoint to add a task
     @PostMapping("/add")
     public ResponseEntity<TaskDTO> addTask(@RequestBody TaskEntity task) {
+        task.setTitle(task.getTitle().trim());
+        task.setDescription(task.getDescription().trim());
         TaskEntity addedTask = taskService.addTask(task);
         TaskDTO addedTaskDto = modelMapper.map(addedTask, TaskDTO.class);
         return new ResponseEntity<>(addedTaskDto, HttpStatus.CREATED);

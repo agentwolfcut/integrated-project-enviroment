@@ -276,7 +276,7 @@ const taskToDelete = ref(undefined)
             @click="$emit('deleteConfirm'), (showDeleteModal = false)"
             class="transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
           >
-            Delete
+            Confirm
           </button>
         </div>
       </div>
@@ -286,6 +286,7 @@ const taskToDelete = ref(undefined)
   <Teleport to="#showAlert">
     <Alert v-show="showAlert" />
   </Teleport>
+  
 </template>
 
 <style scoped></style>

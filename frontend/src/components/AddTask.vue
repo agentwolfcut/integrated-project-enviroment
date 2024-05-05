@@ -2,6 +2,11 @@
 
 import { ref, computed, watch } from 'vue'
 import router from '@/router';
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+
+
+const toaster = createToaster({ /* options */ })
+
 const emit = defineEmits(['taskAdded']); // Define the custom event
 
 const props = defineProps({
@@ -34,14 +39,13 @@ const saveTask = async () => {
         if (!res.ok) {
             throw new Error(`Failed to add task. Server responded with status ${res.status}`);
         }
-            if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
-            console.log('The task has been successfully added')
-             alert('The task has been successfully added', 'success')
-        }
-        const addedTask = await res.json(); //respondจากbackend        
+        //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
+        //     console.log('The task has been successfully added')
+        //      alert('The task has been successfully added', 'success')
+        // }
+        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
         // อันนี้return 201
-        console.log(res.status);
-        
+        // console.log(res.status);
         // Reset task fields
         previousTask.value = {
             title: '',
@@ -50,10 +54,12 @@ const saveTask = async () => {
             status: 'No Status'
         };
         router.back();
+        toaster.success(`The task has been successfully added`);
     }    // Navigate back
     catch (error) {
         console.error('Error adding task:', error);
         // Handle error as needed
+        toaster.error(`sdifjsodifo`)
     };
 
 
@@ -80,8 +86,9 @@ const saveTask = async () => {
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 " style='padding: 15px;' type="text">
-                        
+                        <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 "
+                            style='padding: 15px;' type="text">
+
                         </input>
 
                     </div>
@@ -204,7 +211,4 @@ const saveTask = async () => {
     width: calc(50% - 5px);
     /* กำหนดขนาดของปุ่มให้เท่ากับครึ่งของพื้นที่ของ container และลบระยะห่าง */
 }
-
-
-
 </style>

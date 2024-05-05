@@ -4,7 +4,10 @@ import { addItem, editItem, getItemById, getItems, deleteItemById } from '../lib
 import { TaskManagement } from '@/libs/TaskManagement';
 import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
-import Delete from './Delete.vue'
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+
+
+const toaster = createToaster({ /* options */ })
 
 const taskMan = ref(new TaskManagement())
 
@@ -58,6 +61,7 @@ const deleteTask = async (removeId) => {
         import.meta.env.VITE_BASE_URL, removeId
     )
     taskMan.value.removetask(removeId)
+    toaster.success(`The task has  been deleted`);
     //console.log(taskMan.value);
 }
 

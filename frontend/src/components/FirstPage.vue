@@ -6,7 +6,6 @@ import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-
 const toaster = createToaster({ /* options */ })
 
 const taskMan = ref(new TaskManagement())

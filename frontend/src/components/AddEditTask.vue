@@ -54,19 +54,16 @@ const saveTask = async () => {
             status: 'No Status'
         };
         router.back();
-        toaster.success(`The task has been successfully added`);
+        toaster.success(`The ${addedTask.title} task has been successfully added`);
     }    // Navigate back
     catch (error) {
         console.error('Error adding task:', error);
         // Handle error as needed
         toaster.error(`sdifjsodifo`)
     };
-
-
 }
 
 </script>
-
 
 <template>
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">

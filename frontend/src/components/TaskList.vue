@@ -80,14 +80,14 @@ const taskToDelete = ref(undefined)
             </a>
           </div>
 
-          <!-- button -->
 
+          <!-- ADD button  -->
           <router-link to="/task/add" @taskAdded="handleTaskAdded">
             <button>
               <div
                 class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
               >
-                <button class="text-sm font-medium leading-none text-white">
+                <button class="itbkk-button-add text-sm font-medium leading-none text-white">
                   Add Task
                 </button>
               </div>
@@ -175,12 +175,12 @@ const taskToDelete = ref(undefined)
                   </div>
                 </td>
 
-                <td>
-                  <button class="pr-2">
+                <td class="itbkk-button-action">
+                  <button class="pr-2 itbkk-button-edit">
                     <Edit />
                   </button>
                   <button
-                    class="pr-1"
+                    class="pr-1 itbkk-button-delete"
                     @click="
                       ;(showDeleteModal = true),
                         (taskToDelete = task),
@@ -249,6 +249,8 @@ const taskToDelete = ref(undefined)
     </div>
   </div>
 
+
+  <!-- Delete modal -->
   <div v-if="showDeleteModal">
     <div
       class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
@@ -286,7 +288,7 @@ const taskToDelete = ref(undefined)
   <Teleport to="#showAlert">
     <Alert v-show="showAlert" />
   </Teleport>
-  
+
 </template>
 
 <style scoped></style>

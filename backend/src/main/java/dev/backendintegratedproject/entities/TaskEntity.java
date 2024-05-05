@@ -13,8 +13,9 @@ import java.util.Date;
 @NoArgsConstructor
 public class TaskEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taskID")
-    private int id;
+    private Integer id;
 
     @Column(name = "taskTitle", length = 100, nullable = false)
     private String title;

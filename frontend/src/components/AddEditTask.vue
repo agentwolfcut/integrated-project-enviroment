@@ -71,14 +71,16 @@ const saveTask = async () => {
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
 
             <div class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
-                <!-- head -->
                 <p class="font-bold text-3xl text-black flex justify-center m-3">Add Task</p>
+                <!-- head -->
+                <div class="m-4">
+                    <label for="title" class="font-medium text-base">Title</label>
+                    <input v-model="previousTask.title"
+                        class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
+                        type="text">
+                    </input>
+                </div>
 
-                <input v-model="previousTask.title"
-                    class="itbkk-title bg-slate-100 w-10/12 flex font-semibold text-xl text-black m-4 p-2 rounded-md border-slate-600"
-                    type="text">
-
-                </input>
                 <!-- center -->
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description  w-8/12">
@@ -93,7 +95,7 @@ const saveTask = async () => {
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <input v-model="previousTask.assignees" class="text-base rounded-md border p-1 ">
+                                <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1">
 
                                 </input>
 

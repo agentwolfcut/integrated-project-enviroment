@@ -35,7 +35,6 @@ const saveTask = async () => {
             },
             body: JSON.stringify(previousTask.value)
         });
-
         if (!res.ok) {
             throw new Error(`Failed to add task. Server responded with status ${res.status}`);
         }
@@ -100,13 +99,13 @@ const saveTask = async () => {
                                 </input>
 
                             </div>
-                            <div class="itbkk-status">
+                            <div >
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option value="No Status" selected>No Status</option>
+                                        class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                        <option value="No Status"  selected>No Status</option>
                                         <option value="To Do">To Do</option>
                                         <option value="Doing">Doing</option>
                                         <option value="Done">Done</option>
@@ -121,12 +120,14 @@ const saveTask = async () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
                         <button @click="saveTask" :disabled="!previousTask.title"
-                            :class="{ 'opacity-50 cursor-not-allowed bg-slate-600 text-slate-900': !previousTask.title }"
-                            class="hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
+                            
+                            class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                            disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
+                            ">
                             save
                         </button>
                         <button @click="$router.go(-1)"
-                            class="hover:bg-slate-400 hover:text-white transition-all ease-out itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
+                            class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>
                     </div>
@@ -185,13 +186,6 @@ const saveTask = async () => {
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
-}
-
-.itbkk-button {
-    padding: 10px 20px;
-    /* ปรับขนาดของปุ่ม */
-    border: 1px solid #4a5568;
-    /* เพิ่มเส้นขอบสีเทาให้กับปุ่ม */
 }
 
 .buttons {

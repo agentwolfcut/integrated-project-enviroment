@@ -87,6 +87,10 @@ const deleteTask = async (removeId) => {
         </div>
     </Teleport>
 
+    <div class="itbkk-message opacity-0 ">
+        The task has been deleted
+    </div>
+
 
 </template>
 

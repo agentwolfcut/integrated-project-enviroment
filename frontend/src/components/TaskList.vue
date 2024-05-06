@@ -223,23 +223,24 @@ const taskToDelete = ref(undefined)
   <!-- Delete modal -->
   <div v-if="showDeleteModal">
     <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-      <div class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
+      <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
         <p class="mb-4 text-base font-medium overflow-y-auto">
-          Are you sure , you want to delete
+          Do you want to delete the task number
           <span class="text-red-600 text-lg italic text-wrap hover:text-balance">{{ taskToDelete.title }}</span>
           task?
         </p>
 
         <div class="flex justify-end">
           <button @click="cancelDelete"
-            class="transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
             Cancel
           </button>
 
           <button @click="$emit('deleteConfirm'), (showDeleteModal = false)"
-            class="transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
             Confirm
           </button>
+          
         </div>
       </div>
     </div>

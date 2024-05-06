@@ -124,18 +124,19 @@ const formatLocalDate = (dateString) => {
 
                 <!-- bottom -->
                 <div class="m-3">
-                    <div class="buttons flex gap-2">
+                    <div class="buttons flex gap-2 ">
                         <!-- <button @click="$emit('saveModal' , taskSelect)" -->
                         <button @click="$emit('saveModal', false)"
-                            class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
+                            class="transition-all ease-in  hover:bg-green-600 hover:text-white itbkk-button font-medium text-base text-green-800 bg-green-400 rounded-md px-3 ">
                             ok
                         </button>
                         <button @click="$emit('closeModal', false)"
-                            class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
+                            class="transition-all ease-in hover:bg-slate-600 hover:text-white itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             close
                         </button>
                     </div>
                 </div>
+                
             </div>
 
         </div>
@@ -194,6 +195,7 @@ const formatLocalDate = (dateString) => {
     padding: 10px 20px;
     /* ปรับขนาดของปุ่ม */
     border: 1px solid #4a5568;
+    
     /* เพิ่มเส้นขอบสีเทาให้กับปุ่ม */
 }
 
@@ -205,7 +207,7 @@ const formatLocalDate = (dateString) => {
     /* เพิ่มระยะห่างด้านบนระหว่างปุ่มกับส่วนข้างบน */
 }
 
-.buttons>button {
+.buttons > button {
     flex-grow: 0;
     /* ปรับให้ปุ่มไม่ขยายตัว */
     margin: 0 5px;

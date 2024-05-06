@@ -122,11 +122,11 @@ const saveTask = async () => {
                     <div class="buttons flex gap-2">
                         <button @click="saveTask" :disabled="!previousTask.title"
                             :class="{ 'opacity-50 cursor-not-allowed bg-slate-600 text-slate-900': !previousTask.title }"
-                            class="itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
+                            class="hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button font-medium text-base text-green-800 bg-green-300 rounded-md px-3 ">
                             save
                         </button>
                         <button @click="$router.go(-1)"
-                            class="itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
+                            class="hover:bg-slate-400 hover:text-white transition-all ease-out itbkk-button font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>
                     </div>

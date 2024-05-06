@@ -43,7 +43,7 @@ const taskToDelete = ref(undefined)
       <div class="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
         <!-- head -->
         <div class="sm:flex items-center justify-between">
-          <div class="flex items-center button-filter">
+          <div class=" flex items-center button-filter">
             <div class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800">
               <div class="py-2 px-8 bg-indigo-100 text-indigo-700 rounded-full">
                 <button>All</button>
@@ -52,35 +52,32 @@ const taskToDelete = ref(undefined)
             <div
               class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8">
               <div class="py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full">
-                <button >Do</button>
+                <button>Do</button>
               </div>
             </div>
             <div
-              class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8"
-              >
+              class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8">
               <div class="py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full">
                 <button>Doing</button>
               </div>
             </div>
             <div
-              class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8"
-              >
+              class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8">
               <div class="py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full">
                 <button>Done</button>
               </div>
             </div>
           </div>
 
-
           <!-- ADD button  -->
           <router-link to="/task/add" @taskAdded="handleTaskAdded">
-            <button>
-              <div
-                class="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
-                <button class="itbkk-button-add text-sm font-medium leading-none text-white">
-                  Add Task
-                </button>
-              </div>
+            <button class="itbkk-button-add mt-4 
+                sm:mt-0 inline-flex px-6 py-3 relative items-center justify-center
+              overflow-hidden bg-blue-600 font-medium text-white shadow-2xl
+               transition-all duration-300 before:absolute before:inset-0 before:border-0 before:border-white 
+               before:duration-100 before:ease-linear hover:bg-blue-50 hover:text-black hover:shadow-blue-600 rounded-md
+               ">
+              <span class="relative  text-sm font-medium ">Add Task</span>
             </button>
           </router-link>
         </div>
@@ -111,9 +108,11 @@ const taskToDelete = ref(undefined)
               </tr>
             </thead>
             <!-- อันนี้อันใหม่แก้บัคเลข -->
-            <tbody>
+
+            <tbody class="container">
+
               <tr v-for="(task, index) in tasks" :key="index"
-                class="itbkk-item focus:outline-none h-16 border border-gray-100 rounded">
+                class="itbkk-item box h-16 border border-gray-100 rounded">
                 <td>
                   <div class="flex items-center pl-5">
                     <div class="flex flex-row justify-start">
@@ -161,6 +160,7 @@ const taskToDelete = ref(undefined)
                   </button>
                 </td>
               </tr>
+
             </tbody>
 
             <!-- //อันนี้อันเก่าที่บัคเรื่องเลขนะ
@@ -252,5 +252,13 @@ const taskToDelete = ref(undefined)
 </template>
 
 <style scoped>
-.itbkk-message {}
+.box {
+  transition: opacity 0.6s ease;
+  ;
+}
+
+.container:hover> :not(:hover) {
+  opacity: 0.2;
+
+}
 </style>

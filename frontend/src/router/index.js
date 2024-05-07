@@ -24,8 +24,9 @@ const routes = [
     component: NotFoundId,
   },
 
-  { path: '/task/add', component: AddEditTask , name:'AddEditTask' } ,
-  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound }
+  { path: '/task/add', component: AddEditTask , name:'AddTask' } ,
+  { path: '/task/:taskId/edit', component: AddEditTask , name:'EditTask' } ,
+  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound , redirect: '/task'}
 ]
 const router = createRouter({
   history,

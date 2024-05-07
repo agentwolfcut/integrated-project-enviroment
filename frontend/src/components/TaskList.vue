@@ -148,9 +148,14 @@ const taskToDelete = ref(undefined)
                 </td>
 
                 <td class="itbkk-button-action">
+
                   <button class="pr-2 itbkk-button-edit">
-                    <Edit />
+                    <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
+                      <Edit />
+                    </router-link>
                   </button>
+
+
                   <button class="pr-1 itbkk-button-delete" @click="
                       ; (showDeleteModal = true),
                     (taskToDelete = task),
@@ -225,7 +230,7 @@ const taskToDelete = ref(undefined)
     <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
       <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
         <p class="mb-4 text-base font-medium overflow-y-auto">
-          Do you want to delete the task number
+          Do you want to delete the task  number {{ taskToDelete.id }} , 
           <span class="text-red-600 text-lg italic text-wrap hover:text-balance">{{ taskToDelete.title }}</span>
           task?
         </p>
@@ -240,7 +245,7 @@ const taskToDelete = ref(undefined)
             class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
             Confirm
           </button>
-          
+
         </div>
       </div>
     </div>

@@ -1,8 +1,11 @@
 <script setup>
 
-import { ref, computed, watch } from 'vue'
+import { onMounted, ref , computed} from 'vue'
 import router from '@/router';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+import { useRoute } from 'vue-router';
+import { getItemById } from '../libs/fetchUtils'
+import { TaskManagement } from '@/libs/TaskManagement';
 
 
 const toaster = createToaster({ /* options */ })
@@ -26,51 +29,69 @@ const props = defineProps({
 let previousTask = ref({ ...props.task })
 // const previousTask = ref(props.task)
 
+
 const saveTask = async () => {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(previousTask.value)
-        });
-        if (!res.ok) {
-            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+    if (previousTask.id === undefined) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(previousTask.value)
+            });
+            if (!res.ok) {
+                throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+            }
+            //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
+            //     console.log('The task has been successfully added')
+            //      alert('The task has been successfully added', 'success')
+            // }
+            const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+            // อันนี้return 201
+            // console.log(res.status);
+            // Reset task fields
+            previousTask.value = {
+                title: '',
+                description: '',
+                assignees: '',
+                status: 'No Status'
+            };
+            // console.log(previousTask.value);
+            router.back();
+            toaster.success(`The ${addedTask.title} task has been successfully added`);
+        }    // Navigate back
+        catch (error) {
+            console.error('Error adding task:', error);
+            // Handle error as needed
+            toaster.error(`The task can't add please try again`)
         }
-        //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
-        //     console.log('The task has been successfully added')
-        //      alert('The task has been successfully added', 'success')
-        // }
-        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-        // อันนี้return 201
-        // console.log(res.status);
-        // Reset task fields
-        previousTask.value = {
-            title: '',
-            description: '',
-            assignees: '',
-            status: 'No Status'
-        };
-        router.back();
-        toaster.success(`The ${addedTask.title} task has been successfully added`);
-    }    // Navigate back
-    catch (error) {
-        console.error('Error adding task:', error);
-        // Handle error as needed
-        toaster.error(`The task can't add please try again`)
-    };
+    }
+    else {
+    }
+
 }
+
+// Edit 
+const route = useRoute();
+const taskId = ref(route.params.taskId)
+// console.log(taskId.value);
+
 
 </script>
 
 <template>
+
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
 
-            <div class="bg-white w-7/12 h-auto rounded-2xl shadow-xl">
-                <p class="font-bold text-3xl text-black flex justify-center m-3">Add Task</p>
+            <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl">
+
+                <p class="font-bold text-3xl text-black flex justify-center m-3">
+                    {{ taskId === undefined ? 'Add Task' : 'Edit Task' }}
+                </p>
+
                 <!-- head -->
                 <div class="m-4">
                     <label for="title" class="font-medium text-base">Title</label>
@@ -99,13 +120,13 @@ const saveTask = async () => {
                                 </input>
 
                             </div>
-                            <div >
+                            <div>
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option value="No Status"  selected>No Status</option>
+                                        <option value="No Status" selected>No Status</option>
                                         <option value="To Do">To Do</option>
                                         <option value="Doing">Doing</option>
                                         <option value="Done">Done</option>
@@ -119,9 +140,8 @@ const saveTask = async () => {
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="saveTask" :disabled="!previousTask.title"
-                            
-                            class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+
+                        <button @click="saveTask" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

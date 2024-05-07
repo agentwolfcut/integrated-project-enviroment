@@ -15,8 +15,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/itb-kk/v1/tasks")
-@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
-//@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
+@CrossOrigin(origins = "http://localhost:5173")
 
 public class TaskController {
     @Autowired
@@ -41,6 +41,7 @@ public class TaskController {
     public ResponseEntity<TaskDTO> addTask(@RequestBody TaskEntity task) {
         task.setTitle(task.getTitle().trim());
         task.setDescription(task.getDescription().trim());
+        task.setAssignees(task.getAssignees().trim());
         TaskEntity addedTask = taskService.addTask(task);
         TaskDTO addedTaskDto = modelMapper.map(addedTask, TaskDTO.class);
         return new ResponseEntity<>(addedTaskDto, HttpStatus.CREATED);

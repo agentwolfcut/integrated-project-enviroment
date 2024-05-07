@@ -52,7 +52,7 @@ const saveTask = async () => {
                 title: '',
                 description: '',
                 assignees: '',
-                status: 'No Status'
+                status: 'NO_STATUS'
             };
             // console.log(previousTask.value);
             router.back();

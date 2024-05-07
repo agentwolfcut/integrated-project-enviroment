@@ -54,14 +54,39 @@ const deleteIdConfirm = (removeId) => {
     removeIdC.value = removeId
 }
 // DELETE
+// const deleteTask = async (removeId) => {
+//     try {
+//         removeId = removeIdC.value
+//         const status = await deleteItemById(
+//             import.meta.env.VITE_BASE_URL, removeId
+//         )
+//         taskMan.value.removetask(removeId)
+//         toaster.success(`The task has  been deleted`);
+//     } catch (error) {
+//         console.error('Error deleting task:', error);
+//         // Handle error as needed
+//         toaster.error(`Failed to delete task. An error occurred.`);
+//     }
+//     //console.log(taskMan.value);
+// }
+
 const deleteTask = async (removeId) => {
-    removeId = removeIdC.value
-    const status = await deleteItemById(
-        import.meta.env.VITE_BASE_URL, removeId
-    )
-    taskMan.value.removetask(removeId)
-    toaster.success(`The task has  been deleted`);
-    //console.log(taskMan.value);
+    try {
+        removeId = removeIdC.value;
+        const status = await deleteItemById(import.meta.env.VITE_BASE_URL, removeId);
+        if (status === 200) {
+            taskMan.value.removetask(removeId)
+            toaster.success(`The task has been deleted`);
+        } else {
+            toaster.error(`The task does not exist
+            
+            , please refresh page`);
+        }
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        // Handle error as needed
+        toaster.error(`Failed to delete task. An error occurred.`);
+    }
 }
 
 

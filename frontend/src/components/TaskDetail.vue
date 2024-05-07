@@ -2,15 +2,9 @@
 // useRoute use with parameters , useRouter  use with path
 import { computed, } from 'vue';
 import { useRoute, } from 'vue-router'
-import moment from 'moment';
+
 
 const { params } = useRoute();
-//console.log(params.id);
-
-// const router = useRouter()
-// const goBack = () => {
-//     router.go(-1)
-// }
 
 defineEmits(['saveModal', 'closeModal'])
 const props = defineProps({
@@ -19,9 +13,9 @@ const props = defineProps({
         default: {
             id: undefined,
             title: '',
-            description: "",
-            assignees: "",
-            status: "",
+            description: '',
+            assignees: '',
+            status: '',
             createdOn: "",
             updatedOn: ""
         }
@@ -30,6 +24,8 @@ const props = defineProps({
 });
 
 const taskSelect = computed(() => props.task)
+
+
 
 const formatLocalDate = (dateString) => {
     if (!dateString) return ''
@@ -53,7 +49,6 @@ const formatLocalDate = (dateString) => {
 
 //   return date.toLocaleString('en-GB')
 // }
-
 
 </script>
 
@@ -85,13 +80,15 @@ const formatLocalDate = (dateString) => {
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <div v-if="taskSelect.assignees" class="text-base  rounded-md  w-6/6 border p-1 ">
+                                <div v-if="taskSelect.assignees"  class="text-base  rounded-md  w-6/6 border p-1 ">
                                     {{ taskSelect.assignees }}
                                 </div>
-                                <div v-else class="italic">
+                                <div v-else class="italic text-slate-600 ">
                                     Unassigned
                                 </div>
+                                
                             </div>
+
                             <div class="itbkk-status">
                                 <p class="font-medium text-base">status</p>
                                 <div class="text-base  rounded-md  w-6/6 border p-1">

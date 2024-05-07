@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router'
 import Trash from '@/assets/icons/CiTrashFull.vue'
 import Edit from '@/assets/icons/CiEditPencil01.vue'
 import { ref } from 'vue'
-import Alert from '@/components/Alert.vue'
 
 defineProps({
   tasks: {
@@ -122,16 +121,16 @@ const taskToDelete = ref(undefined)
                     </div>
 
                     <button class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
-                      @click="openModalDetail, $emit('showDetail', task.id)">
+                      @click="$emit('showDetail', task.id)">
                       {{ task.title }}
                     </button>
                   </div>
                 </td>
 
-                <td class="itbkk-assignees" :class="{ italic: task.assignees === '' }">
+                <td class="itbkk-assignees" >
                   <div class="text-base font-medium leading-none text-gray-700 mr-2">
                     <span v-if="task.assignees">{{ task.assignees }}</span>
-                    <span v-else class="text-slate-300">Unassigned</span>
+                    <span v-else class="text-slate-300 italic"> Unassigned </span>
                   </div>
                 </td>
 
@@ -250,10 +249,6 @@ const taskToDelete = ref(undefined)
       </div>
     </div>
   </div>
-
-  <Teleport to="#showAlert">
-    <Alert v-show="showAlert" />
-  </Teleport>
 
 </template>
 

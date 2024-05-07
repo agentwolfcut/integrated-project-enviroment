@@ -1,84 +1,79 @@
 <script setup>
-
-import { onMounted, ref , computed} from 'vue'
-import router from '@/router';
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import { useRoute } from 'vue-router';
-
-const toaster = createToaster({ /* options */ })
-
-const emit = defineEmits(['taskAdded']); // Define the custom event
-
-const props = defineProps({
-    task: {
-        type: Object,
-        default: {
-            id: undefined,
-            title: '',
-            description: "",
-            assignees: "",
-            status: "No Status",
-        },
-        require: true
-    },
-})
-
-let previousTask = ref({ ...props.task })
-// const previousTask = ref(props.task)
+import router from '@/router';
+import { ref, onMounted } from 'vue'
+import { getItemById } from '../libs/fetchUtils';
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 
-const saveTask = async () => {
-    if (previousTask.id === undefined) {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(previousTask.value)
-            });
-            if (!res.ok) {
-                throw new Error(`Failed to add task. Server responded with status ${res.status}`);
-            }
-            //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
-            //     console.log('The task has been successfully added')
-            //      alert('The task has been successfully added', 'success')
-            // }
-            const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-            // อันนี้return 201
-            // console.log(res.status);
-            // Reset task fields
-            previousTask.value = {
-                title: '',
-                description: '',
-                assignees: '',
-                status: 'No Status'
-            };
-            // console.log(previousTask.value);
-            router.back();
-            toaster.success(`The ${addedTask.title} task has been successfully added`);
-        }    // Navigate back
-        catch (error) {
-            console.error('Error adding task:', error);
-            // Handle error as needed
-            toaster.error(`The task can't add please try again`)
-        }
-    }
-    else {
-    }
-
-}
-
-// Edit 
+let previousTask = ref('')
+let originalTask = ref('')
 const route = useRoute();
 const taskId = ref(route.params.taskId)
+const toaster = createToaster({ /* options */ })
+
+// console.log(taskId.value);
+
+onMounted(async () => {
+    try {
+        const editTask = await getItemById(import.meta.env.VITE_BASE_URL, taskId.value)
+        previousTask.value = { ...editTask }
+        originalTask.value = { ...editTask }
+        if (!editTask.title) {
+            router.back();
+            toaster.error(`Task not found.`);
+        }
+
+    } catch (error) {
+        toaster.error(`Failed to fetch task. Please try again.`);
+        router.back();
+    }
+})
 
 
+const saveEdit = async () => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/${taskId.value}`, {
+            method: 'PUT',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(previousTask.value)
+        })
+
+        const editedTask = await res.json()
+        router.back();
+        toaster.success(`The ${editedTask.title} task has been updated`);
+        // return editedTask
+    } catch (error) {
+        console.log(`error: ${error}`)
+        toaster.error(`The update was unsuccessful`);
+    }
+}
+
+const isTaskChanged = () => {
+    return JSON.stringify(previousTask.value) !== JSON.stringify(originalTask.value);
+}
+
+const formatLocalDate = (dateString) => {
+    if (!dateString) return ''
+
+    const date = new Date(dateString)
+
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+
+    //   return `${year}-${day}-${day} ${hours}:${minutes}:${seconds}`
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
+}
 
 </script>
 
 <template>
-
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
@@ -86,7 +81,7 @@ const taskId = ref(route.params.taskId)
             <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl">
 
                 <p class="font-bold text-3xl text-black flex justify-center m-3">
-                    {{ taskId === undefined ? 'Add Task' : 'Edit Task' }}
+                    Edit Task
                 </p>
 
                 <!-- head -->
@@ -112,9 +107,11 @@ const taskId = ref(route.params.taskId)
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1">
+                                <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1"
+                                    :class="{ 'italic text-slate-500': previousTask.assignees === '' }">
 
                                 </input>
+
 
                             </div>
                             <div>
@@ -130,6 +127,27 @@ const taskId = ref(route.params.taskId)
                                     </select>
                                 </form>
                             </div>
+
+                            <div class="flex flex-col mt-20 gap-1">
+                                <div class="itbkk-timezone flex flex-row items-center gap-3">
+                                    <p class="font-medium text-base">timezone</p>
+                                    <div class="text-sm  rounded-md  w-6/6 border px-1">
+                                        {{ Intl.DateTimeFormat().resolvedOptions().timeZone }}
+                                    </div>
+                                </div>
+
+                                <div class="itbkk-created-on flex flex-row items-center gap-3">
+                                    <p class="font-medium text-base">created-on</p>
+                                    <div class="text-sm  rounded-md  w-6/6 border px-1">
+                                        {{ formatLocalDate(previousTask.createdOn) }} </div>
+                                </div>
+
+                                <div class="itbkk-updated-on flex flex-row items-center gap-3">
+                                    <p class="font-medium text-base">updated-on</p>
+                                    <div class="text-sm  rounded-md  w-6/6 border px-1">
+                                        {{ formatLocalDate(previousTask.updatedOn) }} </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -138,7 +156,7 @@ const taskId = ref(route.params.taskId)
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="saveTask" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="saveEdit" :disabled="!isTaskChanged() || !previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save
@@ -153,10 +171,8 @@ const taskId = ref(route.params.taskId)
 
         </div>
     </div>
-
-
-
 </template>
+
 <style scoped>
 .itbkk-title {
     overflow-wrap: break-word;

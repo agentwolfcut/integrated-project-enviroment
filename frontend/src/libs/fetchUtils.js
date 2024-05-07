@@ -1,3 +1,4 @@
+
 // async task must wait , inside are promise
 async function getItems(url) { //ส่งurl
   try {

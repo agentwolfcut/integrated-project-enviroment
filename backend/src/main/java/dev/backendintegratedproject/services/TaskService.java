@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -28,11 +29,16 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+//    public void deleteTask(Integer id) {
+//        TaskEntity task = taskRepository.findById(id)
+//                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
+//        taskRepository.delete(task);
+//    }
     public void deleteTask(Integer id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
-        taskRepository.delete(task);
-    }
+    TaskEntity task = taskRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
+    taskRepository.delete(task);
+}
 
     public TaskEntity editTask(Integer id, TaskEntity task) {
         TaskEntity existingTask = taskRepository.findById(id).orElse(null);

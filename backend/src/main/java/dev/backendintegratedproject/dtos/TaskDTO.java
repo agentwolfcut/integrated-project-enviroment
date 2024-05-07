@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Data
 public class TaskDTO {
-    private Long id;
+    private Integer id;
     private String title;
     private String description;
     private String assignees;

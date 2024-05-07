@@ -17,6 +17,7 @@ const toaster = createToaster({ /* options */ })
 onMounted(async () => {
     try {
         const editTask = await getItemById(import.meta.env.VITE_BASE_URL, taskId.value)
+        editTask.status = editTask.status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' ')
         previousTask.value = { ...editTask }
         originalTask.value = { ...editTask }
         if (!editTask.title) {

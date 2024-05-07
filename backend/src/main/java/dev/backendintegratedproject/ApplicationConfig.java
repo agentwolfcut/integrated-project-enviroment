@@ -12,6 +12,8 @@ public class ApplicationConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+    @Bean
+    public ListMapper listMapper() { return new ListMapper();}
 }
 
 

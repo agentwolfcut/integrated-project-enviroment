@@ -1,13 +1,15 @@
 package dev.backendintegratedproject.entities;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
+@Getter
+@Setter
 @Entity
 @Table(name = "tasks")
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +28,43 @@ public class TaskEntity {
     @Column(name = "taskStatus")
     private String status;
     @Column(name = "createdOn", nullable = false)
-    private Date createdOn = new Date();
+    private Date createdOn;
     @Column(name = "updatedOn", nullable = false)
-    private Date updatedOn = new Date();
+    private Date updatedOn;
+
+    public void setStatus(String status) {
+        this.status = status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
+    }
+    public String getStatus(){
+        return status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null?null:description.trim();
+    }
+
+    public void setAssignees(String assignees) {
+        this.assignees = assignees == null?null:assignees.trim();
+    }
+
+    public void setTitle(String title) {
+        this.title = title == null?null:title.trim();
+    }
+
+    public String getCreatedOn() throws ParseException {
+        return dateformat(createdOn);
+    }
+
+    public String getUpdatedOn() throws ParseException {
+        return dateformat(updatedOn);
+    }
+    private String dateformat(Date date_s) throws ParseException {
+        if (date_s ==null) date_s = new Date();
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+        dt.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dt1.format(dt.parse(dt.format(date_s)));
+    }
 }

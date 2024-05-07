@@ -22,7 +22,7 @@ class TaskManagement {
       title: title,
       description: description,
       assignees: assignees,
-      status: status,
+      status: status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' '),
     })
   }
 

@@ -2,6 +2,7 @@ package dev.backendintegratedproject.controllers;
 
 import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.entities.TaskEntity;
+import dev.backendintegratedproject.services.ListMapper;
 import dev.backendintegratedproject.services.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,28 +24,29 @@ public class TaskController {
     private TaskService taskService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private ListMapper listMapper;
     @GetMapping
-    public ResponseEntity<List<TaskEntity>> getTasks() {
+    public ResponseEntity<Object> getTasks() {
         List<TaskEntity> tasks = taskService.getAllTasks();
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+        List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class,modelMapper);
+        return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Integer taskId) {
+    public ResponseEntity<Object> getTaskById(@PathVariable Integer taskId) {
         TaskEntity task = taskService.getTaskById(taskId);
         if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", taskId));
-        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
-        return new ResponseEntity<>(taskDto, HttpStatus.OK);
+//        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
     // Endpoint to add a task
-    @PostMapping()
-    public ResponseEntity<TaskDTO> addTask(@RequestBody TaskEntity task) {
-        task.setTitle(task.getTitle().trim());
-        task.setDescription(task.getDescription().trim());
-        task.setAssignees(task.getAssignees().trim());
-        TaskEntity addedTask = taskService.addTask(task);
-        TaskDTO addedTaskDto = modelMapper.map(addedTask, TaskDTO.class);
-        return new ResponseEntity<>(addedTaskDto, HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+            TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+            TaskEntity addedTask = taskService.addTask(taskEntity);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
     }
 
     // Endpoint to delete a task by ID

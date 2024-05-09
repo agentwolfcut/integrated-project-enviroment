@@ -14,8 +14,8 @@ const props = defineProps({
 </script>
 
 <template>
-    <button class="mt-4 rounded-lg
-                sm:mt-0 inline-flex px-6 py-3 relative items-center justify-center
+    <button class=" rounded-lg
+                 inline-flex px-6 py-3 relative items-center justify-center
               overflow-hidden  font-medium shadow-md  transition-all duration-300 before:absolute 
               before:inset-0 before:border-0  before:duration-100 before:ease-linear
                hover:text-black hover:shadow-slate-400

@@ -42,7 +42,7 @@ const taskToDelete = ref(undefined)
     <div class="sm:px-20 w-full">
       <div class="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
         <!-- head -->
-        <div class="sm:flex items-center justify-between">
+        <!-- <div class="sm:flex items-center justify-between">
           <div class=" flex items-center button-filter">
             <div class="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800">
               <div class="py-2 px-8 bg-indigo-100 text-indigo-700 rounded-full">
@@ -67,20 +67,19 @@ const taskToDelete = ref(undefined)
                 <button>Done</button>
               </div>
             </div>
-
           </div>
-
-          <!-- ADD button  -->
-          <router-link to="/task/add" @taskAdded="handleTaskAdded">
-            <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8 ">
-              <buttonSlot size='sm' type="dark">
-                <template v-slot:title>
-                  Add Task
-                </template>
-              </buttonSlot>
-            </div>
-          </router-link>
-        </div>
+        </div> -->
+        <div class="flex justify-end">
+            <router-link to="/task/add" @taskAdded="handleTaskAdded">
+              <div class="itbkk-button-add rounded-lg ">
+                <buttonSlot size='sm' type="dark">
+                  <template v-slot:title>
+                    Add Task
+                  </template>
+                </buttonSlot>
+              </div>
+            </router-link>
+          </div>
 
 
         <div class="mt-7 overflow-x-auto">

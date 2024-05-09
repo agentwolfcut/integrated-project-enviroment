@@ -5,6 +5,8 @@ import { getItems } from '../libs/fetchUtils';
 import { StatusManagement } from '@/libs/StatusManagement';
 import SideBar from './SideBar.vue'
 import buttonSlot from './Button.vue'
+import Trash from '@/assets/icons/CiTrashFull.vue'
+import Edit from '@/assets/icons/CiEditPencil01.vue'
 
 
 const statusMan = ref(new StatusManagement())
@@ -29,13 +31,12 @@ const statusList = ref(statusMan.value.getStatuses())
             <div class="flex justify-center">
                 <div class="sm:px-20 w-full">
                     <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
-                        <div class="mt-7 overflow-x-auto">
+                        <div class="overflow-x-auto ">
 
                             <!-- button add -->
-
-                            <div class="my-2">
+                            <div class="flex justify-end mb-9">
                                 <router-link to="/status/add">
-                                    <div class="rounded-lg">
+                                    <div class="rounded-lg ml-4 sm:ml-8">
                                         <buttonSlot size='sm' type="dark" class="itbkk-button-add">
                                             <template v-slot:title>
                                                 Add Status
@@ -45,84 +46,91 @@ const statusList = ref(statusMan.value.getStatuses())
                                 </router-link>
                             </div>
 
-                            <table class="w-full whitespace-nowrap rounded-md">
-                                <!-- head -->
-                                <thead class="bg-slate-200 text">
-                                    <tr class="focus:outline-none h-16 border border-gray-100 rounded text-base">
-                                        <td>
-                                            <div class="flex items-center pl-5">
-                                                <p class="font-medium leading-none text-gray-700 ml-6">
-                                                    Name
-                                                </p>
-                                            </div>
-                                        </td>
-
-                                        <td>
-                                            <div class="font-medium leading-none text-gray-700 mr-2">
-                                                Description
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="font-medium leading-none text-gray-700 mr-2 ">
-                                                Action
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                </thead>
-
-                                <!-- body content -->
-                                <tbody class="container">
-                                    <tr v-for="(status, index) in statusList" :key="index"
-                                        class="itbkk-item box h-16 border border-gray-100 rounded">
-                                        <td>
-                                            <div class="flex items-center pl-5">
-                                                <div class="flex flex-row justify-start">
-                                                    <p class="text-base font-medium leading-none text-gray-700 mr-4">
-                                                        {{ index + 1 }}
+                            <div class="mt-7 overflow-x-auto">
+                                <table class="w-full whitespace-nowrap rounded-md">
+                                    <!-- head -->
+                                    <thead class="bg-slate-200 text">
+                                        <tr class="focus:outline-none h-16 border border-gray-100 rounded text-base">
+                                            <td>
+                                                <div class="flex items-center pl-5">
+                                                    <p class="font-medium leading-none text-gray-700 ml-6">
+                                                        Name
                                                     </p>
                                                 </div>
+                                            </td>
 
-                                                <button
-                                                    class="itbkk-status-name text-base font-medium leading-none text-gray-700 mr-4">
-                                                    {{ status.name }}
-                                                </button>
-                                            </div>
-                                        </td>
+                                            <td>
+                                                <div class="font-medium leading-none text-gray-700 mr-2">
+                                                    Description
+                                                </div>
+                                            </td>
 
-
-                                        <td class="itbkk-status-description">
-                                            <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                                                {{ status.description }}
-
-                                            </div>
-                                        </td>
+                                            <td>
+                                                <div class="font-medium leading-none text-gray-700 mr-2 ">
+                                                    Action
+                                                </div>
+                                            </td>
 
 
+                                        </tr>
+                                    </thead>
 
-                                        <td class="itbkk-button-action flex flex-row items-center">
-                                            <div class="rounded-lg">
-                                                <buttonSlot size='sm' type="dark" class="itbkk-button-edit">
-                                                    <template v-slot:title>
-                                                        Edit
-                                                    </template>
-                                                </buttonSlot>
-                                            </div>
+                                    <!-- body content -->
+                                    <tbody class="container">
+                                        <tr v-for="(status, index) in statusList" :key="index"
+                                            class="itbkk-item box h-16 border border-gray-100 rounded">
+                                            <td class="overflow-hidden max-w-96">
+                                                <div class="flex items-center pl-5">
+                                                    <div class="flex flex-row justify-start">
+                                                        <p
+                                                            class="text-base font-medium leading-none text-gray-700 mr-4">
+                                                            {{ index + 1 }}
+                                                        </p>
+                                                    </div>
 
-                                            <div class="rounded-lg">
-                                                <buttonSlot size='sm' type="dark" class="itbkk-button-delete">
-                                                    <template v-slot:title>
-                                                        Delete
-                                                    </template>
-                                                </buttonSlot>
-                                            </div>
-                                        </td>
+                                                    <button
+                                                        class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4">
+                                                        {{ status.name }}
+                                                    </button>
+                                                </div>
+                                            </td>
 
 
-                                    </tr>
+                                            <td class="itbkk-status-description">
+                                                <div class="text-base font-medium leading-none text-gray-700 mr-2">
+                                                    {{ status.description }}
+                                                </div>
+                                            </td>
 
-                                </tbody>
-                            </table>
+
+                                            <!-- <td class="itbkk-button-action flex flex-row">
+                                            
+                                            <button class="pr-2 itbkk-button-edit">
+                                                <Edit />
+                                            </button>
+
+                                            <button class="pr-1 itbkk-button-delete">
+                                                <Trash />
+                                            </button>
+                                        </td> -->
+
+                                            <td class="itbkk-status-description">
+                                                <div class="text-base font-medium leading-none text-gray-700 mr-2">
+                                                    <button class="pr-2 itbkk-button-edit">
+                                                        <Edit />
+                                                    </button>
+
+                                                    <button class="pr-1 itbkk-button-delete">
+                                                        <Trash />
+                                                    </button>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -130,23 +138,18 @@ const statusList = ref(statusMan.value.getStatuses())
         </div>
     </div>
 
+    <Teleport>
+        
+    </Teleport>
+
 </template>
 
 <style scoped>
-.itbkk-button-edit {
+.itbkk-button-add {
     background-color: #260b8a;
 }
 
-.itbkk-button-edit:hover {
-    background-color: #c7b8ea;
-    /* light purple color */
-}
-
-.itbkk-button-delete {
-    background-color: #260b8a;
-}
-
-.itbkk-button-delete:hover {
+.itbkk-button-add:hover {
     background-color: #c7b8ea;
     /* light purple color */
 }

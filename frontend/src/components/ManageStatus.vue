@@ -4,9 +4,12 @@ import HeaderIT from './Header.vue'
 </script>
 
 <template>
-    <div>
-        <HeaderIT />
+    <HeaderIT />
+
+    <div class="table"> 
+        
     </div>
+
 </template>
 
 <style scoped></style>

@@ -5,6 +5,7 @@ import { TaskManagement } from '@/libs/TaskManagement';
 import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+import HeaderIT from './Header.vue'
 
 const toaster = createToaster({ /* options */ })
 
@@ -39,7 +40,7 @@ const openDetails = async (id) => {
         import.meta.env.VITE_BASE_URL, id
     )
     selectTask.value = item
-    selectTask.value.status = selectTask.value.status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' ')
+    selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
     showModal.value = true
     // router.push(`/task/${id}`)
 }
@@ -77,13 +78,8 @@ const deleteTask = async (removeId) => {
 </script>
 
 <template>
-    <header>
-        <div class="px-4 md:px-10 py-4 md:py-7">
-            <div class="flex items-center justify-center italic font-bold text-2xl text-slate-900">
-                IT-Bangmod Kradan Kanban
-            </div>
-        </div>
-    </header>
+
+    <HeaderIT />
 
     <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
         @deleteConfirm="deleteTask" />
@@ -94,10 +90,6 @@ const deleteTask = async (removeId) => {
             <TaskDetail :task='selectTask' @saveModal='complete' @close-modal="cancel" />
         </div>
     </Teleport>
-
-    <div class="itbkk-message opacity-0 ">
-        The task has been deleted
-    </div>
 
 
 </template>

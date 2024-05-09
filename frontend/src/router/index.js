@@ -4,6 +4,7 @@ import AddEditTask from '@/components/AddEditTask.vue'
 import NotFoundId from '@/views/NotFoundId.vue'
 import NotFound from '@/views/NotFound.vue'
 import EditTask from '@/components/EditTask.vue'
+import ManageStatus from '@/components/ManageStatus.vue'
 
 // set history of stor path when visit
 const history = createWebHistory()
@@ -19,6 +20,10 @@ const routes = [
     path: '/task',
     component: FirstPage
   },
+  {
+    path:'/status/manage' ,
+    component : ManageStatus
+  } ,
   {
     path: '/task/:id',
     name: 'TaskDetail',

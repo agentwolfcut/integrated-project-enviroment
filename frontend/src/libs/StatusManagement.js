@@ -6,44 +6,44 @@ class StatusManagement {
     addStatuses(newStatuses) {
       newStatuses.forEach((newStatus) =>
         this.addStatus(
-          newStatus.statusID,
-          newStatus.statusName,
-          newStatus.statusDescription
+          newStatus.id,
+          newStatus.name,
+          newStatus.description
         )
       );
     }
   
-    addStatus(statusID, statusName, statusDescription) {
+    addStatus(id, name, description) {
       this.statuses.push({
-        statusID: statusID,
-        statusName: statusName,
-        statusDescription: statusDescription
+        id: id,
+        name: name,
+        description: description
       });
     }
   
-    updateStatus(statusID, statusName, statusDescription) {
+    updateStatus(id, name, description) {
       this.statuses = this.statuses.map((status) => {
-        return status.statusID === statusID
+        return status.id === id
           ? {
               ...status,
-              statusName: statusName,
-              statusDescription: statusDescription
+              name: name,
+              description: description
             }
           : status;
       });
     }
   
     findStatus(searchID) {
-      return this.statuses.find((status) => status.statusID === searchID);
+      return this.statuses.find((status) => status.id === searchID);
     }
   
     findIndexStatus(searchID) {
-      return this.statuses.findIndex((status) => status.statusID === searchID);
+      return this.statuses.findIndex((status) => status.id === searchID);
     }
   
     removeStatus(removeID) {
       this.statuses.splice(
-        this.statuses.findIndex((status) => status.statusID === removeID),
+        this.statuses.findIndex((status) => status.id === removeID),
         1
       );
     }

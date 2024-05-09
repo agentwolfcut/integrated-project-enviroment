@@ -10,16 +10,11 @@ import buttonSlot from './Button.vue'
 const statusMan = ref(new StatusManagement())
 
 onMounted(async () => {
-    const statusRes = await getItems(
-        import.meta.env.VITE_BASE_URL2
-    )
-    console.log(`url : ${import.meta.env.VITE_BASE_URL2}`);
-
+    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2    )
     statusMan.value.addStatuses(statusRes)
-    console.log(statusMan.value.getStatuses());
 })
 
-const statusList = statusMan.value.getStatuses()
+const statusList = ref(statusMan.value.getStatuses())
 
 
 </script>
@@ -91,14 +86,15 @@ const statusList = statusMan.value.getStatuses()
 
                                                 <button
                                                     class="itbkk-status-name text-base font-medium leading-none text-gray-700 mr-4">
-
+                                                    {{ status.name }}
                                                 </button>
                                             </div>
                                         </td>
+                                        <td></td>
 
                                         <td class="itbkk-status-description">
                                             <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                                                <span></span>
+                                                {{ status.description }}
 
                                             </div>
                                         </td>
@@ -109,6 +105,8 @@ const statusList = statusMan.value.getStatuses()
                                             <button class="itbkk-button-edit">edit</button>
                                             <button class="itbkk-button-delete">delete</button>
                                         </td>
+
+                                        
                                     </tr>
 
                                 </tbody>

@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class StatusDTO {
-    private Integer statusID;
-    private String statusName;
-    private String statusDescription;
+    private Integer id;
+    private String name;
+    private String description;
     public StatusDTO() {
     }
 }

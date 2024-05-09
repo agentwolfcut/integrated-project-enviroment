@@ -86,7 +86,7 @@ const statusList = ref(statusMan.value.getStatuses())
 
                                                 <button
                                                     class="itbkk-status-name text-base font-medium leading-none text-gray-700 mr-4">
-                                                    {{ status.name }}
+                                                    {{ status.statusName }}
                                                 </button>
                                             </div>
                                         </td>

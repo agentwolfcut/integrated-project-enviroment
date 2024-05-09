@@ -30,10 +30,10 @@ public class StatusController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getStatusById(@PathVariable("id") Integer statusID) {
-        StatusEntity status = statusService.getStatusById(statusID);
+    public ResponseEntity<Object> getStatusById(@PathVariable("id") Integer id) {
+        StatusEntity status = statusService.getStatusById(id);
         if (status == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Status id %d does not exist.", statusID));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Status id %d does not exist.", id));
         StatusDTO statusDTO = modelMapper.map(status, StatusDTO.class);
         return new ResponseEntity<>(statusDTO, HttpStatus.OK);
     }

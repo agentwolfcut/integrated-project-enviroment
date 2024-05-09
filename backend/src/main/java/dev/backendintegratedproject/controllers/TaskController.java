@@ -26,6 +26,7 @@ public class TaskController {
     private ModelMapper modelMapper;
     @Autowired
     private ListMapper listMapper;
+
     @GetMapping
     public ResponseEntity<Object> getTasks() {
         List<TaskEntity> tasks = taskService.getAllTasks();

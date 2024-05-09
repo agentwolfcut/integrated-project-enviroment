@@ -6,6 +6,7 @@ import TaskList from './TaskList.vue';
 import TaskDetail from './TaskDetail.vue';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import HeaderIT from './Header.vue'
+import SideBar from './SideBar.vue'
 
 const toaster = createToaster({ /* options */ })
 
@@ -79,11 +80,21 @@ const deleteTask = async (removeId) => {
 
 <template>
 
-    <HeaderIT />
+    <!-- component -->
+    <!-- img/beams.jpg -->
 
-    <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-        @deleteConfirm="deleteTask" />
+    <div class="flex ">
+        
+        <SideBar/>
 
+        <div class="flex flex-col w-screen h-screen">
+            <HeaderIT />
+
+            <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
+                @deleteConfirm="deleteTask" />
+        </div>
+
+    </div>
     <!-- add task -->
     <Teleport to="#ViewTask">
         <div v-show="showModal">

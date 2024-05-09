@@ -37,6 +37,6 @@ const routes = [
 const router = createRouter({
   history,
   routes,
-  linkActiveClass: 'text-blue-600',
+  linkActiveClass: 'text-blue-300',
 })
 export default router

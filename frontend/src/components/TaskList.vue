@@ -39,7 +39,7 @@ const taskToDelete = ref(undefined)
 
 <template>
   <div>
-    <div class="sm:px-6 w-full">
+    <div class="sm:px-20 w-full">
       <div class="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
         <!-- head -->
         <div class="sm:flex items-center justify-between">
@@ -68,23 +68,11 @@ const taskToDelete = ref(undefined)
               </div>
             </div>
 
-            <router-link to="/status/manage">
-              <div class=" ml-4 sm:ml-8 itbkk-manage-status rounded-lg">
-              <buttonSlot size='sm' type="light" >
-                <template v-slot:title>
-                  Manage Status
-                </template>
-              </buttonSlot>
-            </div>
-            </router-link>
-            
-
-
           </div>
 
           <!-- ADD button  -->
           <router-link to="/task/add" @taskAdded="handleTaskAdded">
-            <div class="itbkk-button-add rounded-lg ">
+            <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8 ">
               <buttonSlot size='sm' type="dark">
                 <template v-slot:title>
                   Add Task
@@ -107,7 +95,7 @@ const taskToDelete = ref(undefined)
                   </div>
                 </td>
 
-                <td>
+                <td class="pl-2">
                   <div class="font-medium leading-none text-gray-700 mr-2">
                     Assignees
                   </div>
@@ -125,7 +113,7 @@ const taskToDelete = ref(undefined)
             <tbody class="container">
               <tr v-for="(task, index) in tasks" :key="index"
                 class="itbkk-item box h-16 border border-gray-100 rounded">
-                <td>
+                <td class="overflow-hidden max-w-96" >
                   <div class="flex items-center pl-5">
                     <div class="flex flex-row justify-start">
                       <p class="text-base font-medium leading-none text-gray-700 mr-4">
@@ -140,7 +128,7 @@ const taskToDelete = ref(undefined)
                   </div>
                 </td>
 
-                <td class="itbkk-assignees">
+                <td class="itbkk-assignees pl-2">
                   <div class="text-base font-medium leading-none text-gray-700 mr-2">
                     <span v-if="task.assignees">{{ task.assignees }}</span>
                     <span v-else class="text-slate-300 italic"> Unassigned </span>

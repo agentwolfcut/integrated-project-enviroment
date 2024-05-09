@@ -10,7 +10,7 @@ import buttonSlot from './Button.vue'
 const statusMan = ref(new StatusManagement())
 
 onMounted(async () => {
-    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2    )
+    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
     statusMan.value.addStatuses(statusRes)
 })
 
@@ -49,7 +49,6 @@ const statusList = ref(statusMan.value.getStatuses())
                                 <!-- head -->
                                 <thead class="bg-slate-200 text">
                                     <tr class="focus:outline-none h-16 border border-gray-100 rounded text-base">
-                                        <td></td>
                                         <td>
                                             <div class="flex items-center pl-5">
                                                 <p class="font-medium leading-none text-gray-700 ml-6">
@@ -64,7 +63,7 @@ const statusList = ref(statusMan.value.getStatuses())
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="font-medium leading-none text-gray-700 mr-2">
+                                            <div class="font-medium leading-none text-gray-700 mr-2 ">
                                                 Action
                                             </div>
                                         </td>
@@ -86,11 +85,11 @@ const statusList = ref(statusMan.value.getStatuses())
 
                                                 <button
                                                     class="itbkk-status-name text-base font-medium leading-none text-gray-700 mr-4">
-                                                    {{ status.statusName }}
+                                                    {{ status.name }}
                                                 </button>
                                             </div>
                                         </td>
-                                        <td></td>
+
 
                                         <td class="itbkk-status-description">
                                             <div class="text-base font-medium leading-none text-gray-700 mr-2">
@@ -101,12 +100,25 @@ const statusList = ref(statusMan.value.getStatuses())
 
 
 
-                                        <td class="itbkk-button-action">
-                                            <button class="itbkk-button-edit">edit</button>
-                                            <button class="itbkk-button-delete">delete</button>
+                                        <td class="itbkk-button-action flex flex-row items-center">
+                                            <div class="rounded-lg">
+                                                <buttonSlot size='sm' type="dark" class="itbkk-button-edit">
+                                                    <template v-slot:title>
+                                                        Edit
+                                                    </template>
+                                                </buttonSlot>
+                                            </div>
+
+                                            <div class="rounded-lg">
+                                                <buttonSlot size='sm' type="dark" class="itbkk-button-delete">
+                                                    <template v-slot:title>
+                                                        Delete
+                                                    </template>
+                                                </buttonSlot>
+                                            </div>
                                         </td>
 
-                                        
+
                                     </tr>
 
                                 </tbody>
@@ -121,11 +133,20 @@ const statusList = ref(statusMan.value.getStatuses())
 </template>
 
 <style scoped>
-.itbkk-button-add {
+.itbkk-button-edit {
     background-color: #260b8a;
 }
 
-.itbkk-button-add:hover {
+.itbkk-button-edit:hover {
+    background-color: #c7b8ea;
+    /* light purple color */
+}
+
+.itbkk-button-delete {
+    background-color: #260b8a;
+}
+
+.itbkk-button-delete:hover {
     background-color: #c7b8ea;
     /* light purple color */
 }

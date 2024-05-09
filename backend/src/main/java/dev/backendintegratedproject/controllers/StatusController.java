@@ -16,6 +16,8 @@ import static dev.backendintegratedproject.services.ListMapper.getInstance;
 
 @RestController
 @RequestMapping("/itb-kk/v2/statuses")
+//@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
+@CrossOrigin(origins = "http://localhost:5173")
 public class StatusController {
     @Autowired
     private StatusService statusService;

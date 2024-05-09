@@ -38,7 +38,7 @@ const statusList = ref(statusMan.value.getStatuses())
                                     <div class="rounded-lg">
                                         <buttonSlot size='sm' type="dark" class="itbkk-button-add">
                                             <template v-slot:title>
-                                                Add Task
+                                                Add Status
                                             </template>
                                         </buttonSlot>
                                     </div>

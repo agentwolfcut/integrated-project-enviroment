@@ -1,11 +1,8 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
   <!-- plz edit file in FirstPage.vue -->
-  <RouterView/>
-
+  <RouterView />
 </template>
 
 <style scoped></style>

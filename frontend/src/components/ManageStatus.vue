@@ -1,27 +1,28 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import HeaderIT from './Header.vue'
-import { getItems, addItem } from '../libs/fetchUtils';
+import { getItems, addItem, deleteItemById } from '../libs/fetchUtils';
 import { StatusManagement } from '@/libs/StatusManagement';
 import SideBar from './SideBar.vue'
 import buttonSlot from './Button.vue'
 import Trash from '@/assets/icons/CiTrashFull.vue'
 import Edit from '@/assets/icons/CiEditPencil01.vue'
+import router from '@/router';
 
 
 const statusMan = ref(new StatusManagement())
 
+// GET 
 onMounted(async () => {
     const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
     statusMan.value.addStatuses(statusRes)
 })
-
-
 const statusList = ref(statusMan.value.getStatuses())
 
-const showAddModal = ref(false)
 
+// ADD
 const addStatus = async (newStatus) => {
+    // back
     const addedItem = await addItem(import.meta.env.VITE_BASE_URL2,
         // cus backend will gen id , then send just  data without id
         {
@@ -29,8 +30,28 @@ const addStatus = async (newStatus) => {
             description: newStatus.description
         })
     console.log(addedItem);
+    // front
     statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
+    router.back()
 }
+
+// DELETE
+const confirmDelete = ref(false)
+const statusDelete = ref(undefined)
+const emits = defineEmits(['deleteC', 'deleteConfirm'])
+
+const deleteStatus = async () => {
+    // back
+    const removeId = statusDelete.value.id
+    const removeStatus = await deleteItemById(import.meta.env.VITE_BASE_URL2,
+        removeId)
+    // front
+    if (removeStatus === 200) {
+        statusMan.value.removeStatus(removeId)
+    }
+    confirmDelete.value = false
+}
+
 
 </script>
 
@@ -47,7 +68,7 @@ const addStatus = async (newStatus) => {
                         <div class="overflow-x-auto ">
 
                             <!-- button add -->
-                            <div class="flex justify-end mb-9" @click="showAddModal = true">
+                            <div class="flex justify-end mb-9">
 
                                 <router-link to="/status/manage/add">
                                     <div class="rounded-lg ml-4 sm:ml-8">
@@ -117,18 +138,6 @@ const addStatus = async (newStatus) => {
                                                 </div>
                                             </td>
 
-
-                                            <!-- <td class="itbkk-button-action flex flex-row">
-                                            
-                                            <button class="pr-2 itbkk-button-edit">
-                                                <Edit />
-                                            </button>
-
-                                            <button class="pr-1 itbkk-button-delete">
-                                                <Trash />
-                                            </button>
-                                        </td> -->
-
                                             <td class="itbkk-status-description">
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
 
@@ -136,7 +145,8 @@ const addStatus = async (newStatus) => {
                                                         <Edit />
                                                     </button>
 
-                                                    <button class="pr-1 itbkk-button-delete">
+                                                    <button class="pr-1 itbkk-button-delete"
+                                                        @click="(confirmDelete = true), (statusDelete = status), $emit('deleteC', status.id)">
                                                         <Trash />
                                                     </button>
                                                 </div>
@@ -154,7 +164,34 @@ const addStatus = async (newStatus) => {
         </div>
     </div>
     <div>
-        <router-view :status="statusMan.getStatuses()"  @saveStatus="addStatus" />
+        <router-view :status="statusMan.getStatuses()" @saveStatus="addStatus" />
+    </div>
+
+    <div v-if="confirmDelete">
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+            <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
+                <p class="mb-4 text-base font-medium overflow-y-auto">
+                    Do you want to delete the status number {{ statusDelete.id }} ,
+                    <span class="text-red-600 text-lg italic text-wrap hover:text-balance">
+                        {{ statusDelete.name }}
+                    </span>
+                    status?
+                </p>
+
+                <div class="flex justify-end">
+                    <button @click="confirmDelete = false"
+                        class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
+                        Cancel
+                    </button>
+
+                    <button @click="deleteStatus"
+                        class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Confirm
+                    </button>
+
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>

@@ -7,7 +7,7 @@ const props = defineProps({
     default:{
         id:undefined,
         name:'',
-        description:''
+        description: null
     }
 })
 
@@ -35,7 +35,7 @@ const previousStatus = computed(()=>props.status)
                 <!-- head -->
                 <div class="m-4">
                     <label for="title" class="font-medium text-base">Name of Status</label>
-                    <input v-model="previousStatus.name"
+                    <input v-model.trim()="previousStatus.name"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
                         type="text" maxlength="100">
                     </input>
@@ -45,7 +45,7 @@ const previousStatus = computed(()=>props.status)
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description w-full ">
                         <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousStatus.description" class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full "
+                        <input v-model.trim()="previousStatus.description" class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full "
                             style='padding: 15px;' type="text">
 
                         </input>

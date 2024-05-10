@@ -18,6 +18,7 @@ onMounted(async () => {
 
 const statusList = ref(statusMan.value.getStatuses())
 
+const showAddModal = ref(false)
 
 </script>
 
@@ -30,20 +31,20 @@ const statusList = ref(statusMan.value.getStatuses())
 
             <div class="flex justify-center">
                 <div class="sm:px-20 w-full">
-                    <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
+                    <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10 max-w-screen-2xl">
                         <div class="overflow-x-auto ">
 
                             <!-- button add -->
-                            <div class="flex justify-end mb-9">
-                                <router-link to="/status/add">
-                                    <div class="rounded-lg ml-4 sm:ml-8">
-                                        <buttonSlot size='sm' type="dark" class="itbkk-button-add">
-                                            <template v-slot:title>
-                                                Add Status
-                                            </template>
-                                        </buttonSlot>
-                                    </div>
-                                </router-link>
+                            <div class="flex justify-end mb-9" @click="showAddModal = true">
+
+                                <div class="rounded-lg ml-4 sm:ml-8">
+                                    <buttonSlot size='sm' type="dark" class="itbkk-button-add">
+                                        <template v-slot:title>
+                                            Add Status
+                                        </template>
+                                    </buttonSlot>
+                                </div>
+
                             </div>
 
                             <div class="mt-7 overflow-x-auto">
@@ -138,8 +139,11 @@ const statusList = ref(statusMan.value.getStatuses())
         </div>
     </div>
 
-    <Teleport>
-        
+    <Teleport to="#AddStatus">
+        <div v-show="showAddModal">
+            <AddStatus />
+        </div>
+
     </Teleport>
 
 </template>

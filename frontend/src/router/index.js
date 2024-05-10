@@ -6,6 +6,7 @@ import NotFound from '@/views/NotFound.vue'
 import EditTask from '@/components/EditTask.vue'
 import ManageStatus from '@/components/ManageStatus.vue'
 import AddStatus from '@/components/AddStatus.vue'
+import EditStatus from '@/components/EditStatus.vue'
 
 // set history of stor path when visit
 const history = createWebHistory()
@@ -29,7 +30,7 @@ const routes = [
         path: 'add', component: AddStatus, name: 'AddStatus'
       },
       {
-        path: ':id/edit', component: AddStatus, name: 'EditStatus'
+        path: ':id/edit', component: EditStatus, name: 'EditStatus'
       }
     ]
   },

@@ -38,17 +38,17 @@ const taskToDelete = ref(undefined)
   <div>
     <div class="sm:px-20 w-full">
       <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
-        
-          <div class="flex justify-end mb-9">
-            <router-link to="/task/add" @taskAdded="handleTaskAdded">
-              <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8">
-                <buttonSlot size="sm" type="dark">
-                  <template v-slot:title> Add Task </template>
-                </buttonSlot>
-              </div>
-            </router-link>
-          </div>
-        
+
+        <div class="flex justify-end mb-9">
+          <router-link to="/task/add" @taskAdded="handleTaskAdded">
+            <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8">
+              <buttonSlot size="sm" type="dark">
+                <template v-slot:title> Add Task </template>
+              </buttonSlot>
+            </div>
+          </router-link>
+        </div>
+
 
         <div class="mt-7 overflow-x-auto rounded-2xl border border-gray-100">
           <table class="w-full whitespace-nowrap rounded-md">
@@ -80,7 +80,7 @@ const taskToDelete = ref(undefined)
             <tbody class="container">
               <tr v-for="(task, index) in tasks" :key="index"
                 class="itbkk-item box h-16 border-t border-gray-100 rounded">
-                <td class="overflow-x-hidden">
+                <td >
                   <div class="flex items-center pl-5">
                     <div class="flex flex-row justify-start">
                       <p class="text-base font-medium leading-none text-gray-700 mr-4">
@@ -88,7 +88,7 @@ const taskToDelete = ref(undefined)
                       </p>
                     </div>
 
-                    <button class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
+                    <button class="itbkk-title text-base font-medium overflow-hidden leading-none text-gray-700 mr-4"
                       @click="$emit('showDetail', task.id)">
                       {{ task.title }}
                     </button>
@@ -105,15 +105,16 @@ const taskToDelete = ref(undefined)
                 </td>
                 <td></td>
                 <td class="itbkk-status ">
+
                   <div :class="{
                     'text-green-500 bg-green-100 ': task.status === 'Done',
                     'text-red-500 bg-red-100 ': task.status === 'To Do',
                     'text-yellow-600 bg-yellow-100': task.status === 'Doing',
-                    'text-slate-700 bg-slate-300 w-20':
-                      task.status === 'No Status',
-                  }" class="p-3 text-sm leading-none w-16 rounded-md font-semibold mr-4">
+                    'text-slate-700 bg-slate-300': task.status === 'No Status',
+                  }" class="p-3 w-20 text-sm leading-none flex justify-center rounded-md font-semibold mr-4">
                     {{ task.status }}
                   </div>
+
                 </td>
                 <td class="itbkk-button-action">
                   <button class="pr-2 itbkk-button-edit">

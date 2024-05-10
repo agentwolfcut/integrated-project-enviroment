@@ -87,7 +87,7 @@ const deleteTask = async (removeId) => {
         
         <SideBar/>
 
-        <div class="flex flex-col w-screen h-screen">
+        <div class="flex flex-col ">
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"

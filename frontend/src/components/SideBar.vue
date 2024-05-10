@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="group relative rounded-xl p-2  text-white ">
-                    <router-link to="/status/manage">
+                    <router-link to="/status">
                         <div class="itbkk-manage-status rounded-lg font-medium">
                             Status
                         </div>

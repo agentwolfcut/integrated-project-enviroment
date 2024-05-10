@@ -70,7 +70,7 @@ const deleteStatus = async () => {
                             <!-- button add -->
                             <div class="flex justify-end mb-9">
 
-                                <router-link to="/status/manage/add">
+                                <router-link to="/status/add">
                                     <div class="rounded-lg ml-4 sm:ml-8">
                                         <buttonSlot size='sm' type="dark" class="itbkk-button-add">
                                             <template v-slot:title>
@@ -140,10 +140,12 @@ const deleteStatus = async () => {
 
                                             <td class="itbkk-status-description">
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
-
-                                                    <button class="pr-2 itbkk-button-edit">
-                                                        <Edit />
-                                                    </button>
+                                                    <router-link
+                                                        :to="{ name: 'EditStatus', params: { id: status.id } }">
+                                                        <button class="pr-2 itbkk-button-edit">
+                                                            <Edit />
+                                                        </button>
+                                                    </router-link>
 
                                                     <button class="pr-1 itbkk-button-delete"
                                                         @click="(confirmDelete = true), (statusDelete = status), $emit('deleteC', status.id)">
@@ -165,6 +167,9 @@ const deleteStatus = async () => {
     </div>
     <div>
         <router-view :status="statusMan.getStatuses()" @saveStatus="addStatus" />
+    </div>
+    <div>
+
     </div>
 
     <div v-if="confirmDelete">

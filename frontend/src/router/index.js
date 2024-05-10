@@ -22,11 +22,14 @@ const routes = [
     component: FirstPage
   },
   {
-    path: '/status/manage',
+    path: '/status',
     component: ManageStatus,
-    children:[
+    children: [
       {
         path: 'add', component: AddStatus, name: 'AddStatus'
+      },
+      {
+        path: ':id/edit', component: AddStatus, name: 'EditStatus'
       }
     ]
   },

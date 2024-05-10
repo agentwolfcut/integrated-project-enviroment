@@ -19,9 +19,15 @@ public class StatusEntity {
     @Column(name = "statusName", nullable = false, unique = true, length = 50)
     private String name;
 
-    @Column(name = "statusDescription", nullable = false, length = 200)
+    @Column(name = "statusDescription", length = 200)
     private String description;
 
+    public String getStatusName() {
+        return name;
+    }
+    public void setDescription(String description) {
+        this.description = description == null?null:description.trim();
+    }
 
 }
 

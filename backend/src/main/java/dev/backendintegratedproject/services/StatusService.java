@@ -21,10 +21,12 @@ public class StatusService {
         return statusRepository.findById(id).orElse(null);
     }
 
-    public void addStatus(StatusEntity status) {
-        statusRepository.save(status);
+    public StatusEntity addStatus(StatusEntity status) {
+        if (status.getDescription() != null && status.getDescription().isEmpty()) {
+            status.setDescription(null);
+        }
+        return statusRepository.save(status);
     }
-
     public void editStatus(StatusEntity status) {
         statusRepository.save(status);
     }

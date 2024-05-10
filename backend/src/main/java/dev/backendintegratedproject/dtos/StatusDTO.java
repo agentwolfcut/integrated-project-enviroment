@@ -12,5 +12,7 @@ public class StatusDTO {
     private String description;
     public StatusDTO() {
     }
+
+
 }
 

@@ -39,41 +39,46 @@ public class StatusController {
         StatusDTO statusDTO = modelMapper.map(status, StatusDTO.class);
         return new ResponseEntity<>(statusDTO, HttpStatus.OK);
     }
+
+
+//    @PostMapping
+//    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+//            TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+//            TaskEntity addedTask = taskService.addTask(taskEntity);
+//
+//            return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+//    }
+@PostMapping
+public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
+    StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
+    StatusEntity addedStatus = statusService.addStatus(status);
+    StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
+    return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
+
 }
 
-//
-//    @PostMapping
-//    public ResponseEntity<String> addStatus(@RequestBody StatusDTO statusDTO) {
-//        StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
-//        if (status.getStatusName() == null || status.getStatusName().isEmpty()) {
-//            return ResponseEntity.badRequest().body("Status Name is required");
-//        }
-//        statusService.addStatus(status);
-//        return ResponseEntity.ok("The status has been added");
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<String> editStatus(@PathVariable("id") Integer id, @RequestBody StatusDTO statusDTO) {
-//        StatusEntity existingStatus = statusService.getStatusById(id);
-//        if (existingStatus == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
-//        }
-//        modelMapper.map(statusDTO, existingStatus);
-//        statusService.editStatus(existingStatus);
-//        return ResponseEntity.ok("The status has been updated");
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<String> deleteStatus(@PathVariable("id") Integer id) {
-//        StatusEntity existingStatus = statusService.getStatusById(id);
-//        if (existingStatus == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
-//        }
-//        if (existingStatus.getStatusName().equals("No Status")) {
-//            return ResponseEntity.badRequest().body("Cannot delete 'No Status'");
-//        }
-//        statusService.deleteStatus(id);
-//        return ResponseEntity.ok("The status has been deleted");
-//    }
-//
-//}
+    @PutMapping("/{id}")
+    public ResponseEntity<String> editStatus(@PathVariable("id") Integer id, @RequestBody StatusDTO statusDTO) {
+        StatusEntity existingStatus = statusService.getStatusById(id);
+        if (existingStatus == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
+        }
+        modelMapper.map(statusDTO, existingStatus);
+        statusService.editStatus(existingStatus);
+        return ResponseEntity.ok("The status has been updated");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteStatus(@PathVariable("id") Integer id) {
+        StatusEntity existingStatus = statusService.getStatusById(id);
+        if (existingStatus == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
+        }
+        if (existingStatus.getStatusName().equals("No Status")) {
+            return ResponseEntity.badRequest().body("Cannot delete 'No Status'");
+        }
+        statusService.deleteStatus(id);
+        return ResponseEntity.ok("The status has been deleted");
+    }
+
+}

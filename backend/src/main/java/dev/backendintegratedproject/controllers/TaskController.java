@@ -48,6 +48,7 @@ public class TaskController {
             TaskEntity addedTask = taskService.addTask(taskEntity);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+
     }
 
     // Endpoint to delete a task by ID

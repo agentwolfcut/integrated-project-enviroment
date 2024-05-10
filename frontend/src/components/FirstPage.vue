@@ -87,11 +87,11 @@ const deleteTask = async (removeId) => {
         
         <SideBar/>
 
-        <div class="flex flex-col ">
+        <div class="flex content flex-col items-center w-screen">
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask" />
+                @deleteConfirm="deleteTask" class="w-full" />
         </div>
 
     </div>
@@ -105,4 +105,7 @@ const deleteTask = async (removeId) => {
 
 </template>
 
-<style scoped></style>
+<style scoped>
+
+
+</style>

@@ -28,19 +28,18 @@
 </style>
 
 <template>
-  <div class="px-4 md:px-10 py-4 md:py-7">
-    <div class="sm:px-20 w-screen justify-center">
+    <div class="flex justify-center m-6">
       <h1
         class="mb-4 text-2xl font-extrabold text-gray-900 dark:text-white md:text-2xl lg:text-4xl"
       >
         <span
           class="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 gradient-animation"
         >
-          IT-Bangmod Kradon Kanban
+          IT-Bangmod Kradan Kanban
         </span>
       </h1>
     </div>
-  </div>
+  
 </template>
 
 <style scoped></style>

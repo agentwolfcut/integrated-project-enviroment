@@ -58,18 +58,15 @@ const deleteStatus = async () => {
 <template>
     <div class="flex">
         <SideBar />
-
-        <div class="flex flex-col w-screen h-screen">
+        <div class="flex flex-col w-screen h-screen items-center">
             <HeaderIT />
-
             <div class="flex justify-center">
+                
                 <div class="sm:px-20 w-full">
-                    <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10 max-w-screen-2xl">
+                    <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10 ">
                         <div class="overflow-x-auto ">
-
                             <!-- button add -->
                             <div class="flex justify-end mb-9">
-
                                 <router-link to="/status/add">
                                     <div class="rounded-lg ml-4 sm:ml-8">
                                         <buttonSlot size='sm' type="dark" class="itbkk-button-add">
@@ -79,14 +76,13 @@ const deleteStatus = async () => {
                                         </buttonSlot>
                                     </div>
                                 </router-link>
-
                             </div>
 
-                            <div class="mt-7 overflow-x-auto">
-                                <table class="w-full whitespace-nowrap rounded-md">
+                            <div class="mt-7 overflow-x-auto rounded-2xl border border-gray-100">
+                                <table class="w-full whitespace-nowrap ">
                                     <!-- head -->
                                     <thead class="bg-slate-200 text">
-                                        <tr class="focus:outline-none h-16 border border-gray-100 rounded text-base">
+                                        <tr class="focus:outline-none h-16   text-base">
                                             <td>
                                                 <div class="flex items-center pl-5">
                                                     <p class="font-medium leading-none text-gray-700 ml-6">
@@ -94,15 +90,15 @@ const deleteStatus = async () => {
                                                     </p>
                                                 </div>
                                             </td>
-
+                                            <td></td>
                                             <td>
                                                 <div class="font-medium leading-none text-gray-700 mr-2">
                                                     Description
                                                 </div>
                                             </td>
-
+                                            <td></td>
                                             <td>
-                                                <div class="font-medium leading-none text-gray-700 mr-2 ">
+                                                <div class="px-10 font-medium leading-none text-gray-700 mr-2 ">
                                                     Action
                                                 </div>
                                             </td>
@@ -114,8 +110,8 @@ const deleteStatus = async () => {
                                     <!-- body content -->
                                     <tbody class="container">
                                         <tr v-for="(status, index) in statusList" :key="index"
-                                            class="itbkk-item box h-16 border border-gray-100 rounded">
-                                            <td class="overflow-hidden max-w-96">
+                                            class="itbkk-item box h-16 border-t border-gray-100 rounded">
+                                            <td class="overflow-hidden min-w-60 ">
                                                 <div class="flex items-center pl-5">
                                                     <div class="flex flex-row justify-start">
                                                         <p
@@ -130,15 +126,15 @@ const deleteStatus = async () => {
                                                     </button>
                                                 </div>
                                             </td>
-
-
-                                            <td class="itbkk-status-description">
+                                            <td></td>
+                                            <td class="itbkk-status-description overflow-x-hidden">
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     {{ status.description }}
                                                 </div>
                                             </td>
 
-                                            <td class="itbkk-status-description">
+                                            <td></td>
+                                            <td class="itbkk-status-action px-10 ">
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     <router-link
                                                         :to="{ name: 'EditStatus', params: { id: status.id } }">
@@ -209,5 +205,18 @@ const deleteStatus = async () => {
 .itbkk-button-add:hover {
     background-color: #c7b8ea;
     /* light purple color */
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.box {
+    transition: opacity 0.6s ease;
+}
+
+.container:hover> :not(:hover) {
+    opacity: 0.2;
 }
 </style>

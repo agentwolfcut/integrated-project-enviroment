@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import HeaderIT from './Header.vue'
-import { getItems } from '../libs/fetchUtils';
+import { getItems, addItem } from '../libs/fetchUtils';
 import { StatusManagement } from '@/libs/StatusManagement';
 import SideBar from './SideBar.vue'
 import buttonSlot from './Button.vue'
@@ -16,9 +16,21 @@ onMounted(async () => {
     statusMan.value.addStatuses(statusRes)
 })
 
+
 const statusList = ref(statusMan.value.getStatuses())
 
 const showAddModal = ref(false)
+
+const addStatus = async (newStatus) => {
+    const addedItem = await addItem(import.meta.env.VITE_BASE_URL2,
+        // cus backend will gen id , then send just  data without id
+        {
+            name: newStatus.name,
+            description: newStatus.description
+        })
+    console.log(addedItem);
+    statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
+}
 
 </script>
 
@@ -37,13 +49,15 @@ const showAddModal = ref(false)
                             <!-- button add -->
                             <div class="flex justify-end mb-9" @click="showAddModal = true">
 
-                                <div class="rounded-lg ml-4 sm:ml-8">
-                                    <buttonSlot size='sm' type="dark" class="itbkk-button-add">
-                                        <template v-slot:title>
-                                            Add Status
-                                        </template>
-                                    </buttonSlot>
-                                </div>
+                                <router-link to="/status/manage/add">
+                                    <div class="rounded-lg ml-4 sm:ml-8">
+                                        <buttonSlot size='sm' type="dark" class="itbkk-button-add">
+                                            <template v-slot:title>
+                                                Add Status
+                                            </template>
+                                        </buttonSlot>
+                                    </div>
+                                </router-link>
 
                             </div>
 
@@ -117,6 +131,7 @@ const showAddModal = ref(false)
 
                                             <td class="itbkk-status-description">
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
+
                                                     <button class="pr-2 itbkk-button-edit">
                                                         <Edit />
                                                     </button>
@@ -138,13 +153,9 @@ const showAddModal = ref(false)
             </div>
         </div>
     </div>
-
-    <Teleport to="#AddStatus">
-        <div v-show="showAddModal">
-            <AddStatus />
-        </div>
-
-    </Teleport>
+    <div>
+        <router-view :status="statusMan.getStatuses()"  @saveStatus="addStatus" />
+    </div>
 
 </template>
 

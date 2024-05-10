@@ -23,7 +23,12 @@ const routes = [
   },
   {
     path: '/status/manage',
-    component: ManageStatus
+    component: ManageStatus,
+    children:[
+      {
+        path: 'add', component: AddStatus, name: 'AddStatus'
+      }
+    ]
   },
   {
     path: '/task/:id',
@@ -33,7 +38,6 @@ const routes = [
 
   { path: '/task/add', component: AddEditTask, name: 'AddTask' },
   { path: '/task/:taskId/edit', component: EditTask, name: 'EditTask' },
-  { path: '/status/add', component: AddStatus, name: 'AddStatus' },
   { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/task' }
 ]
 const router = createRouter({

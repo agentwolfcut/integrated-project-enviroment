@@ -32,7 +32,6 @@ public class TaskService {
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
     }
-
 //    public void deleteTask(Integer id) {
 //        TaskEntity task = taskRepository.findById(id)
 //                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
@@ -43,7 +42,6 @@ public class TaskService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
     taskRepository.delete(task);
 }
-
     public TaskEntity editTask(Integer id, TaskEntity task) {
         TaskEntity existingTask = taskRepository.findById(id).orElse(null);
         if (existingTask != null) {

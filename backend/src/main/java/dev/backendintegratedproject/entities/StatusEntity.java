@@ -31,11 +31,13 @@ public class StatusEntity {
     public void setDescription(String description) {
         this.description = description == null?null:description.trim();
     }
-    public void setStatus(String name) {
+    public void setName(String name) {
         this.name = name == null ? null : name.trim().toUpperCase().replace(" ", "_");
     }
     public String getStatus(){
         return name == null?"NO_STATUS":name.trim().toUpperCase().replace(" ","_");
     }
+
+
 }
 

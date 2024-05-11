@@ -57,16 +57,27 @@ public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
 
 }
 
+//    @PutMapping("/{id}")
+//    public ResponseEntity<String> editStatus(@PathVariable Integer id, @RequestBody StatusDTO statusDTO) {
+//        StatusEntity existingStatus = statusService.getStatusById(id);
+//        if (existingStatus == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
+//        }
+//        modelMapper.map(statusDTO, existingStatus);
+//        statusService.editStatus(existingStatus);
+//        return ResponseEntity.ok("The status has been updated");
+//    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<String> editStatus(@PathVariable("id") Integer id, @RequestBody StatusDTO statusDTO) {
-        StatusEntity existingStatus = statusService.getStatusById(id);
-        if (existingStatus == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
+    public ResponseEntity<String> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
+        StatusEntity editedStatus = statusService.editStatus(id,status);
+        if (editedStatus != null) {
+            return ResponseEntity.ok("The status has been updated");
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        modelMapper.map(statusDTO, existingStatus);
-        statusService.editStatus(existingStatus);
-        return ResponseEntity.ok("The status has been updated");
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteStatus(@PathVariable("id") Integer id) {

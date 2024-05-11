@@ -121,10 +121,6 @@ onMounted(async () => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <!-- <option value="No Status" selected>No Status</option>
-                                        <option value="To Do">To Do</option>
-                                        <option value="Doing">Doing</option>
-                                        <option value="Done">Done</option> -->
                                         <option v-for="status in statusOptions" :key="status.name" :value="status.name">
                                             {{ status.name }}
                                         </option>

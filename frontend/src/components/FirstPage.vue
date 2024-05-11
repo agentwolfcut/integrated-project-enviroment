@@ -39,7 +39,7 @@ const openDetails = async (id) => {
         import.meta.env.VITE_BASE_URL, id
     )
     selectTask.value = item
-    selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
+    // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
     showModal.value = true
     // router.push(`/task/${id}`)
 }

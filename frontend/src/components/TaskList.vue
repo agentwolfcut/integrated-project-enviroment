@@ -62,6 +62,7 @@ const taskToDelete = ref(undefined)
                   </div>
                 </td>
                 <td></td>
+                <td></td>
                 <td class="pl-2">
                   <div class="font-medium leading-none text-gray-700 mr-2">
                     Assignees
@@ -80,7 +81,7 @@ const taskToDelete = ref(undefined)
             <tbody class="container">
               <tr v-for="(task, index) in tasks" :key="index"
                 class="itbkk-item box h-16 border-t border-gray-100 rounded">
-                <td >
+                <td>
                   <div class="flex items-center pl-5">
                     <div class="flex flex-row justify-start">
                       <p class="text-base font-medium leading-none text-gray-700 mr-4">
@@ -88,12 +89,13 @@ const taskToDelete = ref(undefined)
                       </p>
                     </div>
 
-                    <button class="itbkk-title text-base font-medium overflow-hidden leading-none text-gray-700 mr-4"
+                    <button class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
                       @click="$emit('showDetail', task.id)">
                       {{ task.title }}
                     </button>
                   </div>
                 </td>
+                <td></td>
                 <td></td>
                 <td class="itbkk-assignees pl-2 overflow-x-hidden ">
                   <div class="text-base font-medium leading-none text-gray-700 mr-2">
@@ -169,6 +171,18 @@ const taskToDelete = ref(undefined)
 table {
   width: 100%;
   table-layout: fixed;
+}
+
+.itbkk-title {
+  white-space: initial;
+  /* adjust this value to your preference */
+  overflow-wrap: break-word;
+  max-width: 30rem;
+
+  @media (max-width: 1350px) {
+    max-width: 17rem;
+  }
+  
 }
 
 .box {

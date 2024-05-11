@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import HeaderIT from './Header.vue'
-import { getItems, addItem, deleteItemById , editItem } from '../libs/fetchUtils';
+import { getItems, addItem, deleteItemById, editItem } from '../libs/fetchUtils';
 import { StatusManagement } from '@/libs/StatusManagement';
 import SideBar from './SideBar.vue'
 import buttonSlot from './Button.vue'
@@ -23,16 +23,24 @@ const statusList = ref(statusMan.value.getStatuses())
 // ADD
 const addStatus = async (newStatus) => {
     // back
-    const addedItem = await addItem(import.meta.env.VITE_BASE_URL2,
-        // cus backend will gen id , then send just  data without id
-        {
-            name: newStatus.name,
-            description: newStatus.description
-        })
-    console.log(addedItem);
-    // front
-    statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
-    router.back()
+    if (newStatus.id === undefined) {
+        const addedItem = await addItem(import.meta.env.VITE_BASE_URL2,
+            // cus backend will gen id , then send just  data without id
+            {
+                name: newStatus.name,
+                description: newStatus.description
+            })
+        console.log(addedItem);
+        // front
+        statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
+        router.back()
+    }
+    else {
+        // backend put (replace with new)
+        const editedItem = await editItem(import.meta.env.VITE_BASE_URL2,newStatus.id,newStatus)
+        // front
+        statusMan.value.updateStatus(newStatus.id,newStatus.name,newStatus.description)
+    }
 }
 
 // DELETE
@@ -58,8 +66,8 @@ const sendData = (status) => {
     editingStatus.value = status
 }
 const editStatus = async (editStatus) => {
-    const editedItem = await editItem(import.meta.env.VITE_BASE_URL2 , editStatus.id , editStatus )
-    statusMan.value.updateStatus(editStatus.id , editStatus.description , editStatus.name)
+    const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
+    statusMan.value.updateStatus(editStatus.id, editStatus.description, editStatus.name)
 }
 
 </script>
@@ -147,7 +155,8 @@ const editStatus = async (editStatus) => {
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     <router-link
                                                         :to="{ name: 'EditStatus', params: { id: status.id } }">
-                                                        <button class="pr-2 itbkk-button-edit" @click="sendData(status)">
+                                                        <button class="pr-2 itbkk-button-edit"
+                                                            @click="sendData(status)">
                                                             <Edit />
                                                         </button>
                                                     </router-link>
@@ -170,11 +179,9 @@ const editStatus = async (editStatus) => {
             </div>
         </div>
     </div>
+    
     <div>
         <router-view :status="statusMan.getStatuses()" @saveStatus="addStatus" />
-    </div>
-    <div>
-        <router-view :status="editingStatus" @saveStatus = "editStatus"></router-view>
     </div>
 
     <div v-if="confirmDelete">

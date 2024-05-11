@@ -18,9 +18,7 @@ const previousStatus = computed(() => props.status)
 
 const route = useRoute()
 const statusId = route.params.id
-
-console.log(previousStatus.value);
-
+console.log(statusId);
 
 </script>
 

@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -22,12 +23,15 @@ public class StatusEntity {
     @Column(name = "statusDescription", length = 200)
     private String description;
 
+    @OneToMany(mappedBy = "status")
+    private List<TaskEntity> tasks;
     public String getStatusName() {
         return name;
     }
     public void setDescription(String description) {
         this.description = description == null?null:description.trim();
     }
+
 
 }
 

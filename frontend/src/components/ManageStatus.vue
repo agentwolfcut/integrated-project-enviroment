@@ -8,8 +8,9 @@ import buttonSlot from './Button.vue'
 import Trash from '@/assets/icons/CiTrashFull.vue'
 import Edit from '@/assets/icons/CiEditPencil01.vue'
 import router from '@/router';
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-
+const toaster = createToaster({ /* options */ })
 const statusMan = ref(new StatusManagement())
 
 // GET 
@@ -21,25 +22,32 @@ const statusList = ref(statusMan.value.getStatuses())
 
 
 // ADD
-const addStatus = async (newStatus) => {
-    // back
-    if (newStatus.id === undefined) {
-        const addedItem = await addItem(import.meta.env.VITE_BASE_URL2,
-            // cus backend will gen id , then send just  data without id
-            {
-                name: newStatus.name,
-                description: newStatus.description
-            })
-        console.log(addedItem);
-        // front
+const editingStatus = ref({ id: undefined, name: '', description: '' })
+
+const addStatus = async () => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL2}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(editingStatus.value)
+        });
+        if (!res.ok) {
+            throw new Error(`Failed to add status. Server responded with status ${res.status}`);
+        }
+        const addedItem = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+        editingStatus.value = { id: undefined, name: '', description: '' }
+        // console.log(previousTask.value);
+
         statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
-        router.back()
-    }
-    else {
-        // backend put (replace with new)
-        const editedItem = await editItem(import.meta.env.VITE_BASE_URL2,newStatus.id,newStatus)
-        // front
-        statusMan.value.updateStatus(newStatus.id,newStatus.name,newStatus.description)
+        router.back();
+        toaster.success(`The ${addedItem.name} status has been added`)
+    }    // Navigate back
+    catch (error) {
+        console.error('Error adding status:', error);
+        // Handle error as needed
+        toaster.error(`An error has occurred, the status could not be added.`)
     }
 }
 
@@ -61,14 +69,12 @@ const deleteStatus = async () => {
 }
 
 // EDIT
-const editingStatus = ref({ id: undefined, name: '', description: '' })
-const sendData = (status) => {
-    editingStatus.value = status
+
+const updateStatus = async (newStatus) => {
+    const res = await editItem(import.meta.env.VITE_BASE_URL2, newStatus.id, newStatus)
+    statusMan.value.updateStatus(newStatus.id, newStatus.name, newStatus.description)
 }
-const editStatus = async (editStatus) => {
-    const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
-    statusMan.value.updateStatus(editStatus.id, editStatus.description, editStatus.name)
-}
+
 
 </script>
 
@@ -155,8 +161,7 @@ const editStatus = async (editStatus) => {
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     <router-link
                                                         :to="{ name: 'EditStatus', params: { id: status.id } }">
-                                                        <button class="pr-2 itbkk-button-edit"
-                                                            @click="sendData(status)">
+                                                        <button class="pr-2 itbkk-button-edit">
                                                             <Edit />
                                                         </button>
                                                     </router-link>
@@ -179,21 +184,21 @@ const editStatus = async (editStatus) => {
             </div>
         </div>
     </div>
-    
-    <div>
-        <router-view :status="statusMan.getStatuses()" @saveStatus="addStatus" />
-    </div>
+
+
+    <router-view :status="editingStatus" @saveStatus="addStatus" @saveEdit="updateStatus" />
 
     <div v-if="confirmDelete">
         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
             <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
-                <p class="mb-4 text-base font-medium overflow-y-auto">
-                    Do you want to delete the status number {{ statusDelete.id }} ,
+                <div class="mb-4 text-base font-medium overflow-y-auto">
+                    <p v-if="statusDelete.id === 1">You don't permit to delete </p>
+                    <p v-else>Do you want to delete the status number {{ statusDelete.id }} ,</p>
                     <span class="text-red-600 text-lg italic text-wrap hover:text-balance">
                         {{ statusDelete.name }}
                     </span>
                     status?
-                </p>
+                </div>
 
                 <div class="flex justify-end">
                     <button @click="confirmDelete = false"
@@ -201,8 +206,8 @@ const editStatus = async (editStatus) => {
                         Cancel
                     </button>
 
-                    <button @click="deleteStatus"
-                        class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    <button @click="deleteStatus" :disabled="statusDelete.id === 1" 
+                        class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900">
                         Confirm
                     </button>
 

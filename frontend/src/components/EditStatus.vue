@@ -1,19 +1,36 @@
 <script setup>
 import router from '@/router';
-import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router'
+import { computed, ref, onMounted } from 'vue';
+import { getItemById, editItem } from '../libs/fetchUtils';
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-const props = defineProps({
-    status: Object,
-    default: {
-        id: undefined,
-        name: '',
-        description: ''
+const toaster = createToaster({ /* options */ })
+
+let previousStatus = ref('')
+let originalStatus = ref('')
+
+const route = useRoute()
+const statusId = ref(route.params.id)
+
+
+onMounted(async () => {
+    const statusRes = await getItemById(import.meta.env.VITE_BASE_URL2, statusId.value)
+    if (statusRes.name === 'No Status') {
+        toaster.error('The “No Status” status cannot be edited')
+        router.back()
+    } else {
+        previousStatus.value = { ...statusRes }
+        originalStatus.value = { ...statusRes }
     }
 })
 
-defineEmits(['saveStatus'])
+const isTaskChanged = () => {
+    return JSON.stringify(previousStatus.value) !== JSON.stringify(originalStatus.value);
+}
 
-const previousStatus = computed(() => props.status)
+const emits = defineEmits(['saveEdit'])
+
 </script>
 
 <template>
@@ -30,9 +47,9 @@ const previousStatus = computed(() => props.status)
                 <!-- head -->
                 <div class="m-4">
                     <label for="title" class="font-medium text-base">Name of Status</label>
-                    <input v-model.trim()="previousStatus.name"
+                    <input v-model="previousStatus.name"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text" maxlength="100">
+                        type="text" maxlength="100" placeholder="Enter status name">
                     </input>
                 </div>
 
@@ -40,7 +57,7 @@ const previousStatus = computed(() => props.status)
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description w-full ">
                         <p class="font-medium text-base mb-2">description</p>
-                        <input v-model.trim()="previousStatus.description"
+                        <input v-model="previousStatus.description"
                             class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
                             type="text">
 
@@ -54,7 +71,8 @@ const previousStatus = computed(() => props.status)
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('saveStatus', previousStatus)" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveEdit', previousStatus)"
+                            :disabled="!isTaskChanged() || !previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

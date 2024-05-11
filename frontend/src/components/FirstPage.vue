@@ -16,9 +16,7 @@ const showModal = ref(false)
 
 // GET items
 onMounted(async () => {
-    const taskRes = await getItems(
-        import.meta.env.VITE_BASE_URL
-    )
+    const taskRes = await getItems(import.meta.env.VITE_BASE_URL)
     taskMan.value.addtasks(taskRes)
     //tasks.value = taskRes // reverse and slice to show the most
 })
@@ -84,8 +82,8 @@ const deleteTask = async (removeId) => {
     <!-- img/beams.jpg -->
 
     <div class="flex ">
-        
-        <SideBar/>
+
+        <SideBar />
 
         <div class="flex content flex-col items-center w-screen">
             <HeaderIT />
@@ -105,7 +103,4 @@ const deleteTask = async (removeId) => {
 
 </template>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

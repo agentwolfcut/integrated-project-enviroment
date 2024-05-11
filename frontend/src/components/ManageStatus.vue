@@ -70,6 +70,10 @@ const deleteStatus = async () => {
 
 // EDIT
 
+const updateStatus = async (newStatus) => {
+    const res = await editItem(import.meta.env.VITE_BASE_URL2, newStatus.id, newStatus)
+    statusMan.value.updateStatus(newStatus.id, newStatus.name, newStatus.description)
+}
 
 
 </script>
@@ -182,20 +186,19 @@ const deleteStatus = async () => {
     </div>
 
 
-    <router-view :status="editingStatus" @saveStatus="addStatus" />
-    <router-view name="EditStatus"></router-view>
-
+    <router-view :status="editingStatus" @saveStatus="addStatus" @saveEdit="updateStatus" />
 
     <div v-if="confirmDelete">
         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
             <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
-                <p class="mb-4 text-base font-medium overflow-y-auto">
-                    Do you want to delete the status number {{ statusDelete.id }} ,
+                <div class="mb-4 text-base font-medium overflow-y-auto">
+                    <p v-if="statusDelete.id === 1">You don't permit to delete </p>
+                    <p v-else>Do you want to delete the status number {{ statusDelete.id }} ,</p>
                     <span class="text-red-600 text-lg italic text-wrap hover:text-balance">
                         {{ statusDelete.name }}
                     </span>
                     status?
-                </p>
+                </div>
 
                 <div class="flex justify-end">
                     <button @click="confirmDelete = false"
@@ -203,8 +206,8 @@ const deleteStatus = async () => {
                         Cancel
                     </button>
 
-                    <button @click="deleteStatus"
-                        class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    <button @click="deleteStatus" :disabled="statusDelete.id === 1" 
+                        class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900">
                         Confirm
                     </button>
 

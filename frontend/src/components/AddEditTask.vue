@@ -4,6 +4,7 @@ import { onMounted, ref, computed } from 'vue'
 import router from '@/router';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import { useRoute } from 'vue-router';
+import { getItems, deleteItemById } from '../libs/fetchUtils';
 
 const toaster = createToaster({ /* options */ })
 
@@ -17,7 +18,7 @@ const props = defineProps({
             title: '',
             description: "",
             assignees: "",
-            status: "No Status",
+            status: "NO_STATUS",
         },
         require: true
     },
@@ -64,6 +65,12 @@ const saveTask = async () => {
 const route = useRoute();
 const taskId = ref(route.params.taskId)
 
+const statusOptions = ref('')
+
+onMounted(async () => {
+    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+    statusOptions.value = { ...statusRes }
+})
 
 
 </script>
@@ -114,10 +121,13 @@ const taskId = ref(route.params.taskId)
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option value="No Status" selected>No Status</option>
+                                        <!-- <option value="No Status" selected>No Status</option>
                                         <option value="To Do">To Do</option>
                                         <option value="Doing">Doing</option>
-                                        <option value="Done">Done</option>
+                                        <option value="Done">Done</option> -->
+                                        <option v-for="status in statusOptions" :key="status.name" :value="status.name">
+                                            {{ status.name }}
+                                        </option>
                                     </select>
                                 </form>
                             </div>

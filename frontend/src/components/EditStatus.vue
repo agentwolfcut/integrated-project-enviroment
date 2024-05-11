@@ -1,26 +1,35 @@
 <script setup>
 import router from '@/router';
 import { useRoute } from 'vue-router'
-import { computed, ref , onMounted } from 'vue';
-import { getItemById } from '../libs/fetchUtils';
+import { computed, ref, onMounted } from 'vue';
+import { getItemById, editItem } from '../libs/fetchUtils';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 const toaster = createToaster({ /* options */ })
 
 let previousStatus = ref('')
-let originalTask = ref('')
+let originalStatus = ref('')
 
 const route = useRoute()
 const statusId = ref(route.params.id)
 
 
 onMounted(async () => {
-    const statusRes = await getItemById(import.meta.env.VITE_BASE_URL2 , statusId.value)
-    previousStatus.value = {...statusRes}
-    originalTask.value = {...statusRes}
+    const statusRes = await getItemById(import.meta.env.VITE_BASE_URL2, statusId.value)
+    if (statusRes.name === 'No Status') {
+        toaster.error('The “No Status” status cannot be edited')
+        router.back()
+    } else {
+        previousStatus.value = { ...statusRes }
+        originalStatus.value = { ...statusRes }
+    }
 })
 
+const isTaskChanged = () => {
+    return JSON.stringify(previousStatus.value) !== JSON.stringify(originalStatus.value);
+}
 
+const emits = defineEmits(['saveEdit'])
 
 </script>
 
@@ -62,7 +71,8 @@ onMounted(async () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('saveEdit', previousStatus)" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveEdit', previousStatus)"
+                            :disabled="!isTaskChanged() || !previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

@@ -1,4 +1,5 @@
 package dev.backendintegratedproject.entities;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,19 +26,20 @@ public class TaskEntity {
     private String description;
     @Column(name = "taskAssignees", length = 30)
     private String assignees;
-    @Column(name = "taskStatus")
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "statusID")
+    private StatusEntity status;
     @Column(name = "createdOn", nullable = false)
     private Date createdOn;
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
 
-    public void setStatus(String status) {
-        this.status = status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
-    }
-    public String getStatus(){
-        return status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
-    }
+//    public void setStatus(String status) {
+//        this.status = status == null ? null : status.trim().toUpperCase().replace(" ", "_");
+//    }
+//    public String getStatus(){
+//        return status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
+//    }
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim();

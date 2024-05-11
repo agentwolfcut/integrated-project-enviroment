@@ -34,12 +34,6 @@ public class TaskEntity {
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
 
-//    public void setStatus(String status) {
-//        this.status = status == null ? null : status.trim().toUpperCase().replace(" ", "_");
-//    }
-//    public String getStatus(){
-//        return status == null?"NO_STATUS":status.trim().toUpperCase().replace(" ","_");
-//    }
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim();
@@ -68,5 +62,11 @@ public class TaskEntity {
         SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dt1.format(dt.parse(dt.format(date_s)));
+    }
+
+    public void saveTransientStatusEntity(EntityManager entityManager) {
+        if (this.status != null && this.status.getId() == null) {
+            entityManager.persist(this.status);
+        }
     }
 }

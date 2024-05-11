@@ -91,7 +91,7 @@ const deleteTask = async (removeId) => {
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask" class="w-full" />
+                @deleteConfirm="deleteTask" />
         </div>
 
     </div>

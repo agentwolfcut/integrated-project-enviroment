@@ -64,15 +64,40 @@ const deleteStatus = async () => {
     // front
     if (removeStatus === 200) {
         statusMan.value.removeStatus(removeId)
+        toaster.success(`The ${statusDelete.value.name} status has been deleted`)
+    } else {
+        toaster.error(`An error has occurred, the status could not be delete , plz refresh page.`)
     }
     confirmDelete.value = false
 }
 
 // EDIT
+// const updateStatus = async (editStatus) => {
+//     console.log(editStatus);
+//     try {
+//         const res = await fetch(`${import.meta.env.VITE_BASE_URL2}/${editStatus.id}`, {
+//             method: 'PUT',
+//             headers: {
+//                 'content-type': 'application/json'
+//             },
+//             body: JSON.stringify(editStatus.value)
+//         })
+//         const editedStatus = await res.json()
+//         statusMan.value.updateStatus(editStatus.id,editStatus.name,editStatus.description)
+//         router.back();
+//         toaster.success(`The ${editedStatus.name} status has been updated`);
+//         // return editedStatus
+//     } catch (error) {
+//         console.log(`error: ${error}`)
+//         toaster.error(`The update was unsuccessful`);
+//     }
+// }
 
-const updateStatus = async (newStatus) => {
-    const res = await editItem(import.meta.env.VITE_BASE_URL2, newStatus.id, newStatus)
-    statusMan.value.updateStatus(newStatus.id, newStatus.name, newStatus.description)
+const updateStatus = async (editStatus) => {
+    const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
+    statusMan.value.updateStatus(editStatus.id,editStatus.name,editStatus.description)
+    toaster.success(`The ${editStatus.name} status has been updated`);
+    router.push('/status')
 }
 
 
@@ -134,7 +159,7 @@ const updateStatus = async (newStatus) => {
                                     <tbody class="container">
                                         <tr v-for="(status, index) in statusList" :key="index"
                                             class="itbkk-item box h-16 border-t border-gray-100 rounded">
-                                            <td class="overflow-hidden min-w-60 ">
+                                            <td class=" min-w-60 ">
                                                 <div class="flex items-center pl-5">
                                                     <div class="flex flex-row justify-start">
                                                         <p
@@ -206,7 +231,7 @@ const updateStatus = async (newStatus) => {
                         Cancel
                     </button>
 
-                    <button @click="deleteStatus" :disabled="statusDelete.id === 1" 
+                    <button @click="deleteStatus" :disabled="statusDelete.id === 1"
                         class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900">
                         Confirm
                     </button>

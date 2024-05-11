@@ -32,6 +32,8 @@ const handleTaskAdded = (statusCode) => {
 }
 
 const taskToDelete = ref(undefined)
+
+
 </script>
 
 <template>
@@ -109,12 +111,14 @@ const taskToDelete = ref(undefined)
                 <td class="itbkk-status ">
 
                   <div :class="{
-                    'text-green-500 bg-green-100 ': task.status === 'Done',
-                    'text-red-500 bg-red-100 ': task.status === 'To Do',
-                    'text-yellow-600 bg-yellow-100': task.status === 'Doing',
-                    'text-slate-700 bg-slate-300': task.status === 'No Status',
+                    'text-green-500 bg-green-100 ': task.status === 'DONE',
+                    'text-red-500 bg-red-100 ': task.status === 'TO_DO',
+                    'text-yellow-600 bg-yellow-100': task.status === 'DOING',
+                    'text-slate-700 bg-slate-300': task.status === 'NO_STATUS',
                   }" class="p-3 w-20 text-sm leading-none flex justify-center rounded-md font-semibold mr-4">
-                    {{ task.status }}
+                    {{ task.status.split('_').map(words => words.charAt(0).toUpperCase() +
+                      words.slice(1).toLowerCase()).join(' ') }}
+
                   </div>
 
                 </td>
@@ -182,7 +186,7 @@ table {
   @media (max-width: 1350px) {
     max-width: 17rem;
   }
-  
+
 }
 
 .box {

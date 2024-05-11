@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, ref , computed} from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import router from '@/router';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import { useRoute } from 'vue-router';
@@ -28,45 +28,36 @@ let previousTask = ref({ ...props.task })
 
 
 const saveTask = async () => {
-    if (previousTask.id === undefined) {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(previousTask.value)
-            });
-            if (!res.ok) {
-                throw new Error(`Failed to add task. Server responded with status ${res.status}`);
-            }
-            //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
-            //     console.log('The task has been successfully added')
-            //      alert('The task has been successfully added', 'success')
-            // }
-            const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-            // อันนี้return 201
-            // console.log(res.status);
-            // Reset task fields
-            previousTask.value = {
-                title: '',
-                description: '',
-                assignees: '',
-                status: 'NO_STATUS'
-            };
-            // console.log(previousTask.value);
-            router.back();
-            toaster.success(`The ${addedTask.title} task has been successfully added`);
-        }    // Navigate back
-        catch (error) {
-            console.error('Error adding task:', error);
-            // Handle error as needed
-            toaster.error(`The task can't add please try again`)
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(previousTask.value)
+        });
+        if (!res.ok) {
+            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
         }
-    }
-    else {
-    }
 
+        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+
+        previousTask.value = {
+            title: '',
+            description: '',
+            assignees: '',
+            status: 'NO_STATUS'
+        };
+        // console.log(previousTask.value);
+        router.back();
+        toaster.success(`The ${addedTask.title} task has been successfully added`);
+    }    // Navigate back
+    catch (error) {
+        console.error('Error adding task:', error);
+        // Handle error as needed
+        toaster.error(`The task can't add please try again`)
+
+    }
 }
 
 // Edit 

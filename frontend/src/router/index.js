@@ -30,7 +30,7 @@ const routes = [
         path: 'add', component: AddStatus, name: 'AddStatus'
       },
       {
-        path: ':id/edit', component: EditStatus, name: 'EditStatus'
+        path: ':id/edit', component: EditStatus, name: 'EditStatus' , props: true
       }
     ]
   },

@@ -3,6 +3,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router'
 import { computed, ref } from 'vue';
 
+
 const props = defineProps({
     status: Object,
     default: {
@@ -17,8 +18,6 @@ defineEmits(['saveStatus'])
 const previousStatus = computed(() => props.status)
 
 const route = useRoute()
-const statusId = route.params.id
-// console.log(statusId);
 
 </script>
 
@@ -31,7 +30,7 @@ const statusId = route.params.id
             <div class="bg-white w-1/2 h-auto p-2 rounded-2xl shadow-xl">
 
                 <p class="font-bold text-3xl text-black flex justify-center m-5">
-                    {{ previousStatus.id === undefined ? 'Add Status' : 'Edit Status' }}
+                    Add Status
                 </p>
 
                 <!-- head -->
@@ -39,7 +38,7 @@ const statusId = route.params.id
                     <label for="title" class="font-medium text-base">Name of Status</label>
                     <input v-model.trim()="previousStatus.name"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text" maxlength="100">
+                        type="text" maxlength="100" placeholder="Enter status name">
                     </input>
                 </div>
 
@@ -61,7 +60,7 @@ const statusId = route.params.id
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('saveStatus', previousStatus)" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveStatus', previousStatus)" :disabled="!previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

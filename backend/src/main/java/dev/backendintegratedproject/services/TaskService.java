@@ -2,6 +2,7 @@ package dev.backendintegratedproject.services;
 
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.repositories.TaskRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import java.util.List;
 @Service
 public class TaskService {
     @Autowired
+    private EntityManager entityManager;
+    @Autowired
     private TaskRepository taskRepository;
 
     public TaskEntity getTaskById(Integer id) {
@@ -24,6 +27,7 @@ public class TaskService {
         return taskRepository.findAll();
     }
     public TaskEntity addTask(TaskEntity task) {
+        task.saveTransientStatusEntity(entityManager);
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
@@ -49,6 +53,7 @@ public class TaskService {
             existingTask.setAssignees(task.getAssignees());
             existingTask.setStatus(task.getStatus());
             existingTask.setUpdatedOn(new Date());
+            task.saveTransientStatusEntity(entityManager);
             return taskRepository.save(existingTask);
         }
         return null; // Or throw an exception if required

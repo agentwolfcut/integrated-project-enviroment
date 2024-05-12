@@ -6,7 +6,7 @@ import { computed, ref } from 'vue';
 
 const props = defineProps({
     status: {
-        type: String,
+        type: Object,
         default: {
             id: undefined,
             name: '',

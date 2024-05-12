@@ -133,7 +133,7 @@ const addTask = async () => {
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask" @addTask="addTask" :task="previousTask" />
+                @deleteConfirm="deleteTask" @addTask="addTask"  />
         </div>
 
     </div>

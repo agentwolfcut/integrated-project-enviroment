@@ -10,19 +10,10 @@ const props = defineProps({
     type: Array,
     require: true,
   },
-  task: {
-    type: Object,
-    default: {
-      id: undefined,
-      title: '',
-      description: "",
-      assignees: "",
-      status: "NO_STATUS",
-    }
-  }
+
 })
 
-const previousTask = computed(()=>props.task)
+const previousTask = computed(() => props.task)
 
 const emits = defineEmits([
   'showDetail',
@@ -137,14 +128,14 @@ const taskToDelete = ref(undefined)
 
                 </td>
                 <td class="itbkk-button-action">
-                  <button class="pr-2 itbkk-button-edit">
-                    <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
+                  <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
+                    <button class="pr-2 itbkk-button-edit">
                       <Edit />
-                    </router-link>
-                  </button>
+                    </button>
+                  </router-link>
 
                   <button class="pr-1 itbkk-button-delete" @click="showDeleteModal = true,
-                    taskToDelete = task,  $emit('deleteC', task.id)
+                    taskToDelete = task, $emit('deleteC', task.id)
                     ">
                     <Trash />
                   </button>

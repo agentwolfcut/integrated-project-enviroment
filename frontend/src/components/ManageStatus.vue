@@ -72,11 +72,15 @@ const deleteStatus = async () => {
 
 
 const updateStatus = async (editStatus) => {
-
     const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
     statusMan.value.updateStatus(editStatus.id, editStatus.name, editStatus.description)
     toaster.success(`The ${editStatus.name} status has been updated`);
-    router.push('/status')
+    router.back(-1)
+    editingStatus.value = { id: undefined, name: '', description: '' }
+}
+
+const openToEdit = (status) => {
+    editingStatus.value = status
 }
 
 // const updateStatus = async (editStatus) => {
@@ -88,48 +92,16 @@ const updateStatus = async (editStatus) => {
 //             },
 //             body: JSON.stringify(editStatus)
 //         })
-
 //         const editedStatus = await res.json()
 //         router.back();
 //         toaster.success(`The ${editedStatus.title} task has been updated`);
+//         editingStatus.value = { id: undefined, name: '', description: '' }
 //         // return editedStatus
 //     } catch (error) {
-//         console.log(`error: ${error}`)
-//         toaster.error(`The update was unsuccessful`);
+//         console.log(error)
+//         toaster.error(`The update was unsuccessful please refresh page`);
 //     }
 // }
-
-// update
-// const updatingStatus = ref({ id: undefined, name: '', description: '' })
-// const updateStatus = async () => {
-//     try {
-//         const res = await fetch(`${import.meta.env.VITE_BASE_URL2}/${id}` , {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify(editingStatus.value)
-//         });
-//         if (!res.ok) {
-//             throw new Error(`Failed to add status. Server responded with status ${res.status}`);
-//         }
-//         const addedItem = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-//         editingStatus.value = { id: undefined, name: '', description: '' }
-//         // console.log(previousTask.value);
-
-//         statusMan.value.addStatus(addedItem.id, addedItem.name, addedItem.description)
-//         router.back();
-//         toaster.success(`The ${addedItem.name} status has been added`)
-//     }    // Navigate back
-//     catch (error) {
-//         console.error('Error adding status:', error);
-//         // Handle error as needed
-//         toaster.error(`An error has occurred, the status could not be added.`)
-//     }
-// }
-
-
-
 
 </script>
 
@@ -219,7 +191,7 @@ const updateStatus = async (editStatus) => {
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     <router-link
                                                         :to="{ name: 'EditStatus', params: { id: status.id } }">
-                                                        <button class="pr-2 itbkk-button-edit">
+                                                        <button class="pr-2 itbkk-button-edit" @click="openToEdit(status)">
                                                             <Edit />
                                                         </button>
                                                     </router-link>

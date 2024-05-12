@@ -1,29 +1,31 @@
 <script setup>
 import router from '@/router';
 import { useRoute } from 'vue-router'
-import { computed, ref, onMounted } from 'vue';
-import { getItemById, editItem } from '../libs/fetchUtils';
+import { computed, ref, onMounted, watch } from 'vue';
+
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-const toaster = createToaster({ /* options */ })
-
-let previousStatus = ref('')
-let originalStatus = ref('')
 
 const route = useRoute()
 const statusId = ref(route.params.id)
 
 
-onMounted(async () => {
-    const statusRes = await getItemById(import.meta.env.VITE_BASE_URL2, statusId.value)
-    if (statusRes.name === 'No Status') {
-        toaster.error('The “No Status” status cannot be edited')
-        router.back()
-    } else {
-        previousStatus.value = { ...statusRes }
-        originalStatus.value = { ...statusRes }
+const props = defineProps({
+    status: {
+        type: Object,
+        default: {
+            id: undefined,
+            name: '',
+            description: null
+        }
     }
 })
+
+const previousStatus = computed(() => props.status)
+const originalStatus = computed(() => props.status)
+
+
+
 
 const isTaskChanged = () => {
     return JSON.stringify(previousStatus.value) !== JSON.stringify(originalStatus.value);
@@ -44,35 +46,40 @@ const emits = defineEmits(['saveEdit'])
                     Edit Status
                 </p>
 
-                <!-- head -->
-                <div class="m-4">
-                    <label for="title" class="font-medium text-base">Name of Status</label>
-                    <input v-model="previousStatus.name"
-                        class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text" maxlength="100" placeholder="Enter status name">
-                    </input>
+                <div v-if="previousStatus.id === 1" class="flex justify-center font-semibold text-xl text-red-600">
+                    You can't edit default status
                 </div>
 
-                <!-- center -->
-                <div class="flex flex-row gap-4 m-4">
-                    <div class="itbkk-description w-full ">
-                        <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousStatus.description"
-                            class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
-                            type="text">
-
+                <div v-else>
+                    <!-- head -->
+                    <div class="m-4">
+                        <label for="title" class="font-medium text-base">Name of Status</label>
+                        <input v-model="previousStatus.name"
+                            class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
+                            type="text" maxlength="100" placeholder="Enter status name">
                         </input>
-
                     </div>
 
+                    <!-- center -->
+                    <div class="flex flex-row gap-4 m-4">
+                        <div class="itbkk-description w-full ">
+                            <p class="font-medium text-base mb-2">description</p>
+
+                            <input v-model="previousStatus.description"
+                                class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
+                                type="text">
+                            </input>
+
+                        </div>
+
+                    </div>
                 </div>
-
                 <!-- bottom -->
-                <div class="m-3">
-                    <div class="buttons flex gap-2">
 
+                <div class="m-3">
+                    <div class="buttons flex justify-center gap-2">
                         <button @click="$emit('saveEdit', previousStatus)"
-                            :disabled="!isTaskChanged() || !previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                            :disabled="!isTaskChanged() || !previousStatus.name || previousStatus.id === 1" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

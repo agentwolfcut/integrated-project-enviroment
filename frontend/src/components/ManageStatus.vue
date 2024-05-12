@@ -75,10 +75,29 @@ const updateStatus = async (editStatus) => {
 
     const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
     statusMan.value.updateStatus(editStatus.id, editStatus.name, editStatus.description)
-
     toaster.success(`The ${editStatus.name} status has been updated`);
     router.push('/status')
 }
+
+// const updateStatus = async (editStatus) => {
+//     try {
+//         const res = await fetch(`${import.meta.env.VITE_BASE_URL2}/${editStatus.id}`, {
+//             method: 'PUT',
+//             headers: {
+//                 'content-type': 'application/json'
+//             },
+//             body: JSON.stringify(editStatus)
+//         })
+
+//         const editedStatus = await res.json()
+//         router.back();
+//         toaster.success(`The ${editedStatus.title} task has been updated`);
+//         // return editedStatus
+//     } catch (error) {
+//         console.log(`error: ${error}`)
+//         toaster.error(`The update was unsuccessful`);
+//     }
+// }
 
 // update
 // const updatingStatus = ref({ id: undefined, name: '', description: '' })
@@ -187,8 +206,11 @@ const updateStatus = async (editStatus) => {
                                             </td>
                                             <td></td>
                                             <td class="itbkk-status-description ">
-                                                <div class="text-base font-medium leading-none text-gray-700 mr-2">
+                                                <div v-if="status.description" class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     {{ status.description }}
+                                                </div>
+                                                <div v-else class="text-base font-normal italic leading-none text-gray-400 mr-2">
+                                                    No Description Provided
                                                 </div>
                                             </td>
 

@@ -13,12 +13,12 @@ const props = defineProps({
             title: '',
             description: "",
             assignees: "",
-            status: "NO_STATUS",
+            status: 'no status',
         }
     },
 })
 
-const emit = defineEmits(['taskAdded' , 'addTask']); // Define the custom event
+const emit = defineEmits(['taskAdded', 'addTask']); // Define the custom event
 
 let previousTask = computed(() => props.task)
 // const previousTask = ref(props.task)
@@ -32,6 +32,10 @@ const statusOptions = ref('')
 onMounted(async () => {
     const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
     statusOptions.value = { ...statusRes }
+    const defaultStatus = statusOptions.value[0]
+    if (defaultStatus) {
+        previousTask.value.status = defaultStatus.name;
+    }
 })
 
 
@@ -72,9 +76,8 @@ onMounted(async () => {
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
-                                <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1">
-
-                                </input>
+                                <input v-model="previousTask.assignees"
+                                    class=" w-full text-base rounded-md border p-1" />
 
                             </div>
                             <div>
@@ -97,7 +100,7 @@ onMounted(async () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('addTask',status)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('addTask', status)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

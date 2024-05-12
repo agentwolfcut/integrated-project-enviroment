@@ -1,8 +1,10 @@
 package dev.backendintegratedproject.controllers;
 
 import dev.backendintegratedproject.dtos.TaskDTO;
+import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.services.ListMapper;
+import dev.backendintegratedproject.services.StatusService;
 import dev.backendintegratedproject.services.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/itb-kk/v1/tasks")
+@RequestMapping("/itb-kk/v2/tasks")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
 @CrossOrigin(origins = "http://localhost:5173")
 
@@ -26,6 +28,8 @@ public class TaskController {
     private ModelMapper modelMapper;
     @Autowired
     private ListMapper listMapper;
+    @Autowired
+    private StatusService statusService;
 
     @GetMapping
     public ResponseEntity<Object> getTasks() {
@@ -50,8 +54,26 @@ public class TaskController {
             TaskEntity addedTask = taskService.addTask(taskEntity);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-
     }
+//    @PostMapping
+//    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+//        // Map TaskDTO to TaskEntity
+//        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+//
+//        // Retrieve the default status from the database
+//        StatusEntity defaultStatus = statusService.getDefaultStatus();
+//
+//        // Set the default status to the task
+//        taskEntity.setStatus(defaultStatus);
+//
+//        // Call taskService to add the task
+//        TaskEntity addedTask = taskService.addTask(taskEntity);
+//
+//        // Return ResponseEntity with the added task
+//        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+//    }
+
+
 
     // Endpoint to delete a task by ID
     @DeleteMapping("/{id}")

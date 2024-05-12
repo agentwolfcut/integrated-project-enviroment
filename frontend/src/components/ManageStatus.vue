@@ -71,16 +71,35 @@ const deleteStatus = async () => {
 }
 
 
+// const updateStatus = async (editStatus) => {
+//     const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
+//     statusMan.value.updateStatus(editStatus.id, editStatus.name, editStatus.description)
+//     toaster.success(`The ${editStatus.name} status has been updated`);
+//     router.back(-1)
+//     editingStatus.value = { id: undefined, name: '', description: '' }
+// }
+
 const updateStatus = async (editStatus) => {
-    const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus)
-    statusMan.value.updateStatus(editStatus.id, editStatus.name, editStatus.description)
-    toaster.success(`The ${editStatus.name} status has been updated`);
-    router.back(-1)
-    editingStatus.value = { id: undefined, name: '', description: '' }
+    try {
+        const editedItem = await editItem(import.meta.env.VITE_BASE_URL2, editStatus.id, editStatus);
+        statusMan.value.updateStatus(editStatus.id, editStatus.name, editStatus.description);
+        toaster.success(`The ${editStatus.name} status has been updated`);
+        // Update parent component's data
+        editingStatus.value = { id: undefined, name: '', description: '' };
+        router.back(-1);
+    } catch (error) {
+        // Handle error
+        console.error('Error updating status:', error);
+        toaster.error('Failed to update status. Please try again later.');
+    }
 }
+
 
 const openToEdit = (status) => {
     editingStatus.value = status
+}
+const clearEdit = () => {
+    editingStatus.value = { id: undefined, name: '', description: '' }
 }
 
 // const updateStatus = async (editStatus) => {
@@ -178,10 +197,12 @@ const openToEdit = (status) => {
                                             </td>
                                             <td></td>
                                             <td class="itbkk-status-description ">
-                                                <div v-if="status.description" class="text-base font-medium leading-none text-gray-700 mr-2">
+                                                <div v-if="status.description"
+                                                    class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     {{ status.description }}
                                                 </div>
-                                                <div v-else class="text-base font-normal italic leading-none text-gray-400 mr-2">
+                                                <div v-else
+                                                    class="text-base font-normal italic leading-none text-gray-400 mr-2">
                                                     No Description Provided
                                                 </div>
                                             </td>
@@ -191,7 +212,8 @@ const openToEdit = (status) => {
                                                 <div class="text-base font-medium leading-none text-gray-700 mr-2">
                                                     <router-link
                                                         :to="{ name: 'EditStatus', params: { id: status.id } }">
-                                                        <button class="pr-2 itbkk-button-edit" @click="openToEdit(status)">
+                                                        <button class="pr-2 itbkk-button-edit"
+                                                            @click="openToEdit(status)">
                                                             <Edit />
                                                         </button>
                                                     </router-link>
@@ -216,7 +238,7 @@ const openToEdit = (status) => {
     </div>
 
 
-    <router-view :status="editingStatus" @saveStatus="addStatus" @saveEdit="updateStatus" />
+    <router-view :status="editingStatus" @saveStatus="addStatus" @saveEdit="updateStatus" @cancelEdit="clearEdit" />
 
     <div v-if="confirmDelete">
         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">

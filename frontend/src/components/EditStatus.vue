@@ -2,14 +2,16 @@
 import router from '@/router';
 import { useRoute } from 'vue-router'
 import { computed, ref, onMounted, watch } from 'vue';
-
+import { StatusManagement } from '@/libs/StatusManagement';
+import { getItemById } from '@/libs/fetchUtils';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-
+const toaster = createToaster({ /* options */ })
 const route = useRoute()
 const statusId = ref(route.params.id)
 
 
+const emits = defineEmits(['saveEdit', 'cancelEdit'])
 const props = defineProps({
     status: {
         type: Object,
@@ -22,23 +24,14 @@ const props = defineProps({
 })
 
 const previousStatus = computed(() => props.status)
-const originalStatus = computed(() => props.status)
 
-
-
-
-const isTaskChanged = () => {
-    return JSON.stringify(previousStatus.value) !== JSON.stringify(originalStatus.value);
-}
-
-const emits = defineEmits(['saveEdit'])
 
 </script>
 
 <template>
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
-            class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
+            class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-85">
 
             <div class="bg-white w-1/2 h-auto p-2 rounded-2xl shadow-xl">
 
@@ -78,13 +71,13 @@ const emits = defineEmits(['saveEdit'])
 
                 <div class="m-3">
                     <div class="buttons flex justify-center gap-2">
-                        <button @click="$emit('saveEdit', previousStatus)"
-                            :disabled="!isTaskChanged() || !previousStatus.name || previousStatus.id === 1" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveEdit', previousStatus), selectStatus"
+                            :disabled="!previousStatus.name || previousStatus.id === 1" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save
                         </button>
-                        <button @click="router.back()"
+                        <button @click="router.back(), $emit('cancelEdit')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

@@ -15,7 +15,7 @@ const props = defineProps({
     }
 })
 
-defineEmits(['saveStatus'])
+defineEmits(['saveStatus','cancelEdit'])
 
 const previousStatus = computed(() => props.status)
 
@@ -67,7 +67,7 @@ const route = useRoute()
                             ">
                             save
                         </button>
-                        <button @click="router.back()"
+                        <button @click="router.back() , $emit('cancelEdit')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

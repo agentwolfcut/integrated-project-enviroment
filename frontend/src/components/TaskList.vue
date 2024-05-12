@@ -2,21 +2,34 @@
 import { useRouter } from 'vue-router'
 import Trash from '@/assets/icons/CiTrashFull.vue'
 import Edit from '@/assets/icons/CiEditPencil01.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import buttonSlot from './Button.vue'
 
-defineProps({
+const props = defineProps({
   tasks: {
     type: Array,
     require: true,
   },
+  task: {
+    type: Object,
+    default: {
+      id: undefined,
+      title: '',
+      description: "",
+      assignees: "",
+      status: "NO_STATUS",
+    }
+  }
 })
+
+const previousTask = computed(()=>props.task)
 
 const emits = defineEmits([
   'showDetail',
   'deleteTask',
   'deleteC',
   'deleteConfirm',
+  'addTask'
 ])
 
 const showDeleteModal = ref(false)
@@ -116,8 +129,9 @@ const taskToDelete = ref(undefined)
                     'text-yellow-600 bg-yellow-100': task.status === 'DOING',
                     'text-slate-700 bg-slate-300': task.status === 'NO_STATUS',
                   }" class="p-3 w-20 text-sm leading-none flex justify-center rounded-md font-semibold mr-4">
-                    {{ task.status.split('_').map(words => words.charAt(0).toUpperCase() +
-                      words.slice(1).toLowerCase()).join(' ') }}
+                    <!-- {{ task.status.split('_').map(words => words.charAt(0).toUpperCase() +
+                      words.slice(1).toLowerCase()).join(' ') }} -->
+                    {{ task.status }}
 
                   </div>
 
@@ -129,10 +143,8 @@ const taskToDelete = ref(undefined)
                     </router-link>
                   </button>
 
-                  <button class="pr-1 itbkk-button-delete" @click="
-                      ; (showDeleteModal = true),
-                    (taskToDelete = task),
-                    $emit('deleteC', task.id)
+                  <button class="pr-1 itbkk-button-delete" @click="showDeleteModal = true,
+                    taskToDelete = task,  $emit('deleteC', task.id)
                     ">
                     <Trash />
                   </button>
@@ -144,6 +156,8 @@ const taskToDelete = ref(undefined)
       </div>
     </div>
   </div>
+
+  <router-view @addTask="$emit('addTask', status)" :task="previousTask" />
 
   <!-- Delete modal -->
   <div v-if="showDeleteModal">
@@ -169,6 +183,9 @@ const taskToDelete = ref(undefined)
       </div>
     </div>
   </div>
+
+
+
 </template>
 
 <style scoped>

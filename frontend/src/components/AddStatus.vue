@@ -5,11 +5,13 @@ import { computed, ref } from 'vue';
 
 
 const props = defineProps({
-    status: Object,
-    default: {
-        id: undefined,
-        name: '',
-        description: null
+    status: {
+        type: String,
+        default: {
+            id: undefined,
+            name: '',
+            description: null
+        }
     }
 })
 

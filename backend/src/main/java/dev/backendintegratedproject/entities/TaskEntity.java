@@ -10,7 +10,7 @@ import java.util.TimeZone;
 @Getter
 @Setter
 @Entity
-@Table(name = "Tasks")
+@Table(name = "Tasks_v2")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,15 +22,20 @@ public class TaskEntity {
 
     @Column(name = "taskTitle", length = 100, nullable = false)
     private String title;
+
     @Column(name = "taskDescription", length = 500)
     private String description;
+
     @Column(name = "taskAssignees", length = 30)
     private String assignees;
+
     @ManyToOne
     @JoinColumn(name = "statusID")
     private StatusEntity status;
+
     @Column(name = "createdOn", nullable = false)
     private Date createdOn;
+
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
 

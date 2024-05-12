@@ -1,14 +1,9 @@
 <script setup>
 
 import { onMounted, ref, computed } from 'vue'
-import router from '@/router';
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import { useRoute } from 'vue-router';
 import { getItems, deleteItemById } from '../libs/fetchUtils';
 
-const toaster = createToaster({ /* options */ })
-
-const emit = defineEmits(['taskAdded']); // Define the custom event
 
 const props = defineProps({
     task: {
@@ -19,47 +14,14 @@ const props = defineProps({
             description: "",
             assignees: "",
             status: "NO_STATUS",
-        },
-        require: true
+        }
     },
 })
 
-let previousTask = ref({ ...props.task })
+const emit = defineEmits(['taskAdded' , 'addTask']); // Define the custom event
+
+let previousTask = computed(() => props.task)
 // const previousTask = ref(props.task)
-
-
-const saveTask = async () => {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(previousTask.value)
-        });
-        if (!res.ok) {
-            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
-        }
-
-        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-
-        previousTask.value = {
-            title: '',
-            description: '',
-            assignees: '',
-            status: 'NO_STATUS'
-        };
-        // console.log(previousTask.value);
-        router.back();
-        toaster.success(`The ${addedTask.title} task has been successfully added`);
-    }    // Navigate back
-    catch (error) {
-        console.error('Error adding task:', error);
-        // Handle error as needed
-        toaster.error(`The task can't add please try again`)
-
-    }
-}
 
 // Edit 
 const route = useRoute();
@@ -135,7 +97,7 @@ onMounted(async () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="saveTask" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('addTask',status)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

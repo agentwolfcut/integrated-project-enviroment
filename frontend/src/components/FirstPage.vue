@@ -7,6 +7,7 @@ import TaskDetail from './TaskDetail.vue';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import HeaderIT from './Header.vue'
 import SideBar from './SideBar.vue'
+import router from '@/router';
 
 const toaster = createToaster({ /* options */ })
 
@@ -51,6 +52,7 @@ const cancel = (flag) => {
     showModal.value = flag
 }
 const removeIdC = ref('')
+
 const deleteIdConfirm = (removeId) => {
     removeIdC.value = removeId
 }
@@ -63,14 +65,56 @@ const deleteTask = async (removeId) => {
             taskMan.value.removetask(removeId)
             toaster.success(`The task has been deleted`);
         } else {
-            toaster.error(`The task does not exist
-            
+            toaster.error(`The task does not exist            
             , please refresh page`);
         }
     } catch (error) {
         console.error('Error deleting task:', error);
         // Handle error as needed
         toaster.error(`Failed to delete task. An error occurred.`);
+    }
+}
+
+
+// ADD 
+const previousTask = ref({
+    id: undefined,
+    title: '',
+    description: "",
+    assignees: "",
+    status: "NO_STATUS"
+})
+
+const addTask = async () => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(previousTask.value)
+        });
+        if (!res.ok) {
+            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+        }
+
+        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+
+        previousTask.value = {
+            title: '',
+            description: '',
+            assignees: '',
+            status: 'NO_STATUS'
+        };
+        // console.log(previousTask.value);
+        taskMan.value.addtask(addedTask.id, addedTask.title, addedTask.description, addedTask.assignees, addedTask.status)
+        router.back();
+        toaster.success(`The ${addedTask.title} task has been successfully added`);
+    }    // Navigate back
+    catch (error) {
+        console.error('Error adding task:', error);
+        // Handle error as needed
+        toaster.error(`The task can't add please try again`)
     }
 }
 
@@ -89,7 +133,7 @@ const deleteTask = async (removeId) => {
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask" />
+                @deleteConfirm="deleteTask" @addTask="addTask" :task="previousTask" />
         </div>
 
     </div>

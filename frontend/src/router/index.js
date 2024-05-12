@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import FirstPage from '@/components/FirstPage.vue'
-import AddEditTask from '@/components/AddEditTask.vue'
+import AddTask from '@/components/AddEditTask.vue'
 import NotFoundId from '@/views/NotFoundId.vue'
 import NotFound from '@/views/NotFound.vue'
 import EditTask from '@/components/EditTask.vue'
@@ -20,7 +20,11 @@ const routes = [
   },
   {
     path: '/task',
-    component: FirstPage
+    component: FirstPage,
+    children: [
+      { path: 'add', component: AddTask, name: 'AddTask' },
+      { path: ':taskId/edit', component: EditTask, name: 'EditTask' }
+    ]
   },
   {
     path: '/status',
@@ -30,7 +34,7 @@ const routes = [
         path: 'add', component: AddStatus, name: 'AddStatus'
       },
       {
-        path: ':id/edit', component: EditStatus, name: 'EditStatus' , props: true
+        path: ':id/edit', component: EditStatus, name: 'EditStatus', props: true
       }
     ]
   },
@@ -39,9 +43,6 @@ const routes = [
     name: 'TaskDetail',
     component: NotFoundId,
   },
-
-  { path: '/task/add', component: AddEditTask, name: 'AddTask' },
-  { path: '/task/:taskId/edit', component: EditTask, name: 'EditTask' },
   { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/task' }
 ]
 const router = createRouter({

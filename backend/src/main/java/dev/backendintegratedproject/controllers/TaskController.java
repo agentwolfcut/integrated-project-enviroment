@@ -34,10 +34,10 @@ public class TaskController {
         return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
     }
 
-    @GetMapping("/{taskId}")
-    public ResponseEntity<Object> getTaskById(@PathVariable Integer taskId) {
-        TaskEntity task = taskService.getTaskById(taskId);
-        if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", taskId));
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getTaskById(@PathVariable Integer id) {
+        TaskEntity task = taskService.getTaskById(id);
+        if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
 //        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
         return new ResponseEntity<>(task, HttpStatus.OK);
     }

@@ -29,6 +29,7 @@ public class TaskEntity {
     @Column(name = "taskAssignees", length = 30)
     private String assignees;
 
+    // this is newww
     @ManyToOne
     @JoinColumn(name = "statusID")
     private StatusEntity status;

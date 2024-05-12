@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static dev.backendintegratedproject.services.ListMapper.getInstance;
 
@@ -27,7 +28,9 @@ public class StatusController {
     @GetMapping
     public ResponseEntity<Object> getAllStatus() {
         List<StatusEntity> statuses = statusService.getAllStatus();
-        List<StatusDTO> statusDTOList = getInstance().mapList(statuses, StatusDTO.class, modelMapper);
+        List<StatusDTO> statusDTOList = statuses.stream()
+                .map(status -> modelMapper.map(status, StatusDTO.class))
+                .collect(Collectors.toList());
         return new ResponseEntity<>(statusDTOList, HttpStatus.OK);
     }
 
@@ -40,14 +43,6 @@ public class StatusController {
         return new ResponseEntity<>(statusDTO, HttpStatus.OK);
     }
 
-
-//    @PostMapping
-//    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-//            TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-//            TaskEntity addedTask = taskService.addTask(taskEntity);
-//
-//            return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-//    }
 @PostMapping
 public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
     StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
@@ -56,18 +51,6 @@ public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
     return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
 
 }
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<String> editStatus(@PathVariable Integer id, @RequestBody StatusDTO statusDTO) {
-//        StatusEntity existingStatus = statusService.getStatusById(id);
-//        if (existingStatus == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
-//        }
-//        modelMapper.map(statusDTO, existingStatus);
-//        statusService.editStatus(existingStatus);
-//        return ResponseEntity.ok("The status has been updated");
-//    }
-
     @PutMapping("/{id}")
     public ResponseEntity<String> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
         StatusEntity editedStatus = statusService.editStatus(id,status);

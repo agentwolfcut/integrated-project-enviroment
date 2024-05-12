@@ -37,10 +37,11 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskById(@PathVariable Integer id) {
         TaskEntity task = taskService.getTaskById(id);
-        if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
-//        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
-
-        return new ResponseEntity<>(task, HttpStatus.OK);
+        if (task == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
+        }
+        TaskDTO taskDTO = modelMapper.map(task, TaskDTO.class); // แปลง TaskEntity เป็น TaskDTO
+        return new ResponseEntity<>(taskDTO, HttpStatus.OK);
     }
     // Endpoint to add a task
     @PostMapping

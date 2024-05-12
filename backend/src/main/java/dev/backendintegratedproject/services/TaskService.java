@@ -27,7 +27,6 @@ public class TaskService {
         return taskRepository.findAll();
     }
     public TaskEntity addTask(TaskEntity task) {
-        task.saveTransientStatusEntity(entityManager);
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
@@ -51,7 +50,6 @@ public class TaskService {
             existingTask.setAssignees(task.getAssignees());
             existingTask.setStatus(task.getStatus());
             existingTask.setUpdatedOn(new Date());
-            task.saveTransientStatusEntity(entityManager);
             return taskRepository.save(existingTask);
         }
         return null; // Or throw an exception if required

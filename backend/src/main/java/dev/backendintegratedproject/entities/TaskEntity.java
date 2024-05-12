@@ -69,10 +69,4 @@ public class TaskEntity {
         dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dt1.format(dt.parse(dt.format(date_s)));
     }
-
-    public void saveTransientStatusEntity(EntityManager entityManager) {
-        if (this.status != null && this.status.getId() == null) {
-            entityManager.persist(this.status);
-        }
-    }
 }

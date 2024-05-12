@@ -39,6 +39,7 @@ public class TaskController {
         TaskEntity task = taskService.getTaskById(id);
         if (task == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
 //        TaskDTO taskDto = modelMapper.map(task, TaskDTO.class);
+
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
     // Endpoint to add a task

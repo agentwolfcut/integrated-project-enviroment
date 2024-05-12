@@ -1,7 +1,6 @@
 package dev.backendintegratedproject.services;
 import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.repositories.StatusRepository;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,8 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 @Service
 public class StatusService {
-    @Autowired
-    private EntityManager entityManager;
     @Autowired
     private StatusRepository statusRepository;
 

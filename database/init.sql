@@ -28,7 +28,7 @@ CREATE TABLE Status (
 );
 
 INSERT INTO Status (statusName, statusDescription) VALUES 
-('No Status','not declare'),
+('No Status','the default status'),
 ('To Do', 'This item has not been started'),
 ('Doing', 'This item is currently in progress'),
 ('Done', 'This item has been completed');

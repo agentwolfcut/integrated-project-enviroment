@@ -18,8 +18,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/itb-kk/v2/tasks")
-@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
-//@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
+@CrossOrigin(origins = "http://localhost:5173")
 
 public class TaskController {
     @Autowired
@@ -49,29 +49,49 @@ public class TaskController {
     }
     // Endpoint to add a task
     @PostMapping
-    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-            TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-            TaskEntity addedTask = taskService.addTask(taskEntity);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-    }
-//    @PostMapping
 //    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-//        // Map TaskDTO to TaskEntity
-//        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+//        TaskEntity taskEntity = new TaskEntity();
+//        taskEntity.setTitle(taskDTO.getTitle());
+//        taskEntity.setDescription(taskDTO.getDescription());
+//        taskEntity.setAssignees(taskDTO.getAssignees());
 //
-//        // Retrieve the default status from the database
-//        StatusEntity defaultStatus = statusService.getDefaultStatus();
+//        // Fetch the status entity by name
+//        StatusEntity statusEntity = statusService.getStatusByName(taskDTO.getStatus());
+//        if (statusEntity == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
+//        }
+//        taskEntity.setStatus(statusEntity);
 //
-//        // Set the default status to the task
-//        taskEntity.setStatus(defaultStatus);
-//
-//        // Call taskService to add the task
 //        TaskEntity addedTask = taskService.addTask(taskEntity);
-//
-//        // Return ResponseEntity with the added task
 //        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
 //    }
+
+    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+        TaskEntity taskEntity = new TaskEntity();
+        taskEntity.setTitle(taskDTO.getTitle());
+        taskEntity.setDescription(taskDTO.getDescription());
+        taskEntity.setAssignees(taskDTO.getAssignees());
+
+        StatusEntity statusEntity;
+        if (taskDTO.getStatus() == null || taskDTO.getStatus().isEmpty()) {
+            // Set default status to statusId = 1
+            statusEntity = statusService.getStatusById(1);
+            if (statusEntity == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Default status not found");
+            }
+        } else {
+            // Fetch the status entity by name
+            statusEntity = statusService.getStatusByName(taskDTO.getStatus());
+            if (statusEntity == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
+            }
+        }
+        taskEntity.setStatus(statusEntity);
+
+        TaskEntity addedTask = taskService.addTask(taskEntity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+    }
+
 
 
 

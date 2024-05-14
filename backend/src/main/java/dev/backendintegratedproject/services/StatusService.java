@@ -26,6 +26,9 @@ public class StatusService {
         }
         return statusRepository.save(status);
     }
+    public StatusEntity getStatusByName(String name) {
+        return statusRepository.findByName(name).orElse(null);
+    }
 //    public void editStatus(StatusEntity status) {
 //        statusRepository.save(status);
 //    }

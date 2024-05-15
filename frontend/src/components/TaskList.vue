@@ -87,7 +87,7 @@ const taskToDelete = ref(undefined)
             <tbody class="container">
               <tr v-for="(task, index) in tasks" :key="index"
                 class="itbkk-item box h-16 border-t border-gray-100 rounded">
-                <td>
+                <td >
                   <div class="flex items-center pl-5">
                     <div class="flex flex-row justify-start">
                       <p class="text-base font-medium leading-none text-gray-700 mr-4">
@@ -95,7 +95,7 @@ const taskToDelete = ref(undefined)
                       </p>
                     </div>
 
-                    <button class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
+                    <button class="itbkk-title  text-base font-medium leading-none text-gray-700 mr-4"
                       @click="$emit('showDetail', task.id)">
                       {{ task.title }}
                     </button>
@@ -115,10 +115,10 @@ const taskToDelete = ref(undefined)
                 <td class="itbkk-status ">
 
                   <div :class="{
-                    'text-green-500 bg-green-100 ': task.status === 'DONE',
-                    'text-red-500 bg-red-100 ': task.status === 'TO_DO',
-                    'text-yellow-600 bg-yellow-100': task.status === 'DOING',
-                    'text-slate-700 bg-slate-300': task.status === 'NO_STATUS',
+                    'text-green-500 bg-green-100 ': task.status === 'Done',
+                    'text-red-500 bg-red-100 ': task.status === 'To Do',
+                    'text-yellow-600 bg-yellow-100': task.status === 'Doing',
+                    'text-slate-700 bg-slate-300': task.status === 'No Status',
                   }" class="p-3 w-20 text-sm leading-none flex justify-center rounded-md font-semibold mr-4">
                     <!-- {{ task.status.split('_').map(words => words.charAt(0).toUpperCase() +
                       words.slice(1).toLowerCase()).join(' ') }} -->
@@ -189,12 +189,10 @@ table {
   white-space: initial;
   /* adjust this value to your preference */
   overflow-wrap: break-word;
-  max-width: 30rem;
-
-  @media (max-width: 1350px) {
-    max-width: 17rem;
+  
+  @media (max-width: 2000px) {
+    max-width: 28rem;
   }
-
 }
 
 .box {

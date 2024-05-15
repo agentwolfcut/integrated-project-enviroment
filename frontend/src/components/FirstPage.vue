@@ -85,38 +85,39 @@ const previousTask = ref({
     status: "NO_STATUS"
 })
 
-const addTask = async () => {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(previousTask.value)
-        });
-        if (!res.ok) {
-            throw new Error(`Failed to add task. Server responded with status ${res.status}`);
-        }
+// const addTask = async () => {
+    
+//     try {
+//         const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify(previousTask.value)
+//         });
+//         if (!res.ok) {
+//             throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+//         }
 
-        const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+//         const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
 
-        previousTask.value = {
-            title: '',
-            description: '',
-            assignees: '',
-            status: 'NO_STATUS'
-        };
-        // console.log(previousTask.value);
-        taskMan.value.addtask(addedTask.id, addedTask.title, addedTask.description, addedTask.assignees, addedTask.status)
-        router.back();
-        toaster.success(`The ${addedTask.title} task has been successfully added`);
-    }    // Navigate back
-    catch (error) {
-        console.error('Error adding task:', error);
-        // Handle error as needed
-        toaster.error(`The task can't add please try again`)
-    }
-}
+//         previousTask.value = {
+//             title: '',
+//             description: '',
+//             assignees: '',
+//             status: 'NO_STATUS'
+//         };
+//         // console.log(previousTask.value);
+//         taskMan.value.addtask(addedTask.id, addedTask.title, addedTask.description, addedTask.assignees, addedTask.status)
+//         router.back();
+//         toaster.success(`The ${addedTask.title} task has been successfully added`);
+//     }    // Navigate back
+//     catch (error) {
+//         console.error('Error adding task:', error);
+//         // Handle error as needed
+//         toaster.error(`The task can't add please try again`)
+//     }
+// }
 
 </script>
 
@@ -133,7 +134,7 @@ const addTask = async () => {
             <HeaderIT />
 
             <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask" @addTask="addTask"  />
+                @deleteConfirm="deleteTask"   />
         </div>
 
     </div>

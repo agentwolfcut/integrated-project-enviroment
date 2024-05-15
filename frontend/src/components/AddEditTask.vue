@@ -4,28 +4,8 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
 import { getItems, deleteItemById } from '../libs/fetchUtils';
 
-
-const props = defineProps({
-    task: {
-        type: Object,
-        default: {
-            id: undefined,
-            title: '',
-            description: "",
-            assignees: "",
-            status: 'no status',
-        }
-    },
-})
-
-const emit = defineEmits(['taskAdded', 'addTask']); // Define the custom event
-
-let previousTask = computed(() => props.task)
-// const previousTask = ref(props.task)
-
-// Edit 
-const route = useRoute();
-const taskId = ref(route.params.taskId)
+import router from '@/router';
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 const statusOptions = ref('')
 
@@ -38,11 +18,77 @@ onMounted(async () => {
     }
 })
 
+const toaster = createToaster({ /* options */ })
+
+const emit = defineEmits(['taskAdded']); // Define the custom event
+
+const props = defineProps({
+    task: {
+        type: Object,
+        default: {
+            id: undefined,
+            title: '',
+            description: "",
+            assignees: "",
+            status: "No Status",
+        },
+        require: true
+    },
+})
+
+let previousTask = ref({ ...props.task })
+// const previousTask = ref(props.task)
+
+
+const saveTask = async () => {
+    if (previousTask.id === undefined) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(previousTask.value)
+            });
+            if (!res.ok) {
+                throw new Error(`Failed to add task. Server responded with status ${res.status}`);
+            }
+            //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
+            //     console.log('The task has been successfully added')
+            //      alert('The task has been successfully added', 'success')
+            // }
+            const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
+            // อันนี้return 201
+            // console.log(res.status);
+            // Reset task fields
+            previousTask.value = {
+                title: '',
+                description: '',
+                assignees: '',
+                status: 'NO_STATUS'
+            };
+            // console.log(previousTask.value);
+            router.back();
+            toaster.success(`The ${addedTask.title} task has been successfully added`);
+        }    // Navigate back
+        catch (error) {
+            console.error('Error adding task:', error);
+            // Handle error as needed
+            toaster.error(`The task can't add please try again`)
+        }
+    }
+    else {
+    }
+
+}
+
+// Edit 
+const route = useRoute();
+const taskId = ref(route.params.taskId)
 
 </script>
 
 <template>
-
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
@@ -86,7 +132,7 @@ onMounted(async () => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option v-for="status in statusOptions" :key="status.name" :value="status.name">
+                                        <option v-for="status in statusOptions" :key="status.name" :value="status.id">
                                             {{ status.name }}
                                         </option>
                                     </select>
@@ -100,7 +146,7 @@ onMounted(async () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('addTask', status)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="saveTask" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

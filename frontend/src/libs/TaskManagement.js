@@ -16,13 +16,13 @@ class TaskManagement {
     )
   }
   // push
-  addtask(id, title, description, assignees, status) {
+  addtask(id, title, description, assignees, statusId) {
     this.tasks.push({
       id: id,
       title: title,
       description: description,
       assignees: assignees,
-      status: status
+      status: statusId
       // status: status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' '),
     })
   }

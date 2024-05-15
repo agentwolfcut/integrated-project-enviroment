@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { ref, onMounted } from 'vue'
-import { getItemById } from '../libs/fetchUtils';
+import { getItemById, getItems } from '../libs/fetchUtils';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 
@@ -13,11 +13,17 @@ const taskId = ref(route.params.taskId)
 const toaster = createToaster({ /* options */ })
 
 // console.log(taskId.value);
+const statusOptions = ref('')
+
+onMounted(async () => {
+    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+    statusOptions.value = { ...statusRes }
+})
 
 onMounted(async () => {
     try {
         const editTask = await getItemById(import.meta.env.VITE_BASE_URL, taskId.value)
-        editTask.status = editTask.status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' ')
+        editTask.status = editTask.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
         previousTask.value = { ...editTask }
         originalTask.value = { ...editTask }
         if (!editTask.title) {
@@ -31,15 +37,26 @@ onMounted(async () => {
     }
 })
 
+const transformTaskFormat = (task) => {
+    return {
+        title: task.title,
+        description: task.description,
+        assignees: task.assignees,
+        status: {
+            id: task.status
+        }
+    };
+};
 
 const saveEdit = async () => {
+    const transformedTask = transformTaskFormat(previousTask.value);
     try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL}/${taskId.value}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json'
             },
-            body: JSON.stringify(previousTask.value)
+            body: JSON.stringify(transformedTask)
         })
 
         const editedTask = await res.json()
@@ -88,7 +105,7 @@ const formatLocalDate = (dateString) => {
                 <!-- head -->
                 <div class="m-4">
                     <label for="title" class="font-medium text-base">Title</label>
-                    <input v-model="previousTask.title"
+                    <input v-model="previousTask.title" required
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
                         type="text">
                     </input>
@@ -121,10 +138,9 @@ const formatLocalDate = (dateString) => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option value="No Status" selected>No Status</option>
-                                        <option value="To Do">To Do</option>
-                                        <option value="Doing">Doing</option>
-                                        <option value="Done">Done</option>
+                                        <option v-for="status in statusOptions" :key="status.id" :value="status.id">
+                                            {{ status.name }}
+                                        </option>
                                     </select>
                                 </form>
                             </div>

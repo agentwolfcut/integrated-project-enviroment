@@ -68,6 +68,7 @@ const cancel = (flag) => {
 // DELETE
 const showDeleteModal = ref(false);
 const taskToDelete = ref(undefined);
+
 const deleteTask = async (removeId) => {
   try {
     const status = await deleteItemById(

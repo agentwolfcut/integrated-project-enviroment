@@ -51,7 +51,6 @@ const route = useRoute()
                         <input v-model.trim()="previousStatus.description"
                             class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
                             type="text">
-
                         </input>
 
                     </div>
@@ -61,13 +60,12 @@ const route = useRoute()
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-
                         <button @click="$emit('saveStatus', previousStatus)" :disabled="!previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save
                         </button>
-                        <button @click="router.back() , $emit('cancelEdit')"
+                        <button @click="router.back()"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

@@ -1,41 +1,38 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import router from '@/router';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted , computed } from 'vue'
 import { getItemById, getItems } from '../libs/fetchUtils';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
+const props = defineProps({
+    task: {
+        type: Object,
+        default: {
+            id: undefined,
+            title: '',
+            description: "",
+            assignees: "",
+            status: "No Status",
+        },
+        require: true
+    },
+})
 
-let previousTask = ref('')
-let originalTask = ref('')
-const route = useRoute();
-const taskId = ref(route.params.taskId)
-const toaster = createToaster({ /* options */ })
+const emit = defineEmits(['saveEdit']); // Define the custom event
 
-// console.log(taskId.value);
+const previousTask = computed(() => props.task)
 const statusOptions = ref('')
-
 onMounted(async () => {
     const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
     statusOptions.value = { ...statusRes }
 })
 
-onMounted(async () => {
-    try {
-        const editTask = await getItemById(import.meta.env.VITE_BASE_URL, taskId.value)
-        editTask.status = editTask.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
-        previousTask.value = { ...editTask }
-        originalTask.value = { ...editTask }
-        if (!editTask.title) {
-            router.back();
-            toaster.error(`Task not found.`);
-        }
+let originalTask = ref('')
+const route = useRoute();
+const taskId = ref(route.params.taskId)
+const toaster = createToaster({ /* options */ })
 
-    } catch (error) {
-        toaster.error(`Failed to fetch task. Please try again.`);
-        router.back();
-    }
-})
 
 const transformTaskFormat = (task) => {
     return {
@@ -47,27 +44,6 @@ const transformTaskFormat = (task) => {
         }
     };
 };
-
-const saveEdit = async () => {
-    const transformedTask = transformTaskFormat(previousTask.value);
-    try {
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/${taskId.value}`, {
-            method: 'PUT',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(transformedTask)
-        })
-
-        const editedTask = await res.json()
-        router.back();
-        toaster.success(`The ${editedTask.title} task has been updated`);
-        // return editedTask
-    } catch (error) {
-        console.log(`error: ${error}`)
-        toaster.error(`The update was unsuccessful`);
-    }
-}
 
 const isTaskChanged = () => {
     return JSON.stringify(previousTask.value) !== JSON.stringify(originalTask.value);
@@ -138,7 +114,7 @@ const formatLocalDate = (dateString) => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option v-for="status in statusOptions" :key="status.id" :value="status.id">
+                                        <option v-for="status in statusOptions" :key="status.id" :value="status.name">
                                             {{ status.name }}
                                         </option>
                                     </select>
@@ -173,7 +149,7 @@ const formatLocalDate = (dateString) => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="saveEdit" :disabled="!isTaskChanged() || !previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveEdit',previousTask)" :disabled="!isTaskChanged() || !previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

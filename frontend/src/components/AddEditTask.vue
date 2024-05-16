@@ -7,21 +7,6 @@ import { getItems, deleteItemById } from '../libs/fetchUtils';
 import router from '@/router';
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
-const statusOptions = ref('')
-
-onMounted(async () => {
-    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
-    statusOptions.value = { ...statusRes }
-    const defaultStatus = statusOptions.value[0]
-    if (defaultStatus) {
-        previousTask.value.status = defaultStatus.name;
-    }
-})
-
-const toaster = createToaster({ /* options */ })
-
-const emit = defineEmits(['taskAdded']); // Define the custom event
-
 const props = defineProps({
     task: {
         type: Object,
@@ -36,53 +21,22 @@ const props = defineProps({
     },
 })
 
-let previousTask = ref({ ...props.task })
-// const previousTask = ref(props.task)
+const emit = defineEmits(['saveUpdateTask']); // Define the custom event
+
+const previousTask = computed(() => props.task)
 
 
-const saveTask = async () => {
-    if (previousTask.id === undefined) {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(previousTask.value)
-            });
-            if (!res.ok) {
-                throw new Error(`Failed to add task. Server responded with status ${res.status}`);
-            }
-            //     if(res.status === 201){ //อันนี้แจ้งเตือน success เมื่อได้รับ 201
-            //     console.log('The task has been successfully added')
-            //      alert('The task has been successfully added', 'success')
-            // }
-            const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด      
-            // อันนี้return 201
-            // console.log(res.status);
-            // Reset task fields
-            previousTask.value = {
-                title: '',
-                description: '',
-                assignees: '',
-                status: 'NO_STATUS'
-            };
-            // console.log(previousTask.value);
-            router.back();
-            toaster.success(`The ${addedTask.title} task has been successfully added`);
-        }    // Navigate back
-        catch (error) {
-            console.error('Error adding task:', error);
-            // Handle error as needed
-            toaster.error(`The task can't add please try again`)
-        }
+const statusOptions = ref('')
+
+onMounted(async () => {
+    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+    statusOptions.value = { ...statusRes }
+    const defaultStatus = statusOptions.value[0]
+    if (defaultStatus) {
+        previousTask.value.status = defaultStatus.name;
     }
-    else {
-    }
+})
 
-}
-
-// Edit 
 const route = useRoute();
 const taskId = ref(route.params.taskId)
 
@@ -145,13 +99,12 @@ const taskId = ref(route.params.taskId)
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-
-                        <button @click="saveTask" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="$emit('saveUpdateTask', previousTask)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save
                         </button>
-                        <button @click="$router.go(-1)"
+                        <button @click="router.back() "
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

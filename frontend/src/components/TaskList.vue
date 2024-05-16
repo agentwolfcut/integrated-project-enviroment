@@ -45,17 +45,6 @@ const taskToDelete = ref(undefined)
     <div class="sm:px-20 w-full">
       <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
 
-        <div class="flex justify-end mb-9">
-          <router-link to="/task/add" @taskAdded="handleTaskAdded">
-            <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8">
-              <buttonSlot size="sm" type="dark">
-                <template v-slot:title> Add Task </template>
-              </buttonSlot>
-            </div>
-          </router-link>
-        </div>
-
-
         <div class="mt-7 overflow-x-auto rounded-2xl border border-gray-100">
           <table class="w-full whitespace-nowrap rounded-md">
             <thead class="bg-slate-200 text">

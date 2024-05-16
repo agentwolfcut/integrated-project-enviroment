@@ -1,4 +1,5 @@
 package dev.backendintegratedproject.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,14 +23,14 @@ public class StatusEntity {
 
     @Column(name = "statusDescription", length = 200)
     private String description;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "status")
     private List<TaskEntity> tasks;
     public String getStatusName() {
         return name;
     }
     public void setDescription(String description) {
-        this.description = description == null?null:description.trim();
+        this.description = description == null?null:description.trim().length()==0?null:description.trim();
     }
     public void setName(String name) {
 

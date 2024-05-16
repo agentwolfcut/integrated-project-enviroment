@@ -5,6 +5,7 @@ import dev.backendintegratedproject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,6 +24,7 @@ public class TaskService {
     public List<TaskEntity> getAllTasks() {
         return taskRepository.findAll();
     }
+    @Transactional
     public TaskEntity addTask(TaskEntity task) {
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());

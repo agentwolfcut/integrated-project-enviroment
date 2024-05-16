@@ -42,16 +42,18 @@ public class TaskEntity {
 
 
     public void setDescription(String description) {
-        this.description = description == null?null:description.trim();
+        this.description = description == null?null:description.trim().length()==0?null:description.trim();
     }
 
     public void setAssignees(String assignees) {
-        this.assignees = assignees == null?null:assignees.trim();
+        this.assignees = assignees == null?null:assignees.trim().length()==0?null:assignees.trim();
     }
 
     public void setTitle(String title) {
         this.title = title == null?null:title.trim();
     }
+
+
 
     public String getCreatedOn() throws ParseException {
         return dateformat(createdOn);
@@ -69,4 +71,7 @@ public class TaskEntity {
         dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dt1.format(dt.parse(dt.format(date_s)));
     }
+
+
+
 }

@@ -67,27 +67,9 @@ public class TaskController {
 //    }
 
     public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-        TaskEntity taskEntity = new TaskEntity();
-        taskEntity.setTitle(taskDTO.getTitle());
-        taskEntity.setDescription(taskDTO.getDescription());
-        taskEntity.setAssignees(taskDTO.getAssignees());
-
-        StatusEntity statusEntity;
-        if (taskDTO.getStatus() == null || taskDTO.getStatus().isEmpty()) {
-            // Set default status to statusId = 1
-            statusEntity = statusService.getStatusById(1);
-            if (statusEntity == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Default status not found");
-            }
-        } else {
-            // Fetch the status entity by name
-            statusEntity = statusService.getStatusByName(taskDTO.getStatus());
-            if (statusEntity == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
-            }
-        }
+        StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
+        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
         taskEntity.setStatus(statusEntity);
-
         TaskEntity addedTask = taskService.addTask(taskEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
     }

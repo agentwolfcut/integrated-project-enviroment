@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static dev.backendintegratedproject.services.ListMapper.getInstance;
@@ -52,27 +54,23 @@ public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
 
 }
     @PutMapping("/{id}")
-    public ResponseEntity<String> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
+    public ResponseEntity<Object> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
+        if (id == 1){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         StatusEntity editedStatus = statusService.editStatus(id,status);
-        if (editedStatus != null) {
-            return ResponseEntity.ok("The status has been updated");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+            return ResponseEntity.ok(editedStatus);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteStatus(@PathVariable("id") Integer id) {
-        StatusEntity existingStatus = statusService.getStatusById(id);
-        if (existingStatus == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Status not found");
-        }
-        if (existingStatus.getStatusName().equals("No Status")) {
-            return ResponseEntity.badRequest().body("Cannot delete 'No Status'");
-        }
+    public ResponseEntity<Object> deleteStatus(@PathVariable("id") Integer id) {
+        if (id == 1){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         statusService.deleteStatus(id);
-        return ResponseEntity.ok("The status has been deleted");
+        return ResponseEntity.ok().body(new HashMap<>());
     }
 
+    @DeleteMapping("/{id}/{newId}")
+    public ResponseEntity<Object> deleteStatusAndTransferTasks(@PathVariable int id, @PathVariable int newId) {
+        statusService.deleteStatusAndTransferTasks(id, newId);
+        return ResponseEntity.ok("{}");
+    }
 }

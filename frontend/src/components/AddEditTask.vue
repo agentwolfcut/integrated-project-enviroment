@@ -15,10 +15,10 @@ const props = defineProps({
             title: '',
             description: "",
             assignees: "",
-            status: "No Status",
-        },
+            status: 1
+            },
         require: true
-    },
+    }
 })
 
 const emit = defineEmits(['saveUpdateTask']); // Define the custom event
@@ -33,7 +33,7 @@ onMounted(async () => {
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {
-        previousTask.value.status = defaultStatus.name;
+        previousTask.value.status = defaultStatus.id;
     }
 })
 

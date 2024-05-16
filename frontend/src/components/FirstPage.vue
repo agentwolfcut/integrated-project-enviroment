@@ -61,7 +61,7 @@ const cancel = (flag) => {
     title: "",
     description: "",
     assignees: "",
-    status: "No Status",
+    status: 1,
   };
 };
 
@@ -118,7 +118,7 @@ const saveTask = async () => {
       title: "",
       description: "",
       assignees: "",
-      status: "No Status",
+      status: 1,
     };
   } catch (error) {
     // Navigate back
@@ -139,13 +139,15 @@ const transformTaskFormat = (task) => {
         description: task.description,
         assignees: task.assignees,
         status: {
-            id: task.status
+            id: task.status,
+            name: task.status.name
         }
     };
 };
 
 const editTask = async() => {
     const transformedTask = transformTaskFormat(selectTask.value);
+    console.log(transformedTask);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/${selectTask.value.id}`,
@@ -180,7 +182,7 @@ const editTask = async() => {
         title: "",
         description: "",
         assignees: "",
-        status: "No Status",
+        status: 1,
       };
     } catch (error) {
       // Navigate back

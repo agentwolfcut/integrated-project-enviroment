@@ -13,7 +13,7 @@ const props = defineProps({
             title: '',
             description: "",
             assignees: "",
-            status: "No Status",
+            status: 1,
         },
         require: true
     },
@@ -30,20 +30,7 @@ onMounted(async () => {
 
 let originalTask = ref('')
 const route = useRoute();
-const taskId = ref(route.params.taskId)
-const toaster = createToaster({ /* options */ })
 
-
-const transformTaskFormat = (task) => {
-    return {
-        title: task.title,
-        description: task.description,
-        assignees: task.assignees,
-        status: {
-            id: task.status
-        }
-    };
-};
 
 const isTaskChanged = () => {
     return JSON.stringify(previousTask.value) !== JSON.stringify(originalTask.value);
@@ -103,9 +90,7 @@ const formatLocalDate = (dateString) => {
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1"
                                     :class="{ 'italic text-slate-500': previousTask.assignees === '' }">
-
                                 </input>
-
 
                             </div>
                             <div>

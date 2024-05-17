@@ -58,7 +58,7 @@ const taskId = ref(route.params.taskId)
                     <label for="title" class="font-medium text-base">Title</label>
                     <input v-model="previousTask.title"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text">
+                        type="text" max="100">
                     </input>
                 </div>
 

@@ -14,6 +14,7 @@ import Trash from "@/assets/icons/CiTrashFull.vue";
 import Edit from "@/assets/icons/CiEditPencil01.vue";
 import router from "@/router";
 import { createToaster } from "../../node_modules/@meforma/vue-toaster";
+import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
 
 const toaster = createToaster({
   /* options */
@@ -29,9 +30,15 @@ onMounted(async () => {
 const statusList = ref(statusMan.value.getStatuses());
 
 // ADD
-const editingStatus = ref({ id: undefined, name: "", description: "" });
+const editingStatus = ref({ id: undefined, name: "", description: null });
 const addStatus = async () => {
   try {
+    // Trim name and description
+    editingStatus.value.name = editingStatus.value.name.trim();
+    if (editingStatus.value.description !== null) {
+      editingStatus.value.description = editingStatus.value.description.trim();
+    }
+
     const res = await fetch(`${import.meta.env.VITE_BASE_URL2}`, {
       method: "POST",
       headers: {
@@ -69,29 +76,34 @@ const hasTasksToTransfer = ref(false);
 const confirmDelete = ref(false);
 const statusDelete = ref(undefined);
 const confirmTransfer = ref(false);
+const deleteDefault = ref(false);
 
 const tasks = ref("");
 
 const checkTasksBeforeDelete = async (status) => {
-  console.log(status.name);
-  const res = await getItems(import.meta.env.VITE_BASE_URL);
-  tasks.value = { ...res };
-  // console.log(tasks.value);
-  const clean = JSON.parse(JSON.stringify(tasks.value));
-  // console.log(clean);
-  const tasksArray = Object.values(clean);
-  // console.log(tasksArray);
-  const statusToCheck = status.name;
-  const filteredTask = tasksArray.filter(
-    (item) => item.status === statusToCheck
-  );
-  const count = filteredTask.length;
-  if (count > 0) {
-    console.log(`makkwa = ${count}`);
-    confirmTransfer.value = true;
+  if (status.id === 1) {
+    deleteDefault.value = true;
   } else {
-    console.log(`object = ${count}`);
-    confirmDelete.value = true;
+    console.log(status.name);
+    const res = await getItems(import.meta.env.VITE_BASE_URL);
+    tasks.value = { ...res };
+    // console.log(tasks.value);
+    const clean = JSON.parse(JSON.stringify(tasks.value));
+    // console.log(clean);
+    const tasksArray = Object.values(clean);
+    // console.log(tasksArray);
+    const statusToCheck = status.name;
+    const filteredTask = tasksArray.filter(
+      (item) => item.status === statusToCheck
+    );
+    const count = filteredTask.length;
+    if (count > 0) {
+      console.log(`makkwa = ${count}`);
+      confirmTransfer.value = true;
+    } else {
+      console.log(`object = ${count}`);
+      confirmDelete.value = true;
+    }
   }
 };
 
@@ -151,9 +163,9 @@ const updateStatus = async (editStatus) => {
       editStatus
     );
     statusMan.value.updateStatus(
-      editStatus.id,
-      editStatus.name,
-      editStatus.description
+      editedItem.id,
+      editedItem.name,
+      editedItem.description
     );
     toaster.success(`The ${editStatus.name} status has been updated`);
     // Update parent component's data
@@ -246,18 +258,18 @@ const clearEdit = () => {
                             </p>
                           </div>
 
-                          <button
-                            class="itbkk-title text-base font-medium leading-none text-gray-700 mr-4"
+                          <div
+                            class="itbkk-title truncate text-base font-medium leading-none text-gray-700 mr-4"
                           >
                             {{ status.name }}
-                          </button>
+                          </div>
                         </div>
                       </td>
                       <td></td>
                       <td class="itbkk-status-description">
                         <div
                           v-if="status.description"
-                          class="text-base font-medium leading-none text-gray-700 mr-2"
+                          class="text-base truncate font-medium leading-none text-gray-700 mr-2"
                         >
                           {{ status.description }}
                         </div>
@@ -317,6 +329,31 @@ const clearEdit = () => {
     @cancelEdit="clearEdit"
   />
 
+  <div v-if="deleteDefault">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-3 relative w-1/3"
+      >
+        <div class="m-1 flex justify-end">
+          <button @click="deleteDefault = false" class="mb-2">
+            <LineMdCloseSmall
+              class="bg-black text-white rounded-full w-5 h-5 hover:bg-gray-700"
+            />
+          </button>
+        </div>
+        <div
+          class="flex justify-center items-center font-semibold text-xl text-slate-800 mb-8"
+        >
+          You can't delete&nbsp;<span class="text-red-600 italic"
+            >default status
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div v-if="confirmDelete">
     <div
       class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
@@ -366,9 +403,11 @@ const clearEdit = () => {
             v-model="destinationStatusId"
             class="w-full p-2 border rounded"
           >
-            <option value="" selected disabled>Select destination status</option>
+            <option value="" selected disabled>
+              Select destination status
+            </option>
             <option
-              :disabled="(statusDelete.name === status.name)"
+              :disabled="statusDelete.name === status.name"
               v-for="status in statusList"
               :key="status.id"
               :value="status.id"

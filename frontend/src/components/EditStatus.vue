@@ -25,6 +25,17 @@ const props = defineProps({
 
 const previousStatus = computed(() => props.status)
 
+const statusName = ref(previousStatus.value.name);
+
+watch(previousStatus, (newVal, oldVal) => {
+  if (newVal!== oldVal) {
+    isFormModified.value = true;
+  }
+});
+
+const isFormModified = ref(false);
+const isSaveButtonDisabled = computed(() =>!isFormModified.value ||!statusName.value.trim());
+
 
 </script>
 
@@ -71,10 +82,12 @@ const previousStatus = computed(() => props.status)
 
                 <div class="m-3">
                     <div class="buttons flex justify-center gap-2">
-                        <button @click="$emit('saveEdit', previousStatus), selectStatus"
-                            :disabled="!previousStatus.name || previousStatus.id === 1" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
-                            disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
-                            ">
+                        <button
+                            @click="saveEdit"
+                            :disabled="isSaveButtonDisabled"
+                            class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                            disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900"
+                        >
                             save
                         </button>
                         <button @click="router.back(), $emit('cancelEdit')"

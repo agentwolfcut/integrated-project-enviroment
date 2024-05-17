@@ -84,7 +84,7 @@ const taskToDelete = ref(undefined)
                       </p>
                     </div>
 
-                    <button class="itbkk-title  text-base font-medium leading-none text-gray-700 mr-4"
+                    <button class="itbkk-title truncate  text-base font-medium leading-none text-gray-700 mr-4"
                       @click="$emit('showDetail', task.id)">
                       {{ task.title }}
                     </button>
@@ -94,7 +94,7 @@ const taskToDelete = ref(undefined)
                 <td></td>
                 <td class="itbkk-assignees pl-2 overflow-x-hidden ">
                   <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                    <span v-if="task.assignees">{{ task.assignees }}</span>
+                    <span v-if="task.assignees" class="truncate">{{ task.assignees }}</span>
                     <span v-else class="text-slate-300 italic">
                       Unassigned
                     </span>

@@ -15,5 +15,4 @@ public class TaskDTO {
     private String status;
     private String createdOn;
     private String updatedOn;
-
 }

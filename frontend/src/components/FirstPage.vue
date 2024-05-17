@@ -147,8 +147,7 @@ const transformTaskFormat = (task) => {
 };
 
 const editTask = async() => {
-    const transformedTask = transformTaskFormat(selectTask.value);
-    console.log(transformedTask);
+    const transformedTask = transformTaskFormat(selectTask.value);    
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BASE_URL}/${selectTask.value.id}`,
@@ -173,7 +172,7 @@ const editTask = async() => {
         editTask.title,
         editTask.description,
         editTask.assignees,
-        editTask.status.name
+        editTask.status
       );
       router.back();
       toaster.success(

@@ -114,8 +114,7 @@ const deleteStatus = async () => {
   confirmDelete.value = false;
 };
 
-
-const transferAndDeleteStatus = async() => { 
+const transferAndDeleteStatus = async () => {
   try {
     const removeId = statusDelete.value.id;
     const destinationId = destinationStatusId.value;
@@ -138,7 +137,7 @@ const transferAndDeleteStatus = async() => {
       `Failed to transfer tasks and delete status. Please try again later.`
     );
   }
-  confirmTransfer.value = false
+  confirmTransfer.value = false;
   destinationStatusId.value = null;
 };
 
@@ -328,7 +327,7 @@ const clearEdit = () => {
         <div class="mb-4 text-base font-medium overflow-y-auto">
           <p>Do you want to delete the status "{{ statusDelete.name }}"?</p>
         </div>
-        
+
         <div class="flex justify-end mt-4">
           <button
             @click="confirmDelete = false"
@@ -363,9 +362,13 @@ const clearEdit = () => {
           </p>
         </div>
         <div>
-          <select v-model="destinationStatusId" class="w-full p-2 border rounded">
-            <option value="" disabled>Select destination status</option>
+          <select
+            v-model="destinationStatusId"
+            class="w-full p-2 border rounded"
+          >
+            <option value="" selected disabled>Select destination status</option>
             <option
+              :disabled="(statusDelete.name === status.name)"
               v-for="status in statusList"
               :key="status.id"
               :value="status.id"

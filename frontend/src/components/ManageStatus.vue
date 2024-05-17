@@ -108,7 +108,7 @@ const deleteStatus = async () => {
     toaster.success(`The ${statusDelete.value.name} status has been deleted`);
   } else {
     toaster.error(
-      `An error has occurred, the status could not be delete , plz refresh page.`
+      `An error has occurred, The status could not be delete , please refresh page.`
     );
   }
   confirmDelete.value = false;

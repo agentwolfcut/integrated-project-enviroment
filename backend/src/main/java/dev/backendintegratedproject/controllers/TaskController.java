@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.controllers;
 
+import dev.backendintegratedproject.dtos.GetTaskDTO;
 import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.entities.TaskEntity;
@@ -44,8 +45,8 @@ public class TaskController {
         if (task == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
         }
-        TaskDTO taskDTO = modelMapper.map(task, TaskDTO.class); // แปลง TaskEntity เป็น TaskDTO
-        return new ResponseEntity<>(taskDTO, HttpStatus.OK);
+        GetTaskDTO getTaskDTO = modelMapper.map(task, GetTaskDTO.class); // แปลง TaskEntity เป็น TaskDTO
+        return new ResponseEntity<>(getTaskDTO, HttpStatus.OK);
     }
     // Endpoint to add a task
     @PostMapping

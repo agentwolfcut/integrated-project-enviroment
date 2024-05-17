@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import HeaderIT from "./Header.vue";
 import {
   getItems,
-  addItem,
+  transferTasksAndDeleteStatus,
   deleteItemById,
   editItem,
 } from "../libs/fetchUtils";
@@ -68,41 +68,31 @@ const destinationStatusId = ref(null);
 const hasTasksToTransfer = ref(false);
 const confirmDelete = ref(false);
 const statusDelete = ref(undefined);
-const emits = defineEmits(["deleteC", "deleteConfirm"]);
+const confirmTransfer = ref(false);
 
-
-
+const tasks = ref("");
 
 const checkTasksBeforeDelete = async (status) => {
-  const tasks = await getTasksByStatus(
-    import.meta.env.VITE_BASE_URL2,
-    status.id
+  console.log(status.name);
+  const res = await getItems(import.meta.env.VITE_BASE_URL);
+  tasks.value = { ...res };
+  // console.log(tasks.value);
+  const clean = JSON.parse(JSON.stringify(tasks.value));
+  // console.log(clean);
+  const tasksArray = Object.values(clean);
+  // console.log(tasksArray);
+  const statusToCheck = status.name;
+  const filteredTask = tasksArray.filter(
+    (item) => item.status === statusToCheck
   );
-  if (tasks.length > 0) {
-    hasTasksToTransfer.value = true;
+  const count = filteredTask.length;
+  if (count > 0) {
+    console.log(`makkwa = ${count}`);
+    confirmTransfer.value = true;
   } else {
-    hasTasksToTransfer.value = false;
-    deleteStatusDirectly(status);
+    console.log(`object = ${count}`);
+    confirmDelete.value = true;
   }
-  confirmDelete.value = true;
-  statusDelete.value = status;
-};
-
-const deleteStatusDirectly = async (status) => {
-  const removeId = status.id;
-  const removeStatus = await deleteItemById(
-    import.meta.env.VITE_BASE_URL2,
-    removeId
-  );
-  if (removeStatus === 200) {
-    statusMan.value.removeStatus(removeId);
-    toaster.success(`The ${status.name} status has been deleted`);
-  } else {
-    toaster.error(
-      `An error has occurred, the status could not be delete, please refresh page.`
-    );
-  }
-  confirmDelete.value = false;
 };
 
 const deleteStatus = async () => {
@@ -124,7 +114,8 @@ const deleteStatus = async () => {
   confirmDelete.value = false;
 };
 
-const transferAndDeleteStatus = async () => {
+
+const transferAndDeleteStatus = async() => { 
   try {
     const removeId = statusDelete.value.id;
     const destinationId = destinationStatusId.value;
@@ -147,9 +138,11 @@ const transferAndDeleteStatus = async () => {
       `Failed to transfer tasks and delete status. Please try again later.`
     );
   }
-  confirmDelete.value = false;
+  confirmTransfer.value = false
   destinationStatusId.value = null;
 };
+
+// UPDATE
 
 const updateStatus = async (editStatus) => {
   try {
@@ -299,18 +292,14 @@ const clearEdit = () => {
                           <button
                             class="pr-1 itbkk-button-delete"
                             @click="
-                              (confirmDelete = true),
-                                (statusDelete = status),
-                                $emit('deleteC', status.id),
-                                checkTasksBeforeDelete
+                              (statusDelete = status),
+                                checkTasksBeforeDelete(status)
                             "
                           >
                             <Trash />
                           </button>
                         </div>
                       </td>
-
-                      
                     </tr>
                   </tbody>
                 </table>
@@ -337,19 +326,44 @@ const clearEdit = () => {
         class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
       >
         <div class="mb-4 text-base font-medium overflow-y-auto">
-          <p v-if="hasTasksToTransfer">
-            There are tasks in {{ statusDelete.name }} status. To delete this
-            status, please transfer tasks to an existing status.
-          </p>
-          <p v-else>
-            Do you want to delete the status "{{ statusDelete.name }}"?
+          <p>Do you want to delete the status "{{ statusDelete.name }}"?</p>
+        </div>
+        
+        <div class="flex justify-end mt-4">
+          <button
+            @click="confirmDelete = false"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            @click="deleteStatus"
+            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="confirmTransfer">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
+        <div class="mb-4 text-base font-medium overflow-y-auto">
+          <p>
+            There are tasks in
+            <span class="text-red-600 italic">{{ statusDelete.name }}</span>
+            status. To delete this status, please transfer tasks to an other
+            status.
           </p>
         </div>
-        <div v-if="hasTasksToTransfer">
-          <select
-            v-model="destinationStatusId"
-            class="w-full p-2 border rounded"
-          >
+        <div>
+          <select v-model="destinationStatusId" class="w-full p-2 border rounded">
             <option value="" disabled>Select destination status</option>
             <option
               v-for="status in statusList"
@@ -362,21 +376,17 @@ const clearEdit = () => {
         </div>
         <div class="flex justify-end mt-4">
           <button
-            @click="confirmDelete = false"
+            @click="confirmTransfer = false"
             class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
           >
             Cancel
           </button>
           <button
-            @click="
-              hasTasksToTransfer
-                ? transferAndDeleteStatus()
-                : deleteStatusDirectly(statusDelete)
-            "
+            @click="transferAndDeleteStatus(destinationStatusId)"
             :disabled="hasTasksToTransfer && !destinationStatusId"
             class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
           >
-            {{ hasTasksToTransfer ? "Transfer and Delete" : "Confirm" }}
+            Transfer and Delete
           </button>
         </div>
       </div>

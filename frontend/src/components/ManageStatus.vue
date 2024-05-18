@@ -30,14 +30,14 @@ onMounted(async () => {
 const statusList = ref(statusMan.value.getStatuses());
 
 // ADD
-const editingStatus = ref({ id: undefined, name: "", description: null });
+const editingStatus = ref({ id: undefined, name: '', description: '' });
 const addStatus = async () => {
   try {
     // Trim name and description
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
-    }
+    }    
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL2}`, {
       method: "POST",
@@ -84,7 +84,6 @@ const checkTasksBeforeDelete = async (status) => {
   if (status.id === 1) {
     deleteDefault.value = true;
   } else {
-    console.log(status.name);
     const res = await getItems(import.meta.env.VITE_BASE_URL);
     tasks.value = { ...res };
     // console.log(tasks.value);
@@ -98,10 +97,10 @@ const checkTasksBeforeDelete = async (status) => {
     );
     const count = filteredTask.length;
     if (count > 0) {
-      console.log(`makkwa = ${count}`);
+      
       confirmTransfer.value = true;
     } else {
-      console.log(`object = ${count}`);
+      
       confirmDelete.value = true;
     }
   }
@@ -170,7 +169,7 @@ const updateStatus = async () => {
       throw new Error(
         `Failed to update task. Server responded with status ${res.status}`
       );
-    }    
+    }
     router.back();
     toaster.success(
       `The ${editingStatus.name} task has been successfully updated`

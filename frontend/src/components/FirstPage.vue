@@ -21,7 +21,6 @@ import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
 
-
 const toaster = createToaster({
   /* options */
 });
@@ -31,12 +30,11 @@ const showModalDetail = ref(false);
 const tasks = ref({});
 const tasksArray = ref([]);
 const sortedTasks = ref([]);
-
+const sortMode = ref("default"); // 'default', 'Alp', 'desc'
 
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(import.meta.env.VITE_BASE_URL);
-  taskMan.value.addtasks(taskRes);
   //tasks.value = taskRes // reverse and slice to show the most
   tasks.value = taskRes;
   // Convert tasks object to array
@@ -51,17 +49,19 @@ onMounted(async () => {
 // Function to sort tasks by creation time
 const sortTasksByCreationTime = () => {
   sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
+  sortMode.value = "default";
+  sortAlp.value = false;
+  console.log(sortMode.value);
 };
-
-const sortAsc = ref(true);
+const sortAlp = ref(false);
 // Function to sort tasks by status name
-const sortTasksByStatusNameAsc = () => {
+const sortTasksByStatusNameAlp = () => {
   sortedTasks.value = tasksArray.value
     .slice()
     .sort((a, b) => a.status.localeCompare(b.status));
 };
 
-const sortTasksByStatusNameDsc = () => {
+const sortTasksByStatusNameRev = () => {
   sortedTasks.value = tasksArray.value
     .slice()
     .sort((a, b) => b.status.localeCompare(a.status));
@@ -69,22 +69,15 @@ const sortTasksByStatusNameDsc = () => {
 
 // Function to toggle sorting
 const toggleSortOrder = () => {
-  sortAsc.value = !sortAsc.value;
-  if (sortAsc.value) {
-    sortTasksByStatusNameAsc();
+  sortAlp.value = !sortAlp.value;
+  if (sortAlp.value) {
+    sortMode.value = "Alp";
+    console.log(sortMode.value);
+    sortTasksByStatusNameAlp();
   } else {
-    sortTasksByStatusNameDsc();
-  }
-};
-
-const checkTasksBeforeDelete = (status) => {
-  const statusInUse = tasksArray.value.some(
-    (task) => task.status === status.statusName
-  );
-  if (statusInUse) {
-    console.log(`status1 : ${status}`);
-  } else {
-    console.log(`status2 : ${status}`);
+    sortTasksByStatusNameRev();
+    sortMode.value = "Rev";
+    console.log(sortMode.value);
   }
 };
 
@@ -94,8 +87,8 @@ const taskList = taskMan.value.gettasks();
 const selectTask = ref({
   id: undefined,
   title: "",
-  description: null,
-  assignees: null,
+  description: '',
+  assignees: '',
   status: 1,
   createdOn: "",
   updatedOn: "",
@@ -133,8 +126,8 @@ const deleteTask = async (removeId) => {
     if (status === 200) {
       // taskMan.value.removetask(removeId);
       sortedTasks.value.splice(
-        sortedTasks.value.findIndex((item) => item.id === removeId),
-      )
+        sortedTasks.value.findIndex((item) => item.id === removeId)
+      );
       toaster.success(`The task has been deleted`);
     } else {
       toaster.error(`The task does not exist            
@@ -162,21 +155,23 @@ const saveTask = async () => {
         `Failed to add task. Server responded with status ${res.status}`
       );
     }
-    const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด
-    // taskMan.value.addtask(
-    //   addedTask.id,
-    //   addedTask.title,
-    //   addedTask.description,
-    //   addedTask.assignees,
-    //   addedTask.status.name
-    // );
-    console.log(addedTask);  
-    const modifiedTask = {
-      ...addedTask,
-      status: addedTask.status.statusName
-    };
+    const addedTask = await res.json();     
+    addedTask.status = addedTask.status.name;
+    
+    if (sortMode.value === "default") {
+      sortedTasks.value.push(addedTask);
+    } else if (sortMode.value === "Alp") { 
+      let index = sortedTasks.value.findIndex((task) => task.status > addedTask.status)
+      sortedTasks.value.splice(index,0,addedTask)   
+      index = undefined
+    } else if (sortMode.value === 'Rev') {
+      let index = sortedTasks.value.findIndex((task) => task.status < addedTask.status)
+      sortedTasks.value.splice(index,0,addedTask)   
+      index = undefined
+    } else {
+      sortedTasks.value.push(addedTask);
+    }
 
-    sortedTasks.value.push(modifiedTask);
     // console.log(previousTask.value);
     router.back();
     toaster.success(`The ${addedTask.title} task has been successfully added`);
@@ -254,7 +249,6 @@ const editTask = async () => {
     toaster.error(`The task can't update please try again`);
   }
 };
-
 </script>
 
 <template>
@@ -272,11 +266,9 @@ const editTask = async () => {
 
       <!-- Task List -->
       <div class="TaskList sm:px-20 w-full overflow-y-scroll h-5/6">
-        <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10  ">
+        <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
           <div class="flex items-center mb-9">
-            <div class="flex flex-1">
-              filter
-            </div>
+            <div class="flex flex-1">filter</div>
             <router-link to="/task/add">
               <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8">
                 <buttonSlot size="sm" type="dark">
@@ -302,8 +294,8 @@ const editTask = async () => {
                   <SortDefault />
                 </button>
                 <div @click="toggleSortOrder" class="flex items-center ml-2">
-                  <button v-if="sortAsc"><SortDown /></button>
-                  <button v-if="!sortAsc"><SortUp /></button>
+                  <button v-if="sortAlp"><SortDown /></button>
+                  <button v-if="!sortAlp"><SortUp /></button>
                 </div>
               </div>
               <div
@@ -320,7 +312,7 @@ const editTask = async () => {
                 <p class="text-gray-500 mr-5">{{ index + 1 }}</p>
                 <button
                   @click="openDetails(task.id)"
-                  class="text-gray-700 truncate max-w-lg "
+                  class="text-gray-700 truncate max-w-lg"
                 >
                   {{ task.title }}
                 </button>
@@ -331,7 +323,9 @@ const editTask = async () => {
                 }}</span>
                 <span v-else class="text-slate-300 italic"> Unassigned </span>
               </div>
-              <div class="task-column text-gray-700 truncate">{{ task.status }}</div>
+              <div class="task-column text-gray-700 truncate">
+                {{ task.status }}
+              </div>
               <div class="task-column text-gray-700">
                 <router-link
                   :to="{ name: 'EditTask', params: { taskId: task.id } }"
@@ -435,6 +429,4 @@ const editTask = async () => {
   --tw-border-opacity: 1;
   border-color: rgb(243 244 246 / var(--tw-border-opacity));
 }
-
-
 </style>

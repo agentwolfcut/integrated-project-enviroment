@@ -13,8 +13,8 @@ const props = defineProps({
         default: {
             id: undefined,
             title: '',
-            description: "",
-            assignees: "",
+            description: '',
+            assignees: '',
             status: 1
             },
         require: true
@@ -40,6 +40,35 @@ onMounted(async () => {
 const route = useRoute();
 const taskId = ref(route.params.taskId)
 
+const textColorClass = computed(() => {
+    if (previousTask.value.description !== null) {
+          return previousTask.value.title.length > 100 || previousTask.value.description.length > 500 || previousTask.value.assignees.length > 30 ? 'text-red-600' : 'text-blue-600';
+    }
+});
+
+const limitInputLength = () => {
+    if (previousTask.value.title.length > 100) {
+        previousTask.value.title = previousTask.value.title.slice(0, 100);
+    }
+    if (previousTask.value.description !== null && previousTask.value.description.length > 500) {
+        previousTask.value.description = previousTask.value.description.slice(0, 500);
+    }
+    if(previousTask.value.assignees !== null && previousTask.value.assignees.length > 30){
+        previousTask.value.assignees = previousTask.value.assignees.slice(0, 30);
+    }
+};
+
+const saveTask = () => {
+    // Trim the description and set to null if it contains only whitespace
+    if (previousTask.value.description.trim().length === 0) {
+        previousTask.value.description = null;
+    }
+    if (previousTask.value.assignees.trim().length === 0) {
+        previousTask.value.assignees = null;
+    }
+    emit('saveUpdateTask', previousTask.value);
+};
+
 </script>
 
 <template>
@@ -58,26 +87,33 @@ const taskId = ref(route.params.taskId)
                     <label for="title" class="font-medium text-base">Title</label>
                     <input v-model="previousTask.title"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text" max="100">
+                        type="text" @input="limitInputLength">
                     </input>
+                    <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
+                    <p v-if="previousTask.title.length === 100" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task title</p>
                 </div>
 
                 <!-- center -->
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 "
-                            style='padding: 15px;' type="text">
-
+                        <input v-model="previousTask.description" class="text-base rounded-md py-1 h-24 w-full mb-2"
+                            style='padding: 10px;' type="text" @input="limitInputLength">
                         </input>
+                        <p v-if="previousTask.description" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
+                    <!-- <p v-if="previousTask.description.length === 500" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task description</p> -->
+                                          
 
                     </div>
+                   
                     <div class="flex flex-col w-5/12">
                         <div>
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees"
-                                    class=" w-full text-base rounded-md border p-1" />
+                                    class=" w-full text-base rounded-md border p-1" @input="limitInputLength" />
+                                    <p v-if="previousTask.assignees" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.assignees.length}}/30</p>
+                                    <!-- <p v-if="previousTask.assignees.length === 30" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task assignees</p> -->
 
                             </div>
                             <div>
@@ -99,7 +135,7 @@ const taskId = ref(route.params.taskId)
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="$emit('saveUpdateTask', previousTask)" :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click=saveTask(previousTask) :disabled="!previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

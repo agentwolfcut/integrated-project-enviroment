@@ -15,11 +15,32 @@ const props = defineProps({
     }
 })
 
-defineEmits(['saveStatus','cancelEdit'])
+const emit = defineEmits(['saveStatus','cancelEdit'])
 
 const previousStatus = computed(() => props.status)
 
-const route = useRoute()
+const textColorClass = computed(() => {
+    if (previousStatus.value.description !== null) {
+          return previousStatus.value.name.length > 50 || previousStatus.value.description.length > 200 ? 'text-red-600' : 'text-blue-600';
+    }
+});
+
+const limitInputLength = () => {
+    if (previousStatus.value.name.length > 50) {
+        previousStatus.value.name = previousStatus.value.name.slice(0, 50);
+    }
+    if (previousStatus.value.description !== null && previousStatus.value.description.length > 200) {
+        previousStatus.value.description = previousStatus.value.description.slice(0, 200);
+    }
+};
+
+const saveStatus = () => {
+    // Trim the description and set to null if it contains only whitespace
+    if (previousStatus.value.description.trim().length === 0) {
+        previousStatus.value.description = null;
+    }
+    emit('saveStatus', previousStatus.value);
+};
 
 </script>
 
@@ -40,8 +61,10 @@ const route = useRoute()
                     <label for="title" class="font-medium text-base">Name of Status</label>
                     <input v-model.trim()="previousStatus.name"
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text" maxlength="100" placeholder="Enter status name">
+                        type="text" maxlength="50" placeholder="Enter status name" @input="limitInputLength">
                     </input>
+                    <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.name.length}}/50</p>
+                    <p v-if="previousStatus.name.length === 50" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for status name </p>
                 </div>
 
                 <!-- center -->
@@ -50,9 +73,12 @@ const route = useRoute()
                         <p class="font-medium text-base mb-2">description</p>
                         <input v-model.trim()="previousStatus.description"
                             class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
-                            type="text">
+                            type="text"
+                            placeholder="Enter status description"
+                            @input="limitInputLength">
                         </input>
-
+                        <p v-if="previousStatus.description" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.description.length}}/200</p>
+                        <!-- <p v-if="previousStatus.description.length === 200 " class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for status description </p> -->
                     </div>
 
                 </div>
@@ -60,7 +86,7 @@ const route = useRoute()
                 <!-- bottom -->
                 <div class="m-3">
                     <div class="buttons flex gap-2">
-                        <button @click="$emit('saveStatus', previousStatus)" :disabled="!previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="saveStatus" :disabled="!previousStatus.name" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

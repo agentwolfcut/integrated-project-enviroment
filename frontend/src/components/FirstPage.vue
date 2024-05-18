@@ -31,14 +31,14 @@ const showModalDetail = ref(false);
 const tasks = ref({});
 const tasksArray = ref([]);
 const sortedTasks = ref([]);
-const sortByStatus = ref(false); // Default is false, which means sorting by creation time
+
 
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(import.meta.env.VITE_BASE_URL);
   taskMan.value.addtasks(taskRes);
   //tasks.value = taskRes // reverse and slice to show the most
-  tasks.value = { ...taskRes };
+  tasks.value = taskRes;
   // Convert tasks object to array
   const clean = JSON.parse(JSON.stringify(tasks.value));
   tasksArray.value = Object.values(clean);
@@ -94,8 +94,8 @@ const taskList = taskMan.value.gettasks();
 const selectTask = ref({
   id: undefined,
   title: "",
-  description: "",
-  assignees: "",
+  description: null,
+  assignees: null,
   status: 1,
   createdOn: "",
   updatedOn: "",
@@ -131,7 +131,10 @@ const deleteTask = async (removeId) => {
       removeId
     );
     if (status === 200) {
-      taskMan.value.removetask(removeId);
+      // taskMan.value.removetask(removeId);
+      sortedTasks.value.splice(
+        sortedTasks.value.findIndex((item) => item.id === removeId),
+      )
       toaster.success(`The task has been deleted`);
     } else {
       toaster.error(`The task does not exist            
@@ -160,13 +163,20 @@ const saveTask = async () => {
       );
     }
     const addedTask = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด
-    taskMan.value.addtask(
-      addedTask.id,
-      addedTask.title,
-      addedTask.description,
-      addedTask.assignees,
-      addedTask.status.name
-    );
+    // taskMan.value.addtask(
+    //   addedTask.id,
+    //   addedTask.title,
+    //   addedTask.description,
+    //   addedTask.assignees,
+    //   addedTask.status.name
+    // );
+    console.log(addedTask);  
+    const modifiedTask = {
+      ...addedTask,
+      status: addedTask.status.statusName
+    };
+
+    sortedTasks.value.push(modifiedTask);
     // console.log(previousTask.value);
     router.back();
     toaster.success(`The ${addedTask.title} task has been successfully added`);

@@ -272,7 +272,7 @@ const editTask = async () => {
 
       <!-- Task List -->
       <div class="TaskList sm:px-20 w-full overflow-y-scroll h-5/6">
-        <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
+        <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10  ">
           <div class="flex items-center mb-9">
             <div class="flex flex-1">
               filter
@@ -320,7 +320,7 @@ const editTask = async () => {
                 <p class="text-gray-500 mr-5">{{ index + 1 }}</p>
                 <button
                   @click="openDetails(task.id)"
-                  class="text-gray-700 truncate"
+                  class="text-gray-700 truncate max-w-lg "
                 >
                   {{ task.title }}
                 </button>
@@ -331,7 +331,7 @@ const editTask = async () => {
                 }}</span>
                 <span v-else class="text-slate-300 italic"> Unassigned </span>
               </div>
-              <div class="task-column text-gray-700">{{ task.status }}</div>
+              <div class="task-column text-gray-700 truncate">{{ task.status }}</div>
               <div class="task-column text-gray-700">
                 <router-link
                   :to="{ name: 'EditTask', params: { taskId: task.id } }"
@@ -417,7 +417,7 @@ const editTask = async () => {
 }
 .task-list {
   display: grid;
-  grid-template-columns: 6fr 3fr 2fr 1fr;
+  grid-template-columns: 5fr 4fr 2fr 1fr;
   width: 100%;
 }
 

@@ -22,6 +22,7 @@ const props = defineProps({
 const emit = defineEmits(['saveEdit']); // Define the custom event
 
 const previousTask = computed(() => props.task)
+console.log(previousTask.value);
 const statusOptions = ref('')
 onMounted(async () => {
     const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)

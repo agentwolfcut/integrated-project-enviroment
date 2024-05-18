@@ -154,27 +154,37 @@ const transferAndDeleteStatus = async () => {
 };
 
 // UPDATE
-
-const updateStatus = async (editStatus) => {
+const updateStatus = async () => {
   try {
-    const editedItem = await editItem(
-      import.meta.env.VITE_BASE_URL2,
-      editStatus.id,
-      editStatus
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL2}/${editingStatus.value.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(editingStatus.value),
+      }
     );
-    statusMan.value.updateStatus(
-      editedItem.id,
-      editedItem.name,
-      editedItem.description
+    if (!res.ok) {
+      throw new Error(
+        `Failed to update task. Server responded with status ${res.status}`
+      );
+    }    
+    router.back();
+    toaster.success(
+      `The ${editingStatus.name} task has been successfully updated`
     );
-    toaster.success(`The ${editStatus.name} status has been updated`);
-    // Update parent component's data
-    editingStatus.value = { id: undefined, name: "", description: "" };
-    router.back(-1);
+    editingStatus.value = {
+      id: undefined,
+      name: "",
+      description: null,
+    };
   } catch (error) {
-    // Handle error
-    console.error("Error updating status:", error);
-    toaster.error("Failed to update status. Please try again later.");
+    // Navigate back
+    console.error("Error editing task:", error);
+    // Handle error as needed
+    toaster.error(`The task can't update please try again`);
   }
 };
 

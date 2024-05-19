@@ -1,14 +1,11 @@
 <script setup>
-import { computed, onMounted, ref, toRaw } from "vue";
+import {  onMounted, ref } from "vue";
 import {
-  addItem,
-  editItem,
   getItemById,
   getItems,
   deleteItemById,
 } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
-import TaskList from "./TaskList.vue";
 import TaskDetail from "./TaskDetail.vue";
 import { createToaster } from "../../node_modules/@meforma/vue-toaster";
 import HeaderIT from "./Header.vue";
@@ -48,7 +45,7 @@ onMounted(async () => {
 
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
-  console.log(statuses.value);
+  // console.log(statuses.value);
   const status = JSON.parse(JSON.stringify(statuses.value));
   statusArray.value = Object.values(status);
   // console.log(statuses.value);
@@ -61,7 +58,7 @@ const sortTasksByCreationTime = () => {
   sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
   sortMode.value = "default";
   sortAlp.value = false;
-  console.log(`sort mode = ${sortMode.value}`);
+  // console.log(`sort mode = ${sortMode.value}`);
 };
 const sortAlp = ref(false);
 // Function to sort tasks by status name
@@ -311,8 +308,10 @@ const toggleFilter = () => {
 const statusFilter = ref([])
 
 const doFilter = async() => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusFilter}`)
-  
+  if (statusFilter.value) {
+    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusFilter}`);
+    sortedTasks.value = res
+  }
 }
 </script>
 
@@ -424,6 +423,7 @@ const doFilter = async() => {
                 :key="id"
               >
                 <input
+                  @click="doFilter"
                   v-model="statusFilter"
                   id="filter-checkbox"
                   type="checkbox"

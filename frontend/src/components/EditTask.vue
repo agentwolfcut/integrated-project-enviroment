@@ -1,9 +1,7 @@
 <script setup>
-import { useRoute } from 'vue-router';
 import router from '@/router';
 import { ref, onMounted , computed } from 'vue'
-import { getItemById, getItems } from '../libs/fetchUtils';
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+import {  getItems } from '../libs/fetchUtils';
 
 const props = defineProps({
     task: {

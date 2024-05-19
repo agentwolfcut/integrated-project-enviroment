@@ -2,8 +2,7 @@
 import router from '@/router';
 import { useRoute } from 'vue-router'
 import { computed, ref, onMounted, watch } from 'vue';
-import { StatusManagement } from '@/libs/StatusManagement';
-import { getItemById } from '@/libs/fetchUtils';
+
 import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 const toaster = createToaster({ /* options */ })

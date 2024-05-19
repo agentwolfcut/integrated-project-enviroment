@@ -2,10 +2,9 @@
 
 import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
-import { getItems, deleteItemById } from '../libs/fetchUtils';
+import { getItems } from '../libs/fetchUtils';
 
 import router from '@/router';
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 
 const props = defineProps({
     task: {

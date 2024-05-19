@@ -1,6 +1,5 @@
 <script setup>
 import router from '@/router';
-import { useRoute } from 'vue-router'
 import { computed, ref } from 'vue';
 
 

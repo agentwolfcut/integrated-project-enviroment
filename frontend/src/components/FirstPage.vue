@@ -28,6 +28,7 @@ const toaster = createToaster({
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const tasks = ref({});
+const taskList = taskMan.value.gettasks()
 const statuses = ref({});
 const tasksArray = ref([]);
 const statusArray = ref([]);
@@ -49,8 +50,6 @@ onMounted(async () => {
   statuses.value = statusRes;
   const status = JSON.parse(JSON.stringify(statuses.value));
   statusArray.value = Object.values(status);
-  console.log(typeof statusArray.value);
-  console.log(statusArray.value);
   // console.log(statuses.value);
 });
 
@@ -90,8 +89,6 @@ const toggleSortOrder = () => {
     console.log(sortMode.value);
   }
 };
-
-const taskList = taskMan.value.gettasks();
 
 // for modal
 const selectTask = ref({
@@ -134,7 +131,6 @@ const deleteTask = async (removeId) => {
       removeId
     );
     if (status === 200) {
-      // taskMan.value.removetask(removeId);
       sortedTasks.value.splice(
         sortedTasks.value.findIndex((item) => item.id === removeId)
       );
@@ -177,6 +173,7 @@ const saveTask = async () => {
 
     if (sortMode.value === "default") {
       sortedTasks.value.push(addedTask);
+      taskMan.value.addtask(addedTask.id,addedTask.title,addedTask.description,addedTask.assignees,addedTask.status)
     } else if (sortMode.value === "Alp") {
       let index = sortedTasks.value.findIndex(
         (task) => task.status > addedTask.status
@@ -215,19 +212,6 @@ const editMode = (task) => {
   selectTask.value = task;
 };
 
-const transformTaskFormat = (task) => {
-  return {
-    title: task.title,
-    description: task.description,
-    assignees: task.assignees,
-    status: {
-      id: task.status,
-      name: task.status.name,
-      description : task.status.description
-    },
-  };
-};
-
 const updateStatusId = () => {
   const selectedStatus = statusArray.value.find(
     (status) => status.name === selectTask.value.status
@@ -245,8 +229,7 @@ const editTask = async () => {
   if (selectTask.value.assignees !== null) {
     selectTask.value.assignees = selectTask.value.assignees.trim();
   }
-  updateStatusId()
-  console.log(selectTask.value);
+  updateStatusId();
   // const transformedTask = transformTaskFormat(selectTask.value);
   try {
     const res = await fetch(
@@ -267,16 +250,9 @@ const editTask = async () => {
         `Failed to update task. Server responded with status ${res.status}`
       );
     }
-    const editTask = await res.json();
-    taskMan.value.updatetask(
-      editTask.id,
-      editTask.title,
-      editTask.description,
-      editTask.assignees,
-      editTask.status
-    );
+    
     router.back();
-    toaster.success(`The ${editTask.title} task has been successfully updated`);
+    toaster.success(`The ${selectTask.value.title} task has been successfully updated`);
     selectTask.value = {
       title: "",
       description: "",
@@ -306,6 +282,7 @@ const cancelHandle = () => {
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
 };
+
 </script>
 
 <template>

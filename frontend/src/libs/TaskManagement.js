@@ -28,7 +28,7 @@ class TaskManagement {
   }
 
   // map
-  updatetask(id, title, description, assignees, statusId) {
+  updatetask(id, title, description, assignees, status) {
     this.tasks = this.tasks.map((task) => {
       return task.id === id // if id correct
         ? // destructuring and replace with new
@@ -37,7 +37,7 @@ class TaskManagement {
           title: title,
           description: description,
           assignees: assignees,
-          status: statusId
+          status: status
         }
         : task
     })

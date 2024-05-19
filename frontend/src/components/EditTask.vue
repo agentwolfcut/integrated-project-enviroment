@@ -12,7 +12,9 @@ const props = defineProps({
             id: undefined,
             name: '',
             description: null,
-            status: ''
+            status: '' ,
+            createdOn: "",
+            updatedOn: "",
         })
     },
     statusOptions: {
@@ -26,8 +28,8 @@ const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the cus
 const statusOptions = ref('')
 
 onMounted(async () => {
-    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
-    statusOptions.value = { ...statusRes }
+  const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+  statusOptions.value = statusRes;
 })
 
 // const previousTask = ref({ ...props.task });
@@ -47,31 +49,15 @@ const saveTask = () => {
             status: statusId.value // Send status id to the backend
         };
         emit('saveEdit', taskToSave);
-        console.log(taskToSave);
     } catch (error) {
         console.error('Error saving task:', error);
         // Handle error as needed
     }
-};
-
-// const saveTaskOld = () => {
-//     // if (previousTask.value.description.length === 0) {
-//     //     previousTask.value.description = null;
-//     // }
-//     // if (previousTask.value.assignees.length === 0) {
-//     //     previousTask.value.assignees = null;
-//     // }
-//     emit('saveEdit', previousTask.value);
-// };
-
-const toaster = createToaster({
-  /* options */
-});
-
+}
 
 
 const previousTask = computed(() => props.task)
-
+console.log(previousTask.value);
 
 if (previousTask.value.title === null || previousTask.value.title === undefined || previousTask.value.title == '') {
     // router.back()
@@ -81,12 +67,6 @@ if (previousTask.value.title === null || previousTask.value.title === undefined 
     } , 800)
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
-
-
-
-
-const route = useRoute();
-
 
 const formatLocalDate = (dateString) => {
     if (!dateString) return ''

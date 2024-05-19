@@ -1,14 +1,16 @@
 package dev.backendintegratedproject.services;
 
+import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +49,18 @@ public class TaskService {
             return taskRepository.save(existingTask);
         }
         return null;
+    }
+
+    public List<TaskEntity> getTasksByStatuses(List<StatusEntity> statusEntities, String[] sortBy, String[] direction) {
+        if (sortBy != null && sortBy.length > 0) {
+            List<Sort.Order> sortOrderList = new ArrayList<>();
+            for (int i = 0; i < sortBy.length; i++) {
+                sortOrderList.add(new Sort.Order(Sort.Direction.valueOf(direction[i].toUpperCase()), sortBy[i]));
+            }
+            return taskRepository.findAllByStatusIn(statusEntities, Sort.by(sortOrderList));
+        } else {
+            return taskRepository.findAllByStatusIn(statusEntities);
+        }
     }
 
 }

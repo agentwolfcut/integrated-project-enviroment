@@ -19,10 +19,27 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['saveEdit','cancelOpe']); // Define the custom event
+const toaster = createToaster({
+  /* options */
+});
+
+
+
+const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the custom event
 
 const previousTask = computed(() => props.task)
 console.log(previousTask.value);
+
+if (previousTask.value.title === null || previousTask.value.title === undefined || previousTask.value.title == '') {
+    // router.back()
+    emit('failEdit');
+    setTimeout(()=>{
+        router.back();
+    } , 1000)
+    // toaster.error(`An error has occurred, the status does not exist.`);
+}
+
+
 const statusOptions = ref('')
 onMounted(async () => {
     const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)

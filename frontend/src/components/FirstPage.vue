@@ -279,6 +279,10 @@ const cancelHandle = () => {
     updatedOn: "",
   };
 };
+
+const handelFail = () => {
+  toaster.error(`An error has occurred, the status does not exist.`);
+}
 </script>
 
 <template>
@@ -428,6 +432,7 @@ const cancelHandle = () => {
     @saveUpdateTask="saveTask"
     @saveEdit="editTask"
     @cancelOpe="cancelHandle"
+    @failEdit="handelFail"
   />
 </template>
 

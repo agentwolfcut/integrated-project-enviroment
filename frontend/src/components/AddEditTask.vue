@@ -21,7 +21,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['saveUpdateTask']); // Define the custom event
+const emit = defineEmits(['saveUpdateTask' , 'cancelOpe']); // Define the custom event
 
 const previousTask = computed(() => props.task)
 
@@ -41,10 +41,18 @@ const route = useRoute();
 const taskId = ref(route.params.taskId)
 
 const textColorClass = computed(() => {
-    if (previousTask.value.description !== null) {
-          return previousTask.value.title.length > 100 || previousTask.value.description.length > 500 || previousTask.value.assignees.length > 30 ? 'text-red-600' : 'text-blue-600';
+    if (previousTask.value.description !== null) {  
+        return previousTask.value.title.length > 99 ? 'text-red-600' : 'text-blue-600';  
     }
 });
+
+const descriptionClass = computed(()=>{
+    return previousTask.value.description.length > 499 ? 'text-red-600' : 'text-blue-600';
+})
+
+const assigneesClass = computed(() => {
+    return previousTask.value.assignees.length > 29 ? 'text-red-600' : 'text-blue-600';
+})
 
 const limitInputLength = () => {
     if (previousTask.value.title.length > 100) {
@@ -90,7 +98,7 @@ const saveTask = () => {
                         type="text" @input="limitInputLength">
                     </input>
                     <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
-                    <p v-if="previousTask.title.length === 100" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task title</p>
+                    <!-- <p v-if="previousTask.title.length === 100" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task title</p> -->
                 </div>
 
                 <!-- center -->
@@ -100,7 +108,7 @@ const saveTask = () => {
                         <input v-model="previousTask.description" class="text-base rounded-md py-1 h-24 w-full mb-2"
                             style='padding: 10px;' type="text" @input="limitInputLength">
                         </input>
-                        <p v-if="previousTask.description" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
+                        <p v-if="previousTask.description" :class="descriptionClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
                     <!-- <p v-if="previousTask.description.length === 500" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task description</p> -->
                                           
 
@@ -112,7 +120,7 @@ const saveTask = () => {
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees"
                                     class=" w-full text-base rounded-md border p-1" @input="limitInputLength" />
-                                    <p v-if="previousTask.assignees" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.assignees.length}}/30</p>
+                                    <p v-if="previousTask.assignees" :class="assigneesClass" class="text-end text-blue-600 text-sm font-semibold ">{{ previousTask.assignees.length}}/30</p>
                                     <!-- <p v-if="previousTask.assignees.length === 30" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task assignees</p> -->
 
                             </div>
@@ -140,7 +148,7 @@ const saveTask = () => {
                             ">
                             save
                         </button>
-                        <button @click="router.back() "
+                        <button @click="router.back() , $emit('cancelOpe')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

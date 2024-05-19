@@ -15,13 +15,13 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['saveStatus','cancelEdit'])
+const emit = defineEmits(['saveStatus','cancelAdd'])
 
 const previousStatus = computed(() => props.status)
 
 const textColorClass = computed(() => {
     if (previousStatus.value.description !== null) {
-          return previousStatus.value.name.length > 50 || previousStatus.value.description.length > 200 ? 'text-red-600' : 'text-blue-600';
+          return previousStatus.value.name.length > 49 || previousStatus.value.description.length > 199 ? 'text-red-600' : 'text-blue-600';
     }
 });
 
@@ -34,9 +34,23 @@ const limitInputLength = () => {
     }
 };
 
+// Track the initial state of the status to detect changes
+const initialStatus = ref({ ...props.status });
+
+const isFormModified = computed(() => {
+    return (
+        initialStatus.value.name !== previousStatus.value.name ||
+        initialStatus.value.description !== previousStatus.value.description
+    );
+});
+
+const canSave = computed(() => {
+    return previousStatus.value.name.trim().length > 0 && isFormModified.value;
+});
+
 const saveStatus = () => {
     // Trim the description and set to null if it contains only whitespace
-    if (previousStatus.value.description.trim().length === 0) {
+    if (previousStatus.value.description.length === 0) {
         previousStatus.value.description = null;
     }
     emit('saveStatus', previousStatus.value);
@@ -64,7 +78,7 @@ const saveStatus = () => {
                         type="text" maxlength="50" placeholder="Enter status name" @input="limitInputLength">
                     </input>
                     <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.name.length}}/50</p>
-                    <p v-if="previousStatus.name.length === 50" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for status name </p>
+                    <!-- <p v-if="previousStatus.name.length === 50" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for status name </p> -->
                 </div>
 
                 <!-- center -->
@@ -91,7 +105,7 @@ const saveStatus = () => {
                             ">
                             save
                         </button>
-                        <button @click="router.back()"
+                        <button @click="router.back() , $emit('cancelAdd')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

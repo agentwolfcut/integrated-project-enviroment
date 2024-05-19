@@ -25,6 +25,42 @@ const props = defineProps({
 
 const previousStatus = computed(() => props.status)
 
+
+// Track the initial state of the status to detect changes
+const initialStatus = JSON.parse(JSON.stringify(props.status))
+console.log(initialStatus);
+
+const isSaveDisabled = computed(() => {
+  return (
+    JSON.stringify(previousStatus.value) === JSON.stringify(initialStatus) ||
+    previousStatus.value.name.length < 1 ||
+    previousStatus.value.description > 199
+  )
+})
+
+const textColorClass = computed(() => {
+    if (previousStatus.value.description !== null) {
+          return previousStatus.value.name.length > 49 || previousStatus.value.description.length > 199 ? 'text-red-600' : 'text-blue-600';
+    }
+});
+
+const limitInputLength = () => {
+    if (previousStatus.value.name.length > 50) {
+        previousStatus.value.name = previousStatus.value.name.slice(0, 50);
+    }
+    if (previousStatus.value.description !== null && previousStatus.value.description.length > 200) {
+        previousStatus.value.description = previousStatus.value.description.slice(0, 200);
+    }
+};
+
+const saveStatus = () => {    
+    // Trim the description and set to null if it contains only whitespace
+    if (previousStatus.value.description.length === 0) {
+        previousStatus.value.description = null;
+    }
+    emits('saveEdit', previousStatus.value);
+};
+
 </script>
 
 <template>
@@ -47,8 +83,10 @@ const previousStatus = computed(() => props.status)
                         <label for="title" class="font-medium text-base">Name of Status</label>
                         <input v-model="previousStatus.name"
                             class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                            type="text" maxlength="100" placeholder="Enter status name">
+                            type="text" maxlength="100" @input="limitInputLength" placeholder="Enter status name">
                         </input>
+                        <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.name.length}}/50</p>
+
                     </div>
 
                     <!-- center -->
@@ -58,8 +96,11 @@ const previousStatus = computed(() => props.status)
 
                             <input v-model="previousStatus.description"
                                 class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
-                                type="text">
+                                type="text"
+                                @input="limitInputLength">
                             </input>
+                            <p v-if="previousStatus.description" :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.description.length}}/200</p>
+
 
                         </div>
 
@@ -71,7 +112,8 @@ const previousStatus = computed(() => props.status)
                     <div class="buttons flex justify-center gap-2">
                         <button
                         v-show="previousStatus.id !== 1"
-                            @click="$emit('saveEdit',previousStatus)"                            
+                            @click="saveStatus(previousStatus)"  
+                            :disabled="isSaveDisabled"                         
                             class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900"
                         >

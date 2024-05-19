@@ -87,8 +87,8 @@ const taskList = taskMan.value.gettasks();
 const selectTask = ref({
   id: undefined,
   title: "",
-  description: '',
-  assignees: '',
+  description: "",
+  assignees: "",
   status: 1,
   createdOn: "",
   updatedOn: "",
@@ -142,6 +142,13 @@ const deleteTask = async (removeId) => {
 
 // ADD
 const saveTask = async () => {
+  selectTask.value.title = selectTask.value.title.trim();
+  if (selectTask.value.description !== null) {
+    selectTask.value.description = selectTask.value.description.trim();
+  }
+  if (selectTask.value.assignees !== null) {
+    selectTask.value.assignees = selectTask.value.assignees.trim();
+  }
   try {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
       method: "POST",
@@ -155,19 +162,23 @@ const saveTask = async () => {
         `Failed to add task. Server responded with status ${res.status}`
       );
     }
-    const addedTask = await res.json();     
+    const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
-    
+
     if (sortMode.value === "default") {
       sortedTasks.value.push(addedTask);
-    } else if (sortMode.value === "Alp") { 
-      let index = sortedTasks.value.findIndex((task) => task.status > addedTask.status)
-      sortedTasks.value.splice(index,0,addedTask)   
-      index = undefined
-    } else if (sortMode.value === 'Rev') {
-      let index = sortedTasks.value.findIndex((task) => task.status < addedTask.status)
-      sortedTasks.value.splice(index,0,addedTask)   
-      index = undefined
+    } else if (sortMode.value === "Alp") {
+      let index = sortedTasks.value.findIndex(
+        (task) => task.status > addedTask.status
+      );
+      sortedTasks.value.splice(index, 0, addedTask);
+      index = undefined;
+    } else if (sortMode.value === "Rev") {
+      let index = sortedTasks.value.findIndex(
+        (task) => task.status < addedTask.status
+      );
+      sortedTasks.value.splice(index, 0, addedTask);
+      index = undefined;
     } else {
       sortedTasks.value.push(addedTask);
     }
@@ -248,6 +259,18 @@ const editTask = async () => {
     // Handle error as needed
     toaster.error(`The task can't update please try again`);
   }
+};
+
+const cancelHandle = () => {
+  selectTask.value = {
+    id: undefined,
+    title: "",
+    description: "",
+    assignees: "",
+    status: 1,
+    createdOn: "",
+    updatedOn: "",
+  };
 };
 </script>
 
@@ -397,6 +420,7 @@ const editTask = async () => {
     :task="selectTask"
     @saveUpdateTask="saveTask"
     @saveEdit="editTask"
+    @cancelOpe="cancelHandle"
   />
 </template>
 
@@ -411,7 +435,7 @@ const editTask = async () => {
 }
 .task-list {
   display: grid;
-  grid-template-columns: 5fr 4fr 2fr 1fr;
+  grid-template-columns: 6fr 5fr 3fr 1fr;
   width: 100%;
 }
 

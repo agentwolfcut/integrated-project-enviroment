@@ -336,6 +336,7 @@ const clearEdit = () => {
     @saveStatus="addStatus"
     @saveEdit="updateStatus"
     @cancelEdit="clearEdit"
+    @cancelAdd="clearEdit"
   />
 
   <div v-if="deleteDefault">

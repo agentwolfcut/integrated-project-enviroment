@@ -19,7 +19,7 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['saveEdit']); // Define the custom event
+const emit = defineEmits(['saveEdit','cancelOpe']); // Define the custom event
 
 const previousTask = computed(() => props.task)
 console.log(previousTask.value);
@@ -53,6 +53,43 @@ const formatLocalDate = (dateString) => {
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `
 }
 
+const textColorClass = computed(() => {
+    if (previousTask.value.description !== null) {  
+        return previousTask.value.title.length > 99 ? 'text-red-600' : 'text-blue-600';  
+    }
+});
+
+const descriptionClass = computed(()=>{
+    return previousTask.value.description.length > 499 ? 'text-red-600' : 'text-blue-600';
+})
+
+const assigneesClass = computed(() => {
+    return previousTask.value.assignees.length > 29 ? 'text-red-600' : 'text-blue-600';
+})
+
+const limitInputLength = () => {
+    if (previousTask.value.title.length > 100) {
+        previousTask.value.title = previousTask.value.title.slice(0, 100);
+    }
+    if (previousTask.value.description !== null && previousTask.value.description.length > 500) {
+        previousTask.value.description = previousTask.value.description.slice(0, 500);
+    }
+    if(previousTask.value.assignees !== null && previousTask.value.assignees.length > 30){
+        previousTask.value.assignees = previousTask.value.assignees.slice(0, 30);
+    }
+};
+
+const saveTask = () => {
+    // Trim the description and set to null if it contains only whitespace
+    if (previousTask.value.description.trim().length === 0) {
+        previousTask.value.description = null;
+    }
+    if (previousTask.value.assignees.trim().length === 0) {
+        previousTask.value.assignees = null;
+    }
+    emit('saveEdit', previousTask.value);
+};
+
 </script>
 
 <template>
@@ -71,8 +108,11 @@ const formatLocalDate = (dateString) => {
                     <label for="title" class="font-medium text-base">Title</label>
                     <input v-model="previousTask.title" required
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text">
+                        type="text"
+                        @input="limitInputLength">
                     </input>
+                    <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
+
                 </div>
 
                 <!-- center -->
@@ -80,9 +120,8 @@ const formatLocalDate = (dateString) => {
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
                         <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 "
-                            style='padding: 15px;' type="text">
-
-                        </input>
+                            style='padding: 15px;' type="text" @input="limitInputLength"/>
+                            <p v-if="previousTask.description" :class="descriptionClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
 
                     </div>
                     <div class="flex flex-col w-5/12">
@@ -90,8 +129,9 @@ const formatLocalDate = (dateString) => {
                             <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1"
-                                    :class="{ 'italic text-slate-500': previousTask.assignees === '' }">
-                                </input>
+                                    :class="{ 'italic text-slate-500': previousTask.assignees === '' }"
+                                    @input="limitInputLength"/>
+                                    <p v-if="previousTask.assignees" :class="assigneesClass" class="text-end text-blue-600 text-sm font-semibold ">{{ previousTask.assignees.length}}/30</p>
 
                             </div>
                             <div>
@@ -140,7 +180,7 @@ const formatLocalDate = (dateString) => {
                             ">
                             save
                         </button>
-                        <button @click="$router.go(-1)"
+                        <button @click="$router.go(-1) , $emit('cancelOpe')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

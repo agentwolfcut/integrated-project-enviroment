@@ -155,6 +155,11 @@ const transferAndDeleteStatus = async () => {
 // UPDATE
 const updateStatus = async () => {
   try {
+    // Trim name and description
+    editingStatus.value.name = editingStatus.value.name.trim();
+    if (editingStatus.value.description !== null) {
+      editingStatus.value.description = editingStatus.value.description.trim();
+    }    
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL2}/${editingStatus.value.id}`,
       {
@@ -172,7 +177,7 @@ const updateStatus = async () => {
     }
     router.back();
     toaster.success(
-      `The ${editingStatus.name} task has been successfully updated`
+      `The ${editingStatus.value.name} task has been successfully updated`
     );
     editingStatus.value = {
       id: undefined,

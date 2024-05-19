@@ -24,6 +24,7 @@ const props = defineProps({
 })
 
 const previousStatus = computed(() => props.status)
+const watchStatus = {...props.status}
 
 
 // Track the initial state of the status to detect changes
@@ -33,8 +34,7 @@ console.log(initialStatus);
 const isSaveDisabled = computed(() => {
   return (
     JSON.stringify(previousStatus.value) === JSON.stringify(initialStatus) ||
-    previousStatus.value.name.length < 1 ||
-    previousStatus.value.description > 199
+    previousStatus.value.name.length < 1 
   )
 })
 

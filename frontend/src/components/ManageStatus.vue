@@ -30,14 +30,14 @@ onMounted(async () => {
 const statusList = ref(statusMan.value.getStatuses());
 
 // ADD
-const editingStatus = ref({ id: undefined, name: '', description: '' });
+const editingStatus = ref({ id: undefined, name: "", description: "" });
 const addStatus = async () => {
   try {
     // Trim name and description
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
-    }    
+    }
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/statuses`, {
       method: "POST",
@@ -77,13 +77,16 @@ const confirmDelete = ref(false);
 const statusDelete = ref(undefined);
 const confirmTransfer = ref(false);
 const deleteDefault = ref(false);
-const taskCount = ref(undefined)
+const taskCount = ref(undefined);
 
 const tasks = ref("");
 
 const checkTasksBeforeDelete = async (status) => {
   if (status.id === 1) {
     deleteDefault.value = true;
+    setTimeout(() => {
+      deleteDefault.value = false;
+    }, 1000);
   } else {
     const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
     tasks.value = { ...res };
@@ -102,7 +105,7 @@ const checkTasksBeforeDelete = async (status) => {
     } else {
       confirmDelete.value = true;
     }
-    taskCount.value = count
+    taskCount.value = count;
   }
 };
 
@@ -159,7 +162,7 @@ const updateStatus = async () => {
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
-    }    
+    }
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
       {
@@ -201,7 +204,7 @@ const clearEdit = () => {
 
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
-}
+};
 </script>
 
 <template>
@@ -364,11 +367,9 @@ const handelFail = () => {
           </button>
         </div>
         <div
-          class="flex justify-center items-center font-semibold text-xl text-slate-800 mb-8"
+          class="flex justify-center items-center font-semibold italic text-xl text-red-500 mb-8"
         >
-          You can't delete&nbsp;<span class="text-red-600 italic"
-            >default status
-          </span>
+          This status is the default status and cannot be modified
         </div>
       </div>
     </div>
@@ -412,7 +413,8 @@ const handelFail = () => {
       >
         <div class="mb-4 text-base font-medium overflow-y-auto">
           <p>
-            There are <span class="text-red-600 italic">{{ taskCount }}</span> tasks in
+            There are
+            <span class="text-red-600 italic">{{ taskCount }}</span> tasks in
             <span class="text-red-600 italic">{{ statusDelete.name }}</span>
             status. To delete this status, please transfer tasks to an other
             status.

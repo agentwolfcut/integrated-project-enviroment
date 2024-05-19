@@ -23,7 +23,7 @@ const props = defineProps({
     }
 })
 
-const previousStatus = computed(() => props.status)
+const previousStatus = ref({...props.status})
 
 if (previousStatus.value.id === undefined || previousStatus.value.name === null || previousStatus.value.name === undefined || previousStatus.value.title == '') {
     // router.back()

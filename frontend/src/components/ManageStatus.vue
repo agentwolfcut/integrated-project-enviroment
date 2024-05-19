@@ -156,13 +156,15 @@ const transferAndDeleteStatus = async () => {
 };
 
 // UPDATE
-const updateStatus = async () => {
+const updateStatus = async (editStatus) => {
   try {
     // Trim name and description
+    editingStatus.value = editStatus
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
     }
+    console.log(editingStatus.value);
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
       {
@@ -178,6 +180,12 @@ const updateStatus = async () => {
         `Failed to update task. Server responded with status ${res.status}`
       );
     }
+    const resJson = await res.json()
+    // console.log(res.json());
+    console.log(resJson);
+
+    statusMan.value.updateStatus(resJson)
+    statusList.value = statusMan.value.getStatuses()
     router.back();
     toaster.success(
       `The ${editingStatus.value.name} task has been successfully updated`

@@ -50,7 +50,7 @@ const canSave = computed(() => {
 
 const saveStatus = () => {
     // Trim the description and set to null if it contains only whitespace
-    if (previousStatus.value.description.length === 0) {
+    if (previousStatus.value.description && previousStatus.value.description.length === 0) {
         previousStatus.value.description = null;
     }
     emit('saveStatus', previousStatus.value);

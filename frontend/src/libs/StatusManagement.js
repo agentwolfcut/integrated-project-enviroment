@@ -21,13 +21,13 @@ class StatusManagement {
       });
     }
   
-    updateStatus(id, name, description) {
+    updateStatus(newStatus) {
       this.statuses = this.statuses.map((status) => {
-        return status.id === id
+        return status.id === newStatus.id
           ? {
               ...status,
-              name: name,
-              description: description
+              name: newStatus.name,
+              description: newStatus.description
             }
           : status;
       });

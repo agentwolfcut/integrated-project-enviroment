@@ -23,7 +23,7 @@ const statusMan = ref(new StatusManagement());
 
 // GET
 onMounted(async () => {
-  const statusRes = await getItems(import.meta.env.VITE_BASE_URL2);
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statusMan.value.addStatuses(statusRes);
 });
 
@@ -39,7 +39,7 @@ const addStatus = async () => {
       editingStatus.value.description = editingStatus.value.description.trim();
     }    
 
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL2}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/statuses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const checkTasksBeforeDelete = async (status) => {
   if (status.id === 1) {
     deleteDefault.value = true;
   } else {
-    const res = await getItems(import.meta.env.VITE_BASE_URL);
+    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
     tasks.value = { ...res };
     // console.log(tasks.value);
     const clean = JSON.parse(JSON.stringify(tasks.value));
@@ -110,7 +110,7 @@ const deleteStatus = async () => {
   // back
   const removeId = statusDelete.value.id;
   const removeStatus = await deleteItemById(
-    import.meta.env.VITE_BASE_URL2,
+    `${import.meta.env.VITE_BASE_URL}/statuses`,
     removeId
   );
   // front
@@ -130,7 +130,7 @@ const transferAndDeleteStatus = async () => {
     const removeId = statusDelete.value.id;
     const destinationId = destinationStatusId.value;
     const result = await transferTasksAndDeleteStatus(
-      import.meta.env.VITE_BASE_URL2,
+      `${import.meta.env.VITE_BASE_URL}/statuses`,
       removeId,
       destinationId
     );
@@ -161,7 +161,7 @@ const updateStatus = async () => {
       editingStatus.value.description = editingStatus.value.description.trim();
     }    
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL2}/${editingStatus.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
       {
         method: "PUT",
         headers: {

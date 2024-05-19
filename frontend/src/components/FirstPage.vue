@@ -37,7 +37,7 @@ const sortMode = ref("default"); // 'default', 'Alp', 'desc'
 
 // GET items
 onMounted(async () => {
-  const taskRes = await getItems(import.meta.env.VITE_BASE_URL);
+  const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
   //tasks.value = taskRes // reverse and slice to show the most
   tasks.value = taskRes;
   // Convert tasks object to array
@@ -46,7 +46,7 @@ onMounted(async () => {
   // Initially sort by creation time
   sortTasksByCreationTime();
 
-  const statusRes = await getItems(import.meta.env.VITE_BASE_URL2);
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
   const status = JSON.parse(JSON.stringify(statuses.value));
   statusArray.value = Object.values(status);
@@ -104,7 +104,7 @@ const selectTask = ref({
 
 const openDetails = async (id) => {
   //console.log(id);
-  const item = await getItemById(import.meta.env.VITE_BASE_URL, id);
+  const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id);
   selectTask.value = item;
   // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
   showModalDetail.value = true;
@@ -128,7 +128,7 @@ const taskToDelete = ref(undefined);
 const deleteTask = async (removeId) => {
   try {
     const status = await deleteItemById(
-      import.meta.env.VITE_BASE_URL,
+      `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
     );
     if (status === 200) {
@@ -157,7 +157,7 @@ const saveTask = async () => {
     selectTask.value.assignees = selectTask.value.assignees.trim();
   }
   try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -234,7 +234,7 @@ const editTask = async () => {
   // const transformedTask = transformTaskFormat(selectTask.value);
   try {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/${selectTask.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/tasks/${selectTask.value.id}`,
       {
         method: "PUT",
         headers: {

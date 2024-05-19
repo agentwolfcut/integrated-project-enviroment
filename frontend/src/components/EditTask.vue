@@ -28,7 +28,7 @@ const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the cus
 const statusOptions = ref('')
 
 onMounted(async () => {
-  const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
   statusOptions.value = statusRes;
 })
 
@@ -54,7 +54,6 @@ const saveTask = () => {
         // Handle error as needed
     }
 }
-
 
 const previousTask = computed(() => props.task)
 console.log(previousTask.value);

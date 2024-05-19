@@ -9,16 +9,7 @@ const { params } = useRoute();
 defineEmits([ "closeModal"]);
 const props = defineProps({
   task: {
-    type: Object,
-    default: {
-      id: undefined,
-      title: "",
-      description: "",
-      assignees: "",
-      status: "",
-      createdOn: "",
-      updatedOn: "",
-    },
+    type: Object
   },
 });
 

@@ -28,13 +28,16 @@ const toaster = createToaster({
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const tasks = ref({});
+const taskList = taskMan.value.gettasks()
+const statuses = ref({});
 const tasksArray = ref([]);
+const statusArray = ref([]);
 const sortedTasks = ref([]);
 const sortMode = ref("default"); // 'default', 'Alp', 'desc'
 
 // GET items
 onMounted(async () => {
-  const taskRes = await getItems(import.meta.env.VITE_BASE_URL);
+  const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
   //tasks.value = taskRes // reverse and slice to show the most
   tasks.value = taskRes;
   // Convert tasks object to array
@@ -42,6 +45,12 @@ onMounted(async () => {
   tasksArray.value = Object.values(clean);
   // Initially sort by creation time
   sortTasksByCreationTime();
+
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
+  statuses.value = statusRes;
+  const status = JSON.parse(JSON.stringify(statuses.value));
+  statusArray.value = Object.values(status);
+  // console.log(statuses.value);
 });
 
 // SORT by STATUS
@@ -51,7 +60,7 @@ const sortTasksByCreationTime = () => {
   sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
   sortMode.value = "default";
   sortAlp.value = false;
-  console.log(sortMode.value);
+  console.log(`sort mode = ${sortMode.value}`);
 };
 const sortAlp = ref(false);
 // Function to sort tasks by status name
@@ -81,7 +90,6 @@ const toggleSortOrder = () => {
   }
 };
 
-const taskList = taskMan.value.gettasks();
 
 // for modal
 const selectTask = ref({
@@ -96,7 +104,7 @@ const selectTask = ref({
 
 const openDetails = async (id) => {
   //console.log(id);
-  const item = await getItemById(import.meta.env.VITE_BASE_URL, id);
+  const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id);
   selectTask.value = item;
   // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
   showModalDetail.value = true;
@@ -120,11 +128,10 @@ const taskToDelete = ref(undefined);
 const deleteTask = async (removeId) => {
   try {
     const status = await deleteItemById(
-      import.meta.env.VITE_BASE_URL,
+      `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
     );
     if (status === 200) {
-      // taskMan.value.removetask(removeId);
       sortedTasks.value.splice(
         sortedTasks.value.findIndex((item) => item.id === removeId)
       );
@@ -150,7 +157,7 @@ const saveTask = async () => {
     selectTask.value.assignees = selectTask.value.assignees.trim();
   }
   try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -167,6 +174,7 @@ const saveTask = async () => {
 
     if (sortMode.value === "default") {
       sortedTasks.value.push(addedTask);
+      taskMan.value.addtask(addedTask.id,addedTask.title,addedTask.description,addedTask.assignees,addedTask.status)
     } else if (sortMode.value === "Alp") {
       let index = sortedTasks.value.findIndex(
         (task) => task.status > addedTask.status
@@ -205,38 +213,37 @@ const editMode = (task) => {
   selectTask.value = task;
 };
 
-const transformTaskFormat = (task) => {
-  return {
-    title: task.title,
-    description: task.description,
-    assignees: task.assignees,
-    status: {
-      id: task.status,
-      name: task.status.name,
-    },
-  };
+const updateStatusId = () => {
+  const selectedStatus = statusArray.value.find(
+    (status) => status.name === selectTask.value.status
+  );
+  if (selectedStatus) {
+    selectTask.value.status = selectedStatus;
+  }
 };
 
 const editTask = async () => {
-  selectTask.value.title = selectTask.value.title.trim()
+  selectTask.value.title = selectTask.value.title.trim();
   if (selectTask.value.description !== null) {
-    selectTask.value.description = selectTask.value.description.trim()
+    selectTask.value.description = selectTask.value.description.trim();
   }
   if (selectTask.value.assignees !== null) {
-    selectTask.value.assignees = selectTask.value.assignees.trim()
+    selectTask.value.assignees = selectTask.value.assignees.trim();
   }
-  const transformedTask = transformTaskFormat(selectTask.value);
+  updateStatusId();
+  // const transformedTask = transformTaskFormat(selectTask.value);
   try {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/${selectTask.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/tasks/${selectTask.value.id}`,
       {
         method: "PUT",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({
-          ...transformedTask,
-        }),
+        // body: JSON.stringify({
+        //   ...selectTask.value,
+        // }),
+        body: JSON.stringify(selectTask.value),
       }
     );
     if (!res.ok) {
@@ -244,16 +251,9 @@ const editTask = async () => {
         `Failed to update task. Server responded with status ${res.status}`
       );
     }
-    const editTask = await res.json();
-    taskMan.value.updatetask(
-      editTask.id,
-      editTask.title,
-      editTask.description,
-      editTask.assignees,
-      editTask.status
-    );
+    
     router.back();
-    toaster.success(`The ${editTask.title} task has been successfully updated`);
+    toaster.success(`The ${selectTask.value.title} task has been successfully updated`);
     selectTask.value = {
       title: "",
       description: "",
@@ -282,7 +282,8 @@ const cancelHandle = () => {
 
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
-}
+};
+
 </script>
 
 <template>
@@ -429,6 +430,7 @@ const handelFail = () => {
 
   <router-view
     :task="selectTask"
+    :statusOptions="statuses"
     @saveUpdateTask="saveTask"
     @saveEdit="editTask"
     @cancelOpe="cancelHandle"

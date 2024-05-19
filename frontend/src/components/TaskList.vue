@@ -13,7 +13,7 @@ const props = defineProps({
 
 })
 
-const previousTask = computed(() => props.task)
+const previousTask = computed(() => props.tasks)
 
 const emits = defineEmits([
   'showDetail',

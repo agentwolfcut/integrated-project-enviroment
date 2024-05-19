@@ -9,7 +9,7 @@ import AddStatus from '@/components/AddStatus.vue'
 import EditStatus from '@/components/EditStatus.vue'
 
 // set history of stor path when visit
-const history = createWebHistory()
+const history = createWebHistory(import.meta.env.BASE_URL)
 
 // give roue paths
 const routes = [

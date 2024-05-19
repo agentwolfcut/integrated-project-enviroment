@@ -29,7 +29,7 @@ const previousTask = computed(() => props.task)
 const statusOptions = ref('')
 
 onMounted(async () => {
-    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
+    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {

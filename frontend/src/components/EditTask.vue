@@ -8,24 +8,52 @@ import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 const props = defineProps({
     task: {
         type: Object,
-        default: {
+        default: () => ({
             id: undefined,
-            title: '',
+            name: '',
             description: null,
-            assignees: null,
-            status: 1,
-        },
-        require: true
+            status: '' ,
+            createdOn: "",
+            updatedOn: "",
+        })
     },
-})
-
-const toaster = createToaster({
-  /* options */
+    statusOptions: {
+        type: Array,
+        default: () => []
+    }
 });
 
-
-
 const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the custom event
+
+const statusOptions = ref('')
+
+onMounted(async () => {
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
+  statusOptions.value = statusRes;
+})
+
+// const previousTask = ref({ ...props.task });
+
+// Computed property to find the status id from status name
+const statusId = computed(() => {
+    const selectedStatus = props.statusOptions.find(
+        (status) => status.name === previousTask.value.status
+    );
+    return selectedStatus ? selectedStatus.id : null;
+});
+
+const saveTask = () => {
+    try {
+        const taskToSave = {
+            ...previousTask.value,
+            status: statusId.value // Send status id to the backend
+        };
+        emit('saveEdit', taskToSave);
+    } catch (error) {
+        console.error('Error saving task:', error);
+        // Handle error as needed
+    }
+}
 
 const previousTask = computed(() => props.task)
 console.log(previousTask.value);
@@ -38,16 +66,6 @@ if (previousTask.value.title === null || previousTask.value.title === undefined 
     } , 800)
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
-
-
-const statusOptions = ref('')
-onMounted(async () => {
-    const statusRes = await getItems(import.meta.env.VITE_BASE_URL2)
-    statusOptions.value = { ...statusRes }
-})
-
-const route = useRoute();
-
 
 const formatLocalDate = (dateString) => {
     if (!dateString) return ''
@@ -91,23 +109,14 @@ const limitInputLength = () => {
     }
 };
 
-const saveTask = () => {
-    // if (previousTask.value.description.length === 0) {
-    //     previousTask.value.description = null;
-    // }
-    // if (previousTask.value.assignees.length === 0) {
-    //     previousTask.value.assignees = null;
-    // }
-    emit('saveEdit', previousTask.value);
-};
+
 
 // Track the initial state of the status to detect changes
-const initialStatus = JSON.parse(JSON.stringify(props.task))
-console.log(initialStatus);
+const initialTask = JSON.parse(JSON.stringify(props.task))
 
 const isSaveDisabled = computed(() => {
   return (
-    JSON.stringify(previousTask.value) === JSON.stringify(initialStatus) ||
+    JSON.stringify(previousTask.value) === JSON.stringify(initialTask) ||
     previousTask.value.title.length < 1 
   )
 })
@@ -162,7 +171,10 @@ const isSaveDisabled = computed(() => {
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option v-for="status in statusOptions" :key="status.id" :value="status.id">
+                                        <option v-for="status in statusOptions" 
+                                            :key="status.id" 
+                                            :value="status.name"
+                                        >
                                             {{ status.name }}
                                         </option>
                                     </select>

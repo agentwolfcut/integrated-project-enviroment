@@ -34,7 +34,6 @@ if (previousStatus.value.id === undefined || previousStatus.value.name === null 
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
 
-
 // Track the initial state of the status to detect changes
 const initialStatus = JSON.parse(JSON.stringify(props.status))
 console.log(initialStatus);
@@ -63,9 +62,9 @@ const limitInputLength = () => {
 
 const saveStatus = () => {    
     // Trim the description and set to null if it contains only whitespace
-    if (previousStatus.value.description.length === 0) {
-        previousStatus.value.description = null;
-    }
+    // if (previousStatus.value.description.length === 0) {
+    //     previousStatus.value.description = null;
+    // }
     emits('saveEdit', previousStatus.value);
 };
 

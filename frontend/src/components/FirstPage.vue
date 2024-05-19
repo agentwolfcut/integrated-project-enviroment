@@ -28,7 +28,7 @@ const toaster = createToaster({
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const tasks = ref({});
-const taskList = taskMan.value.gettasks()
+const taskList = taskMan.value.gettasks();
 const statuses = ref({});
 const tasksArray = ref([]);
 const statusArray = ref([]);
@@ -48,6 +48,7 @@ onMounted(async () => {
 
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
+  console.log(statuses.value);
   const status = JSON.parse(JSON.stringify(statuses.value));
   statusArray.value = Object.values(status);
   // console.log(statuses.value);
@@ -89,7 +90,6 @@ const toggleSortOrder = () => {
     console.log(sortMode.value);
   }
 };
-
 
 // for modal
 const selectTask = ref({
@@ -174,7 +174,13 @@ const saveTask = async () => {
 
     if (sortMode.value === "default") {
       sortedTasks.value.push(addedTask);
-      taskMan.value.addtask(addedTask.id,addedTask.title,addedTask.description,addedTask.assignees,addedTask.status)
+      taskMan.value.addtask(
+        addedTask.id,
+        addedTask.title,
+        addedTask.description,
+        addedTask.assignees,
+        addedTask.status
+      );
     } else if (sortMode.value === "Alp") {
       let index = sortedTasks.value.findIndex(
         (task) => task.status > addedTask.status
@@ -222,17 +228,23 @@ const updateStatusId = () => {
   }
 };
 
-const editTask = async () => {
-  selectTask.value.title = selectTask.value.title.trim();
-  if (selectTask.value.description !== null) {
-    selectTask.value.description = selectTask.value.description.trim();
-  }
-  if (selectTask.value.assignees !== null) {
-    selectTask.value.assignees = selectTask.value.assignees.trim();
-  }
-  updateStatusId();
-  // const transformedTask = transformTaskFormat(selectTask.value);
+const editTask = async (editedTask) => {
   try {
+    selectTask.value = editedTask; // status : id
+    selectTask.value.title = selectTask.value.title.trim();
+    if (selectTask.value.description !== null) {
+      selectTask.value.description = selectTask.value.description.trim();
+    }
+    if (selectTask.value.assignees !== null) {
+      selectTask.value.assignees = selectTask.value.assignees.trim();
+    }
+    const selectedStatus = statusArray.value.find(
+      (status) => status.id == selectTask.value.status
+    );
+    if (selectedStatus) {
+      selectTask.value.status = selectedStatus;
+    }
+    // const transformedTask = transformTaskFormat(selectTask.value);
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/tasks/${selectTask.value.id}`,
       {
@@ -251,9 +263,15 @@ const editTask = async () => {
         `Failed to update task. Server responded with status ${res.status}`
       );
     }
-    
+    const resJson = await res.json();
+    // console.log(res.json());
+    console.log(resJson);
+    taskMan.value.updatetask(resJson);
+    sortedTasks.value = taskMan.value.gettasks();
     router.back();
-    toaster.success(`The ${selectTask.value.title} task has been successfully updated`);
+    toaster.success(
+      `The ${selectTask.value.title} task has been successfully updated`
+    );
     selectTask.value = {
       title: "",
       description: "",
@@ -284,6 +302,18 @@ const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
 };
 
+// Filter
+const showFilter = ref(false);
+const toggleFilter = () => {
+  showFilter.value = !showFilter.value;
+};
+
+const statusFilter = ref([])
+
+const doFilter = async() => {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusFilter}`)
+  
+}
 </script>
 
 <template>
@@ -292,20 +322,16 @@ const handelFail = () => {
 
   <div class="flex">
     <SideBar />
-
     <div class="flex content flex-col items-center h-screen">
       <HeaderIT />
-
-      <!-- <TaskList :tasks="taskMan.gettasks()" @showDetail="openDetails" @deleteC="deleteIdConfirm"
-                @deleteConfirm="deleteTask"   /> -->
-
       <!-- Task List -->
-      <div class="TaskList sm:px-20 w-full overflow-y-scroll h-5/6">
+      <div class="TaskList sm:px-20 overflow-y-scroll h-3/4 w-11/12">
         <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
-          <div class="flex items-center mb-9">
-            <div class="flex flex-1">filter</div>
+          <div class="flex items-center justify-end mb-9">
             <router-link to="/task/add">
-              <div class="itbkk-button-add rounded-lg ml-4 sm:ml-8">
+              <div
+                class="itbkk-button-add rounded-lg ml-4 sm:ml-8 flex flex-initial"
+              >
                 <buttonSlot size="sm" type="dark">
                   <template v-slot:title> Add Task </template>
                 </buttonSlot>
@@ -313,7 +339,9 @@ const handelFail = () => {
             </router-link>
           </div>
 
-          <div class="task-list rounded-2xl border border-slate-100 w-full">
+          <div
+            class="task-list rounded-2xl border border-slate-100 justify-center table-fixed"
+          >
             <div
               class="task-list-header font-medium leading-none text-gray-700"
             >
@@ -384,6 +412,40 @@ const handelFail = () => {
           </div>
         </div>
       </div>
+
+      <div class="flex justify-end w-11/12 mt-6 sm:px-32">
+        <div id="forFilter" v-if="showFilter">
+          <div class="flex flex-row">
+            <div class="flex">
+              <!-- loop -->
+              <div
+                class="flex items-center me-4"
+                v-for="(status, id) in statuses"
+                :key="id"
+              >
+                <input
+                  v-model="statusFilter"
+                  id="filter-checkbox"
+                  type="checkbox"
+                  :value="status.name"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="filter-checkbox"
+                  class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >{{ status.name }}</label
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          @click="toggleFilter"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          << Filter by Status
+        </button>
+      </div>
     </div>
   </div>
 
@@ -449,7 +511,7 @@ const handelFail = () => {
 }
 .task-list {
   display: grid;
-  grid-template-columns: 6fr 5fr 3fr 1fr;
+  grid-template-columns: 5fr 4fr 3fr 2fr;
   width: 100%;
 }
 

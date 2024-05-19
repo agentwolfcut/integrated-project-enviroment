@@ -55,8 +55,7 @@ const saveTask = () => {
     }
 }
 
-const previousTask = computed(() => props.task)
-console.log(previousTask.value);
+const previousTask = ref({...props.task})
 
 if (previousTask.value.title === null || previousTask.value.title === undefined || previousTask.value.title == '') {
     // router.back()

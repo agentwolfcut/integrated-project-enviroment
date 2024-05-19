@@ -77,6 +77,7 @@ const confirmDelete = ref(false);
 const statusDelete = ref(undefined);
 const confirmTransfer = ref(false);
 const deleteDefault = ref(false);
+const taskCount = ref(undefined)
 
 const tasks = ref("");
 
@@ -97,12 +98,11 @@ const checkTasksBeforeDelete = async (status) => {
     );
     const count = filteredTask.length;
     if (count > 0) {
-      
       confirmTransfer.value = true;
     } else {
-      
       confirmDelete.value = true;
     }
+    taskCount.value = count
   }
 };
 
@@ -412,7 +412,7 @@ const handelFail = () => {
       >
         <div class="mb-4 text-base font-medium overflow-y-auto">
           <p>
-            There are tasks in
+            There are <span class="text-red-600 italic">{{ taskCount }}</span> tasks in
             <span class="text-red-600 italic">{{ statusDelete.name }}</span>
             status. To delete this status, please transfer tasks to an other
             status.

@@ -28,7 +28,9 @@ const toaster = createToaster({
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const tasks = ref({});
+const statuses = ref({});
 const tasksArray = ref([]);
+const statusArray = ref([]);
 const sortedTasks = ref([]);
 const sortMode = ref("default"); // 'default', 'Alp', 'desc'
 
@@ -42,6 +44,14 @@ onMounted(async () => {
   tasksArray.value = Object.values(clean);
   // Initially sort by creation time
   sortTasksByCreationTime();
+
+  const statusRes = await getItems(import.meta.env.VITE_BASE_URL2);
+  statuses.value = statusRes;
+  const status = JSON.parse(JSON.stringify(statuses.value));
+  statusArray.value = Object.values(status);
+  console.log(typeof statusArray.value);
+  console.log(statusArray.value);
+  // console.log(statuses.value);
 });
 
 // SORT by STATUS
@@ -51,7 +61,7 @@ const sortTasksByCreationTime = () => {
   sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
   sortMode.value = "default";
   sortAlp.value = false;
-  console.log(sortMode.value);
+  console.log(`sort mode = ${sortMode.value}`);
 };
 const sortAlp = ref(false);
 // Function to sort tasks by status name
@@ -213,19 +223,31 @@ const transformTaskFormat = (task) => {
     status: {
       id: task.status,
       name: task.status.name,
+      description : task.status.description
     },
   };
 };
 
+const updateStatusId = () => {
+  const selectedStatus = statusArray.value.find(
+    (status) => status.name === selectTask.value.status
+  );
+  if (selectedStatus) {
+    selectTask.value.status = selectedStatus;
+  }
+};
+
 const editTask = async () => {
-  selectTask.value.title = selectTask.value.title.trim()
+  selectTask.value.title = selectTask.value.title.trim();
   if (selectTask.value.description !== null) {
-    selectTask.value.description = selectTask.value.description.trim()
+    selectTask.value.description = selectTask.value.description.trim();
   }
   if (selectTask.value.assignees !== null) {
-    selectTask.value.assignees = selectTask.value.assignees.trim()
+    selectTask.value.assignees = selectTask.value.assignees.trim();
   }
-  const transformedTask = transformTaskFormat(selectTask.value);
+  updateStatusId()
+  console.log(selectTask.value);
+  // const transformedTask = transformTaskFormat(selectTask.value);
   try {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/${selectTask.value.id}`,
@@ -234,9 +256,10 @@ const editTask = async () => {
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({
-          ...transformedTask,
-        }),
+        // body: JSON.stringify({
+        //   ...selectTask.value,
+        // }),
+        body: JSON.stringify(selectTask.value),
       }
     );
     if (!res.ok) {
@@ -282,7 +305,7 @@ const cancelHandle = () => {
 
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
-}
+};
 </script>
 
 <template>
@@ -429,6 +452,7 @@ const handelFail = () => {
 
   <router-view
     :task="selectTask"
+    :statusOptions="statuses"
     @saveUpdateTask="saveTask"
     @saveEdit="editTask"
     @cancelOpe="cancelHandle"

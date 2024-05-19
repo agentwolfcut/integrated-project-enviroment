@@ -11,7 +11,7 @@ const route = useRoute()
 const statusId = ref(route.params.id)
 
 
-const emits = defineEmits(['saveEdit', 'cancelEdit'])
+const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
 const props = defineProps({
     status: {
         type: Object,
@@ -25,6 +25,14 @@ const props = defineProps({
 
 const previousStatus = computed(() => props.status)
 
+if (previousStatus.value.id === undefined || previousStatus.value.name === null || previousStatus.value.name === undefined || previousStatus.value.title == '') {
+    // router.back()
+    emits('failEdit');
+    setTimeout(()=>{
+        router.back();
+    } , 800)
+    // toaster.error(`An error has occurred, the status does not exist.`);
+}
 
 
 // Track the initial state of the status to detect changes

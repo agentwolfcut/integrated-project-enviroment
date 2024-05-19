@@ -35,7 +35,7 @@ if (previousTask.value.title === null || previousTask.value.title === undefined 
     emit('failEdit');
     setTimeout(()=>{
         router.back();
-    } , 1000)
+    } , 800)
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
 

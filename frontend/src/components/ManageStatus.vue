@@ -198,6 +198,10 @@ const openToEdit = (status) => {
 const clearEdit = () => {
   editingStatus.value = { id: undefined, name: "", description: "" };
 };
+
+const handelFail = () => {
+  toaster.error(`An error has occurred, the status does not exist.`);
+}
 </script>
 
 <template>
@@ -342,6 +346,7 @@ const clearEdit = () => {
     @saveEdit="updateStatus"
     @cancelEdit="clearEdit"
     @cancelAdd="clearEdit"
+    @failEdit="handelFail"
   />
 
   <div v-if="deleteDefault">

@@ -24,7 +24,7 @@ const props = defineProps({
 })
 
 const previousStatus = computed(() => props.status)
-const watchStatus = {...props.status}
+
 
 
 // Track the initial state of the status to detect changes

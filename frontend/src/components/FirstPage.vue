@@ -218,6 +218,13 @@ const transformTaskFormat = (task) => {
 };
 
 const editTask = async () => {
+  selectTask.value.title = selectTask.value.title.trim()
+  if (selectTask.value.description !== null) {
+    selectTask.value.description = selectTask.value.description.trim()
+  }
+  if (selectTask.value.assignees !== null) {
+    selectTask.value.assignees = selectTask.value.assignees.trim()
+  }
   const transformedTask = transformTaskFormat(selectTask.value);
   try {
     const res = await fetch(

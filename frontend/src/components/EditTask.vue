@@ -11,8 +11,8 @@ const props = defineProps({
         default: {
             id: undefined,
             title: '',
-            description: "",
-            assignees: "",
+            description: null,
+            assignees: null,
             status: 1,
         },
         require: true
@@ -29,13 +29,8 @@ onMounted(async () => {
     statusOptions.value = { ...statusRes }
 })
 
-let originalTask = ref('')
 const route = useRoute();
 
-
-const isTaskChanged = () => {
-    return JSON.stringify(previousTask.value) !== JSON.stringify(originalTask.value);
-}
 
 const formatLocalDate = (dateString) => {
     if (!dateString) return ''
@@ -80,15 +75,25 @@ const limitInputLength = () => {
 };
 
 const saveTask = () => {
-    // Trim the description and set to null if it contains only whitespace
-    if (previousTask.value.description.trim().length === 0) {
-        previousTask.value.description = null;
-    }
-    if (previousTask.value.assignees.trim().length === 0) {
-        previousTask.value.assignees = null;
-    }
+    // if (previousTask.value.description.length === 0) {
+    //     previousTask.value.description = null;
+    // }
+    // if (previousTask.value.assignees.length === 0) {
+    //     previousTask.value.assignees = null;
+    // }
     emit('saveEdit', previousTask.value);
 };
+
+// Track the initial state of the status to detect changes
+const initialStatus = JSON.parse(JSON.stringify(props.task))
+console.log(initialStatus);
+
+const isSaveDisabled = computed(() => {
+  return (
+    JSON.stringify(previousTask.value) === JSON.stringify(initialStatus) ||
+    previousTask.value.title.length < 1 
+  )
+})
 
 </script>
 
@@ -175,7 +180,7 @@ const saveTask = () => {
                 <div class="m-3">
                     <div class="buttons flex gap-2">
 
-                        <button @click="$emit('saveEdit',previousTask)" :disabled="!isTaskChanged() || !previousTask.title" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
+                        <button @click="saveTask(previousTask)" :disabled="isSaveDisabled" class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
                             disabled:cursor-not-allowed disabled:bg-slate-600  disabled:text-slate-900
                             ">
                             save

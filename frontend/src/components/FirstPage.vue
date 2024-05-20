@@ -1,10 +1,6 @@
 <script setup>
-import {  onMounted, ref } from "vue";
-import {
-  getItemById,
-  getItems,
-  deleteItemById,
-} from "../libs/fetchUtils";
+import { onMounted, ref, watch , nextTick } from "vue";
+import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "./TaskDetail.vue";
 import { createToaster } from "../../node_modules/@meforma/vue-toaster";
@@ -31,6 +27,7 @@ const tasksArray = ref([]);
 const statusArray = ref([]);
 const sortedTasks = ref([]);
 const sortMode = ref("default"); // 'default', 'Alp', 'desc'
+const statusesTest = ref([]);
 
 // GET items
 onMounted(async () => {
@@ -42,51 +39,13 @@ onMounted(async () => {
   tasksArray.value = Object.values(clean);
   // Initially sort by creation time
   sortTasksByCreationTime();
-
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
   // console.log(statuses.value);
   const status = JSON.parse(JSON.stringify(statuses.value));
+  // console.log(status);
   statusArray.value = Object.values(status);
-  // console.log(statuses.value);
 });
-
-// SORT by STATUS
-
-// Function to sort tasks by creation time
-const sortTasksByCreationTime = () => {
-  sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
-  sortMode.value = "default";
-  sortAlp.value = false;
-  // console.log(`sort mode = ${sortMode.value}`);
-};
-const sortAlp = ref(false);
-// Function to sort tasks by status name
-const sortTasksByStatusNameAlp = () => {
-  sortedTasks.value = tasksArray.value
-    .slice()
-    .sort((a, b) => a.status.localeCompare(b.status));
-};
-
-const sortTasksByStatusNameRev = () => {
-  sortedTasks.value = tasksArray.value
-    .slice()
-    .sort((a, b) => b.status.localeCompare(a.status));
-};
-
-// Function to toggle sorting
-const toggleSortOrder = () => {
-  sortAlp.value = !sortAlp.value;
-  if (sortAlp.value) {
-    sortMode.value = "Alp";
-    console.log(sortMode.value);
-    sortTasksByStatusNameAlp();
-  } else {
-    sortTasksByStatusNameRev();
-    sortMode.value = "Rev";
-    console.log(sortMode.value);
-  }
-};
 
 // for modal
 const selectTask = ref({
@@ -305,14 +264,92 @@ const toggleFilter = () => {
   showFilter.value = !showFilter.value;
 };
 
-const statusFilter = ref([])
+// Assuming statuses is an array of status objects provided as a prop or fetched from an API
+const statusFilter = ref([]);
 
-const doFilter = async() => {
-  if (statusFilter.value) {
-    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusFilter}`);
-    sortedTasks.value = res
+// Fetch statuses and initialize statusFilter
+const fetchStatuses = async () => {
+  try {
+    const fetchedStatuses = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
+    statuses.value = fetchedStatuses;
+    statusFilter.value = statuses.value.map((status) => status.name);
+    doFilter(); // Ensure the initial filter is applied
+  } catch (error) {
+    console.error("Failed to fetch statuses:", error);
   }
-}
+};
+
+// Apply the filter whenever statusFilter changes
+const doFilter = async () => {
+  await nextTick(); // Ensure the next DOM update cycle is completed
+  if (statusFilter.value.length > 0) {
+    const statusString = statusFilter.value.join(",");
+    console.log(statusString); // Logs the comma-separated string of selected statuses
+    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`);
+    tasksArray.value = res;
+    if (sortAlp.value) {
+      switch (sortAlp.value) {
+        case false:
+          sortTasksByStatusNameAlp();
+          break;
+        case true:
+          sortTasksByStatusNameRev();
+          break;
+        default:
+          sortTasksByCreationTime();
+          break;
+      }
+    } else {
+      sortTasksByCreationTime();
+    }
+  } else {
+    console.log("No statuses selected");
+    sortedTasks.value = [];
+  }
+};
+
+// Fetch statuses when the component is mounted
+onMounted(fetchStatuses);
+
+// Watch for changes in statusFilter to trigger filtering
+watch(statusFilter, doFilter);
+
+// SORT by STATUS
+const sortAlp = ref(false);
+// Function to sort tasks by creation time
+const sortTasksByCreationTime = () => {
+  sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
+  sortMode.value = "default";
+  sortAlp.value = false;
+  // console.log(`sort mode = ${sortMode.value}`);
+};
+
+// Function to sort tasks by status name
+const sortTasksByStatusNameAlp = () => {
+  sortedTasks.value = tasksArray.value
+    .slice()
+    .sort((a, b) => a.status.localeCompare(b.status));
+};
+
+const sortTasksByStatusNameRev = () => {
+  sortedTasks.value = tasksArray.value
+    .slice()
+    .sort((a, b) => b.status.localeCompare(a.status));
+};
+
+// Function to toggle sorting
+const toggleSortOrder = () => {
+  sortAlp.value = !sortAlp.value;
+  if (sortAlp.value) {
+    sortMode.value = "Alp";
+    console.log(sortMode.value);
+    sortTasksByStatusNameAlp();
+  } else {
+    sortTasksByStatusNameRev();
+    sortMode.value = "Rev";
+    console.log(sortMode.value);
+  }
+};
 </script>
 
 <template>
@@ -356,8 +393,12 @@ const doFilter = async() => {
                   <SortDefault />
                 </button>
                 <div @click="toggleSortOrder" class="flex items-center ml-2">
-                  <button v-if="sortAlp"><SortDown /></button>
-                  <button v-if="!sortAlp"><SortUp /></button>
+                  <button v-if="sortAlp">
+                    <SortDown />
+                  </button>
+                  <button v-if="!sortAlp">
+                    <SortUp />
+                  </button>
                 </div>
               </div>
               <div
@@ -423,11 +464,11 @@ const doFilter = async() => {
                 :key="id"
               >
                 <input
-                  @click="doFilter"
                   v-model="statusFilter"
                   id="filter-checkbox"
                   type="checkbox"
                   :value="status.name"
+                  @click="doFilter"
                   class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <label
@@ -509,6 +550,7 @@ const doFilter = async() => {
   background-color: #c7b8ea;
   /* light purple color */
 }
+
 .task-list {
   display: grid;
   grid-template-columns: 5fr 4fr 3fr 2fr;

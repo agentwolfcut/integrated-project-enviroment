@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/v2/tasks")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
 @CrossOrigin(origins = {"http://localhost:5173",
-			"http://ip23ft.sit.kmutt.ac.th",
+			            "http://ip23ft.sit.kmutt.ac.th",
                        	"http://intproj23.sit.kmutt.ac.th"})
 
 public class TaskController {

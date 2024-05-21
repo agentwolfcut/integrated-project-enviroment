@@ -79,7 +79,7 @@ const saveStatus = () => {
                     Edit Status
                 </p>
 
-                <div v-if="previousStatus.id === 1" class="flex justify-center font-semibold text-xl text-red-600">
+                <div v-if="previousStatus.id === 1 || previousStatus.name==='Done'" class="flex justify-center font-semibold text-xl text-red-600">
                     You can't edit default status
                 </div>
 
@@ -117,7 +117,7 @@ const saveStatus = () => {
                 <div class="m-3">
                     <div class="buttons flex justify-center gap-2">
                         <button
-                        v-show="previousStatus.id !== 1"
+                        v-show="previousStatus.id !== 1 || previousStatus.name !=='Done'"
                             @click="saveStatus(previousStatus)"  
                             :disabled="isSaveDisabled"                         
                             class="disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out itbkk-button-confirm p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 
@@ -132,11 +132,7 @@ const saveStatus = () => {
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
-    
 </template>
-
 <style scoped></style>

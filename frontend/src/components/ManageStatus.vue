@@ -82,7 +82,7 @@ const taskCount = ref(undefined);
 const tasks = ref("");
 
 const checkTasksBeforeDelete = async (status) => {
-  if (status.id === 1) {
+  if (status.id === 1 || status.name === "Done") {
     deleteDefault.value = true;
     setTimeout(() => {
       deleteDefault.value = false;
@@ -144,6 +144,8 @@ const transferAndDeleteStatus = async () => {
       );
     } else if (result === 404) {
       toaster.error(`An error has occurred, the status does not exist.`);
+    } else {
+      toaster.error(`An error has occurred, the status does not exist.`);
     }
   } catch (error) {
     console.error("Error transferring tasks and deleting status:", error);
@@ -159,7 +161,7 @@ const transferAndDeleteStatus = async () => {
 const updateStatus = async (editStatus) => {
   try {
     // Trim name and description
-    editingStatus.value = editStatus
+    editingStatus.value = editStatus;
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
@@ -180,12 +182,12 @@ const updateStatus = async (editStatus) => {
         `Failed to update task. Server responded with status ${res.status}`
       );
     }
-    const resJson = await res.json()
+    const resJson = await res.json();
     // console.log(res.json());
     console.log(resJson);
 
-    statusMan.value.updateStatus(resJson)
-    statusList.value = statusMan.value.getStatuses()
+    statusMan.value.updateStatus(resJson);
+    statusList.value = statusMan.value.getStatuses();
     router.back();
     toaster.success(
       `The ${editingStatus.value.name} task has been successfully updated`
@@ -288,25 +290,25 @@ const handelFail = () => {
                           </div>
 
                           <div
-                            class="itbkk-title truncate text-base font-medium leading-none text-gray-700 mr-4"
+                            class="itbkk-status-name truncate text-base font-medium leading-none text-gray-700 mr-4"
                           >
                             {{ status.name }}
                           </div>
                         </div>
                       </td>
                       <td></td>
-                      <td class="itbkk-status-description">
+                      <td class="">
                         <div
                           v-if="status.description"
-                          class="text-base truncate font-medium leading-none text-gray-700 mr-2"
+                          class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
                         >
                           {{ status.description }}
                         </div>
                         <div
                           v-else
-                          class="text-base font-normal italic leading-none text-gray-400 mr-2"
+                          class="itbkk-status-description text-base font-normal italic leading-none text-gray-400 mr-2"
                         >
-                          No Description Provided
+                          No description is provided
                         </div>
                       </td>
 

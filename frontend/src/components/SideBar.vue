@@ -11,7 +11,7 @@
 
       <div class="group relative rounded-xl p-2 text-white">
         <router-link to="/task">
-          <div class="itbkk-manage-status rounded-lg font-medium">Task</div>
+          <div class="rounded-lg font-medium">Task</div>
         </router-link>
 
         <div class="absolute inset-y-0 left-16 hidden items-center group-hover:flex">
@@ -25,9 +25,9 @@
         </div>
       </div>
 
-      <div class="group relative rounded-xl p-2 text-white">
+      <div class="group relative rounded-xl p-2 text-white itbkk-manage-status">
         <router-link to="/status">
-          <div class="itbkk-manage-status rounded-lg font-medium">Status</div>
+          <div class=" rounded-lg font-medium">Status</div>
         </router-link>
 
         <div class="absolute inset-y-0 left-16 hidden items-center group-hover:flex">

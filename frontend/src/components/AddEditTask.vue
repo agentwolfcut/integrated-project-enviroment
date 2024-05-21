@@ -79,7 +79,7 @@ const saveTask = () => {
 </script>
 
 <template>
-    <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
+    <div class="itbkk-modal-task absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
 

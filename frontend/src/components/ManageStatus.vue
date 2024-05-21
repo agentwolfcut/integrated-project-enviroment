@@ -20,7 +20,10 @@ const toaster = createToaster({
   /* options */
 });
 const statusMan = ref(new StatusManagement());
-const error = ref(false)
+const error = ref(false);
+const complete = ref(false);
+const classNotify = ref("");
+const textNotify = ref("");
 // GET
 onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
@@ -47,7 +50,7 @@ const addStatus = async () => {
       body: JSON.stringify(editingStatus.value),
     });
     if (!res.ok) {
-      error.value = true
+      error.value = true;
       throw new Error(
         `Failed to add status. Server responded with status ${res.status}`
       );
@@ -55,20 +58,27 @@ const addStatus = async () => {
     const addedItem = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด
     editingStatus.value = { id: undefined, name: "", description: "" };
     // console.log(previousTask.value);
-
     statusMan.value.addStatus(
       addedItem.id,
       addedItem.name,
       addedItem.description
     );
     router.back();
-    toaster.success(`The ${addedItem.name} status has been added`);
+    complete.value = true;
+    classNotify.value = "bg-green-500";
+    textNotify.value = `The ${addedItem.name} status has been added`;
+
+    setTimeout(() => {
+      complete.value = false;
+    }, 1000);
   } catch (error) {
     // Navigate back
-    error.value = true
-    console.error("Error adding status:", error);
+    error.value = true;
+    setTimeout(() => {
+      error.value = false;
+    }, 1000);
+    router.back();
     // Handle error as needed
-    toaster.error(`An error has occurred, the status could not be added.`);
   }
 };
 
@@ -121,11 +131,17 @@ const deleteStatus = async () => {
   // front
   if (removeStatus === 200) {
     statusMan.value.removeStatus(removeId);
-    toaster.success(`The ${statusDelete.value.name} status has been deleted`);
-  } else {
-    error.value = true
+    complete.value = true;
+    classNotify.value = "bg-green-600";
+    textNotify.value = `The ${statusDelete.value.name} status has been deleted`;
     setTimeout(() => {
-      error.value = false
+      complete.value = false;
+    }, 1000);
+
+  } else {
+    error.value = true;
+    setTimeout(() => {
+      error.value = false;
     }, 1500);
   }
   confirmDelete.value = false;
@@ -146,12 +162,12 @@ const transferAndDeleteStatus = async () => {
         `The tasks have been transferred and the status has been deleted.`
       );
     } else if (result === 404) {
-      error.value = true
+      error.value = true;
     } else {
-      error.value = true
+      error.value = true;
     }
   } catch (error) {
-    error.value = true
+    error.value = true;
     console.error("Error transferring tasks and deleting status:", error);
     toaster.error(
       `Failed to transfer tasks and delete status. Please try again later.`
@@ -189,7 +205,6 @@ const updateStatus = async (editStatus) => {
     const resJson = await res.json();
     // console.log(res.json());
     console.log(resJson);
-
     statusMan.value.updateStatus(resJson);
     statusList.value = statusMan.value.getStatuses();
     router.back();
@@ -202,7 +217,7 @@ const updateStatus = async (editStatus) => {
       description: null,
     };
   } catch (error) {
-    error.value = true
+    error.value = true;
     // Navigate back
     console.error("Error editing task:", error);
     // Handle error as needed
@@ -333,8 +348,7 @@ const handelFail = () => {
                               class="pr-2 itbkk-button-edit"
                               @click="openToEdit(status)"
                             >
-                            
-                              <Edit/>
+                              <Edit />
                             </button>
                           </router-link>
 
@@ -344,7 +358,7 @@ const handelFail = () => {
                               (statusDelete = status),
                                 checkTasksBeforeDelete(status)
                             "
-                          >                          
+                          >
                             <Trash />
                           </button>
                         </div>
@@ -357,11 +371,16 @@ const handelFail = () => {
           </div>
         </div>
       </div>
-      <div v-show="error" 
-      class="itbkk-message absolute bottom-0 right-0 bg-red-500
-       text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12">
-       An error has occurred, the status does not exist
-      </div>
+
+
+      <div
+        v-show="error || complete"
+        :class="[
+          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+          classNotify,
+        ]"
+        v-text="textNotify"
+      ></div>
     </div>
   </div>
 
@@ -388,12 +407,15 @@ const handelFail = () => {
             />
           </button>
         </div>
-        
-        <div v-show="error"
-          class="flex justify-center items-center font-semibold italic text-xl text-red-500 mb-8"
-        >
-          This status is the default status and cannot be modified
-        </div>
+
+        <div
+          v-show="complete"
+          :class="[
+            'flex justify-center items-center font-semibold italic text-xl mb-8',
+            classNotify,
+          ]"
+          v-text="textNotify"
+        ></div>
       </div>
     </div>
   </div>

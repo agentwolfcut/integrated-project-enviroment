@@ -24,7 +24,8 @@ const statuses = ref({});
 const sortedTasks = ref([]);
 const sortMode = ref("default"); // 'default', 'alp', 'desc'
 const sortalp = ref(false); // for toggle
-
+const error = ref(false);
+const complete = ref(false)
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
@@ -82,15 +83,23 @@ const deleteTask = async (removeId) => {
       );
       taskMan.value.removetask(removeId);
       sortedTasks.value = taskMan.value.gettasks();
-      toaster.success(`The task has been deleted`);
+      complete.value = true
+      setTimeout(() => {
+        complete.value = false;
+      }, 1000);
     } else {
-      toaster.error(`The task does not exist            
-            , please refresh page`);
+      error.value = true;
+      setTimeout(() => {
+        error.value = false;
+      }, 1000);
     }
   } catch (error) {
     console.error("Error deleting task:", error);
     // Handle error as needed
-    toaster.error(`Failed to delete task. An error occurred.`);
+    error.value = true
+    setTimeout(() => {
+    error.value = false
+    }, 1000); 
   }
 };
 
@@ -384,7 +393,10 @@ const toggleSortOrder = () => {
                 <button class="ml-6" @click="sortTasksByCreationTime">
                   <SortDefault />
                 </button>
-                <div @click="toggleSortOrder" class="flex items-center ml-2">
+                <div
+                  @click="toggleSortOrder"
+                  class="itbkk-status-sort flex items-center ml-2"
+                >
                   <button v-if="sortalp">
                     <SortDown />
                   </button>
@@ -426,7 +438,7 @@ const toggleSortOrder = () => {
               <div class="itbkk-status task-column text-gray-700 truncate">
                 {{ task.status }}
               </div>
-              <div class="task-column text-gray-700">
+              <div class="itbkk-button-action task-column text-gray-700">
                 <router-link
                   :to="{ name: 'EditTask', params: { taskId: task.id } }"
                 >
@@ -439,7 +451,7 @@ const toggleSortOrder = () => {
                 </router-link>
                 <button
                   @click="(showDeleteModal = true), (taskToDelete = task)"
-                  class="pr-1 itbkk-button-delete"
+                  class="itbkk-button-delete pr-1"
                 >
                   <Trash />
                 </button>
@@ -466,7 +478,7 @@ const toggleSortOrder = () => {
                   type="checkbox"
                   :value="status.name"
                   @click="doFilter"
-                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <label
                   for="filter-checkbox"
@@ -485,6 +497,15 @@ const toggleSortOrder = () => {
         </button>
       </div>
     </div>
+
+    <div v-show="error || complete"
+      class="itbkk-message absolute bottom-0 right-0 bg-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12"
+    >
+      <span v-show="error">An error has occurred, the status does not exist</span>
+      <span v-show="complete">The task has been deleted</span>
+    </div>
+
+
   </div>
 
   <div v-if="showDeleteModal">

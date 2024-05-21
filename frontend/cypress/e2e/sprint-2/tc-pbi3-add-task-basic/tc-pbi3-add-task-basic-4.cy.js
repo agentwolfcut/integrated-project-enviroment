@@ -27,11 +27,11 @@ describe(`TC-PBI3-ADD-TASK-BASIC-4\n
     cy.get('.itbkk-button-add').should('exist').click() ;
     cy.wait(100)
 
-    cy.get('.itbkk-title').type("     _Front End_     ")
+    cy.get('.itbkk-title-add').type("     _Front End_     ")
     cy.wait(100)
-    cy.get('.itbkk-description').type("     _fix CSS on landing page_     ")
-    cy.get('.itbkk-assignees').type("     _ปุยฝ้าย กับ เสือดาว_     ")
-    cy.get('.itbkk-status').select('Done')
+    cy.get('.itbkk-description-add').type("     _fix CSS on landing page_     ")
+    cy.get('.itbkk-assignees-add').type("     _ปุยฝ้าย กับ เสือดาว_     ")
+    cy.get('.itbkk-status-add').select('Done')
     cy.get('.itbkk-button-confirm').contains('save',{matchCase: false}).as('save') ;
     cy.get('@save').click()
   })

@@ -27,13 +27,13 @@ describe(`TC-PBI3-ADD-TASK-BASIC-2\n
     cy.get('.itbkk-button-add').should('exist').click() ;
     cy.wait(100)
 
-    cy.get('.itbkk-title').type("DevSecOps")
+    cy.get('.itbkk-title-add').type("DevSecOps")
     cy.get('.itbkk-button-confirm').contains('save',{matchCase: false}).as('save') ;
     cy.get('@save').click()
   })
 
   it('Should have task title "DevSecOps"',()=>{
-    cy.get('.itbkk-title').contains('DevSecOps').parents('.itbkk-item').as('item')
+    cy.get('.itbkk-title-add').contains('DevSecOps').parents('.itbkk-item').as('item')
     cy.get('@item').contains('.itbkk-assignees','Unassigned').as('assignees')
     cy.get('@assignees').should('have.css','font-style','italic') 
     cy.get('@item').contains('.itbkk-status',"No Status")

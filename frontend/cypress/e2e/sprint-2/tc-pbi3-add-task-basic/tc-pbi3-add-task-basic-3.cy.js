@@ -27,10 +27,10 @@ describe(`TC-PBI3-ADD-TASK-BASIC-3\n
     cy.get('.itbkk-button-add').should('exist').click() ;
     cy.wait(100)
 
-    cy.get('.itbkk-title').type("DevSecOps1DevSecOps2DevSecOps3DevSecOps4DevSecOps5DevSecOps6DevSecOps7DevSecOps8DevSecOps9DevSecOps0")
-    cy.get('.itbkk-description').type("Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5")
-    cy.get('.itbkk-assignees').type("Assignees1Assignees2Assignees3")
-    cy.get('.itbkk-status').select('To Do')
+    cy.get('.itbkk-title-add').type("DevSecOps1DevSecOps2DevSecOps3DevSecOps4DevSecOps5DevSecOps6DevSecOps7DevSecOps8DevSecOps9DevSecOps0")
+    cy.get('.itbkk-description-add').type("Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5")
+    cy.get('.itbkk-assignees-add').type("Assignees1Assignees2Assignees3")
+    cy.get('.itbkk-status-add').select('To Do')
     cy.get('.itbkk-button-confirm').contains('save',{matchCase: false}).as('save') ;
     cy.get('@save').click()
   })

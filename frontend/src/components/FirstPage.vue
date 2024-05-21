@@ -19,7 +19,6 @@ const toaster = createToaster({
 });
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
-const tasks = ref({});
 // const taskList = taskMan.value.gettasks();
 const statuses = ref({});
 const sortedTasks = ref([]);
@@ -32,7 +31,6 @@ onMounted(async () => {
   //tasks.value = taskRes // reverse and slice to show the most
   taskMan.value.addtasks(taskRes) 
   sortedTasks.value = taskMan.value.gettasks()
-  tasks.value = taskRes;
   // status
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
@@ -205,13 +203,13 @@ const editTask = async (editedTask) => {
       );
     }
     const resJson = await res.json();
-    console.log(sortMode.value);
+    // console.log(sortMode.value);
     if (sortMode.value === 'default') {
-      console.log(`sort mode edit = ${sortMode.value}`);
+      // console.log(`sort mode edit = ${sortMode.value}`);
     } else if(sortMode.value === 'alp') {
-      console.log(`sort mode edit = ${sortMode.value}`);
+      // console.log(`sort mode edit = ${sortMode.value}`);
     } else {
-      console.log(`sort mode edit = ${sortMode.value}`);
+      // console.log(`sort mode edit = ${sortMode.value}`);
     }
     taskMan.value.updatetask(resJson);
     sortedTasks.value = taskMan.value.gettasks();
@@ -314,7 +312,7 @@ watch(statusFilter, doFilter);
 const sortTasksByCreationTime = () => {
   sortedTasks.value = sortedTasks.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
   sortMode.value = "default";
-  console.log(`sort mode = ${sortMode.value}`)
+  // console.log(`sort mode = ${sortMode.value}`)
 };
 
 // Function to sort tasks by status name
@@ -402,7 +400,7 @@ const toggleSortOrder = () => {
             </div>
 
             <div
-              class="task-list-item rounded text-base font-medium leading-none"
+              class="task-list-item itbkk-item rounded text-base font-medium leading-none"
               v-for="(task, index) in sortedTasks"
               :key="index"
             >
@@ -410,18 +408,18 @@ const toggleSortOrder = () => {
                 <p class="text-gray-500 mr-5">{{ index + 1 }}</p>
                 <button
                   @click="openDetails(task.id)"
-                  class="text-gray-700 truncate max-w-lg"
+                  class="itbkk-title text-gray-700 truncate max-w-lg"
                 >
                   {{ task.title }}
                 </button>
               </div>
-              <div class="task-column text-gray-700">
+              <div class="itbkk-assignees task-column text-gray-700">
                 <span v-if="task.assignees" class="truncate">{{
                   task.assignees
                 }}</span>
                 <span v-else class="text-slate-300 italic"> Unassigned </span>
               </div>
-              <div class="task-column text-gray-700 truncate">
+              <div class="itbkk-status task-column text-gray-700 truncate">
                 {{ task.status }}
               </div>
               <div class="task-column text-gray-700">

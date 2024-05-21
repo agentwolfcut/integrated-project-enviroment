@@ -43,12 +43,12 @@ public class StatusController {
         return new ResponseEntity<>(statusDTO, HttpStatus.OK);
     }
 
-@PostMapping
-public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
-    StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
-    StatusEntity addedStatus = statusService.addStatus(status);
-    StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
-    return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
+    @PostMapping
+    public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
+        StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
+        StatusEntity addedStatus = statusService.addStatus(status);
+        StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
 
 }
     @PutMapping("/{id}")

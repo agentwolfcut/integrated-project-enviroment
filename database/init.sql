@@ -28,10 +28,10 @@ CREATE TABLE Status (
 );
 
 INSERT INTO Status (statusName, statusDescription) VALUES 
-('No Status','the default status'),
-('To Do', 'This item has not been started'),
-('Doing', 'This item is currently in progress'),
-('Done', 'This item has been completed');
+('No Status','The default status'),
+('To Do', null),
+('Doing', 'Being worked on'),
+('Done', 'Finished');
 
 CREATE TABLE Tasks_v2 (
     taskID INT AUTO_INCREMENT PRIMARY KEY,

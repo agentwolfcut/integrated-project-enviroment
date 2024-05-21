@@ -16,6 +16,7 @@ import java.util.List;
 
 @Service
 public class TaskService {
+
     @Autowired
     private TaskRepository taskRepository;
 
@@ -23,9 +24,6 @@ public class TaskService {
         return taskRepository.findById(id).orElse(null);
     }
 
-    public List<TaskEntity> getAllTasks() {
-        return taskRepository.findAll();
-    }
     @Transactional
     public TaskEntity addTask(TaskEntity task) {
         task.setCreatedOn(new Date());

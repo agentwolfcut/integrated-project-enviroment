@@ -20,7 +20,7 @@ const toaster = createToaster({
   /* options */
 });
 const statusMan = ref(new StatusManagement());
-
+const error = ref(false)
 // GET
 onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
@@ -47,6 +47,7 @@ const addStatus = async () => {
       body: JSON.stringify(editingStatus.value),
     });
     if (!res.ok) {
+      error.value = true
       throw new Error(
         `Failed to add status. Server responded with status ${res.status}`
       );
@@ -64,6 +65,7 @@ const addStatus = async () => {
     toaster.success(`The ${addedItem.name} status has been added`);
   } catch (error) {
     // Navigate back
+    error.value = true
     console.error("Error adding status:", error);
     // Handle error as needed
     toaster.error(`An error has occurred, the status could not be added.`);
@@ -121,9 +123,10 @@ const deleteStatus = async () => {
     statusMan.value.removeStatus(removeId);
     toaster.success(`The ${statusDelete.value.name} status has been deleted`);
   } else {
-    toaster.error(
-      `An error has occurred, The status could not be delete , please refresh page.`
-    );
+    error.value = true
+    setTimeout(() => {
+      error.value = false
+    }, 1500);
   }
   confirmDelete.value = false;
 };
@@ -143,11 +146,12 @@ const transferAndDeleteStatus = async () => {
         `The tasks have been transferred and the status has been deleted.`
       );
     } else if (result === 404) {
-      toaster.error(`An error has occurred, the status does not exist.`);
+      error.value = true
     } else {
-      toaster.error(`An error has occurred, the status does not exist.`);
+      error.value = true
     }
   } catch (error) {
+    error.value = true
     console.error("Error transferring tasks and deleting status:", error);
     toaster.error(
       `Failed to transfer tasks and delete status. Please try again later.`
@@ -198,6 +202,7 @@ const updateStatus = async (editStatus) => {
       description: null,
     };
   } catch (error) {
+    error.value = true
     // Navigate back
     console.error("Error editing task:", error);
     // Handle error as needed
@@ -313,7 +318,8 @@ const handelFail = () => {
                       </td>
 
                       <td></td>
-                      <td class="itbkk-status-action px-10">
+
+                      <td class="px-10">
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
@@ -327,7 +333,8 @@ const handelFail = () => {
                               class="pr-2 itbkk-button-edit"
                               @click="openToEdit(status)"
                             >
-                              <Edit />
+                            
+                              <Edit/>
                             </button>
                           </router-link>
 
@@ -337,7 +344,7 @@ const handelFail = () => {
                               (statusDelete = status),
                                 checkTasksBeforeDelete(status)
                             "
-                          >
+                          >                          
                             <Trash />
                           </button>
                         </div>
@@ -349,6 +356,11 @@ const handelFail = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div v-show="error" 
+      class="itbkk-message absolute bottom-0 right-0 bg-red-500
+       text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12">
+       An error has occurred, the status does not exist
       </div>
     </div>
   </div>
@@ -376,7 +388,8 @@ const handelFail = () => {
             />
           </button>
         </div>
-        <div
+        
+        <div v-show="error"
           class="flex justify-center items-center font-semibold italic text-xl text-red-500 mb-8"
         >
           This status is the default status and cannot be modified

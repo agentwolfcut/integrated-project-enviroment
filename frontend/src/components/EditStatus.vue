@@ -60,17 +60,13 @@ const limitInputLength = () => {
 };
 
 const saveStatus = () => {    
-    // Trim the description and set to null if it contains only whitespace
-    // if (previousStatus.value.description.length === 0) {
-    //     previousStatus.value.description = null;
-    // }
     emits('saveEdit', previousStatus.value);
 };
 
 </script>
 
 <template>
-    <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
+    <div class="itbkk-modal-status absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center">
         <div
             class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-85">
             <div class="bg-white w-1/2 h-auto p-2 rounded-2xl shadow-xl">
@@ -88,7 +84,7 @@ const saveStatus = () => {
                     <div class="m-4">
                         <label for="title" class="font-medium text-base">Name of Status</label>
                         <input v-model="previousStatus.name"
-                            class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
+                            class="itbkk-status-name p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
                             type="text" maxlength="100" @input="limitInputLength" placeholder="Enter status name">
                         </input>
                         <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.name.length}}/50</p>
@@ -101,7 +97,7 @@ const saveStatus = () => {
                             <p class="font-medium text-base mb-2">description</p>
 
                             <input v-model="previousStatus.description"
-                                class="text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
+                                class="itbkk-status-description text-sm bg-slate-100   rounded-md py-1 h-16 w-full " style='padding: 15px;'
                                 type="text"
                                 @input="limitInputLength">
                             </input>

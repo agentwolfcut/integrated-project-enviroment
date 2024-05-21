@@ -29,12 +29,11 @@ const sortalp = ref(false); // for toggle
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
   //tasks.value = taskRes // reverse and slice to show the most
-  taskMan.value.addtasks(taskRes) 
-  sortedTasks.value = taskMan.value.gettasks()
+  taskMan.value.addtasks(taskRes);
+  sortedTasks.value = taskMan.value.gettasks();
   // status
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
-
 });
 
 // for modal
@@ -81,8 +80,8 @@ const deleteTask = async (removeId) => {
       sortedTasks.value.splice(
         sortedTasks.value.findIndex((item) => item.id === removeId)
       );
-      taskMan.value.removetask(removeId)
-      sortedTasks.value = taskMan.value.gettasks()
+      taskMan.value.removetask(removeId);
+      sortedTasks.value = taskMan.value.gettasks();
       toaster.success(`The task has been deleted`);
     } else {
       toaster.error(`The task does not exist            
@@ -120,8 +119,8 @@ const saveTask = async () => {
     const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
     // sortedTasks.value.push(addedTask);
-    taskMan.value.addtask(addedTask)
-    sortedTasks.value = taskMan.value.gettasks()
+    taskMan.value.addtask(addedTask);
+    sortedTasks.value = taskMan.value.gettasks();
     // if (sortMode.value === "default") {
     //   sortedTasks.value.push(addedTask);
     //   taskMan.value.addtask(
@@ -204,9 +203,9 @@ const editTask = async (editedTask) => {
     }
     const resJson = await res.json();
     // console.log(sortMode.value);
-    if (sortMode.value === 'default') {
+    if (sortMode.value === "default") {
       // console.log(`sort mode edit = ${sortMode.value}`);
-    } else if(sortMode.value === 'alp') {
+    } else if (sortMode.value === "alp") {
       // console.log(`sort mode edit = ${sortMode.value}`);
     } else {
       // console.log(`sort mode edit = ${sortMode.value}`);
@@ -276,7 +275,7 @@ const doFilter = async () => {
   await nextTick(); // Ensure the next DOM update cycle is completed
   if (statusFilter.value.length > 0) {
     const statusString = statusFilter.value.join(",");
-     // Logs the comma-separated string of selected statuses
+    // Logs the comma-separated string of selected statuses
     const res = await getItems(
       `${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`
     );
@@ -293,7 +292,7 @@ const doFilter = async () => {
           sortTasksByCreationTime();
           break;
       }
-    } 
+    }
   } else {
     console.log("No statuses selected");
     sortedTasks.value = [];
@@ -413,7 +412,12 @@ const toggleSortOrder = () => {
                   {{ task.title }}
                 </button>
               </div>
-              <div class="itbkk-assignees task-column text-gray-700">
+              <div
+                class="itbkk-assignees task-column text-gray-700"
+                :class="{
+                  'italic ': !task.assignees,
+                }"
+              >
                 <span v-if="task.assignees" class="truncate">{{
                   task.assignees
                 }}</span>

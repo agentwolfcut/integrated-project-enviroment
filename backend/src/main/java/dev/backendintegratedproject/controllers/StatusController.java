@@ -53,7 +53,7 @@ public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
 }
     @PutMapping("/{id}")
     public ResponseEntity<Object> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
-        if (id == 1){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
+        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         StatusEntity editedStatus = statusService.editStatus(id,status);
             return ResponseEntity.ok(editedStatus);
     }
@@ -61,7 +61,7 @@ public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteStatus(@PathVariable("id") Integer id) {
-        if (id == 1){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
+        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         statusService.deleteStatus(id);
         return ResponseEntity.ok().body(new HashMap<>());
     }

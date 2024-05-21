@@ -82,7 +82,7 @@ const taskCount = ref(undefined);
 const tasks = ref("");
 
 const checkTasksBeforeDelete = async (status) => {
-  if (status.id === 1) {
+  if (status.id === 1 || status.name === 'Done') {
     deleteDefault.value = true;
     setTimeout(() => {
       deleteDefault.value = false;
@@ -143,6 +143,8 @@ const transferAndDeleteStatus = async () => {
         `The tasks have been transferred and the status has been deleted.`
       );
     } else if (result === 404) {
+      toaster.error(`An error has occurred, the status does not exist.`);
+    } else {
       toaster.error(`An error has occurred, the status does not exist.`);
     }
   } catch (error) {

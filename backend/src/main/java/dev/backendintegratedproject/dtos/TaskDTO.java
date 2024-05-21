@@ -17,10 +17,8 @@ public class TaskDTO {
     @NotBlank(message = "Title must not be blank")
     private String title;
     private String description;
-
     @Size(max = 30, message = "Size must be between 0 and 30")
     private String assignees;
-
     @NotNull(message = "Status must not be null")
-    private Integer status;
+    private String status;
 }

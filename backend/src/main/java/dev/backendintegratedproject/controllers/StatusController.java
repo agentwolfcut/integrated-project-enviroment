@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/v2/statuses")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
 @CrossOrigin(origins = {"http://localhost:5173",
-			"http://ip23ft.sit.kmutt.ac.th",
-                       	"http://intproj23.sit.kmutt.ac.th"})
+        "http://ip23ft.sit.kmutt.ac.th",
+        "http://intproj23.sit.kmutt.ac.th"})
 public class StatusController {
     @Autowired
     private StatusService statusService;
@@ -50,12 +50,12 @@ public class StatusController {
         StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
 
-}
+    }
     @PutMapping("/{id}")
     public ResponseEntity<Object> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
         if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         StatusEntity editedStatus = statusService.editStatus(id,status);
-            return ResponseEntity.ok(editedStatus);
+        return ResponseEntity.ok(editedStatus);
     }
 
 

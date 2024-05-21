@@ -5,24 +5,31 @@ class TaskManagement {
   addtasks(newtasks) {
     newtasks.forEach((newtask) =>
       this.addtask(
-        newtask.id,
-        newtask.title,
-        newtask.description,
-        newtask.assignees,
-        newtask.status,
-        newtask.createdOn,
-        newtask.updatedOn
+        newtask
       )
     )
   }
+  // addtasks(newtasks) {
+  //   newtasks.forEach((newtask) =>
+  //     this.addtask(
+  //       newtask.id,
+  //       newtask.title,
+  //       newtask.description,
+  //       newtask.assignees,
+  //       newtask.status,
+  //       newtask.createdOn,
+  //       newtask.updatedOn
+  //     )
+  //   )
+  // }
   // push
-  addtask(id, title, description, assignees, statusId) {
+  addtask(newTask) {
     this.tasks.push({
-      id: id,
-      title: title,
-      description: description,
-      assignees: assignees,
-      status: statusId
+      id: newTask.id,
+      title: newTask.title,
+      description: newTask.description,
+      assignees: newTask.assignees,
+      status: newTask.status
       // status: status.split('_').map(words=> words.charAt(0).toUpperCase()+words.slice(1).toLowerCase()).join(' '),
     })
   }

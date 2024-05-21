@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch , nextTick } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "./TaskDetail.vue";
@@ -17,34 +17,26 @@ import SortDefault from "@/assets/icons/SortDefault.vue";
 const toaster = createToaster({
   /* options */
 });
-
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const tasks = ref({});
-const taskList = taskMan.value.gettasks();
+// const taskList = taskMan.value.gettasks();
 const statuses = ref({});
-const tasksArray = ref([]);
-const statusArray = ref([]);
 const sortedTasks = ref([]);
-const sortMode = ref("default"); // 'default', 'Alp', 'desc'
-const statusesTest = ref([]);
+const sortMode = ref("default"); // 'default', 'alp', 'desc'
+const sortalp = ref(false); // for toggle
 
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
   //tasks.value = taskRes // reverse and slice to show the most
+  taskMan.value.addtasks(taskRes) 
+  sortedTasks.value = taskMan.value.gettasks()
   tasks.value = taskRes;
-  // Convert tasks object to array
-  const clean = JSON.parse(JSON.stringify(tasks.value));
-  tasksArray.value = Object.values(clean);
-  // Initially sort by creation time
-  sortTasksByCreationTime();
+  // status
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
-  // console.log(statuses.value);
-  const status = JSON.parse(JSON.stringify(statuses.value));
-  // console.log(status);
-  statusArray.value = Object.values(status);
+
 });
 
 // for modal
@@ -91,6 +83,8 @@ const deleteTask = async (removeId) => {
       sortedTasks.value.splice(
         sortedTasks.value.findIndex((item) => item.id === removeId)
       );
+      taskMan.value.removetask(removeId)
+      sortedTasks.value = taskMan.value.gettasks()
       toaster.success(`The task has been deleted`);
     } else {
       toaster.error(`The task does not exist            
@@ -127,33 +121,33 @@ const saveTask = async () => {
     }
     const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
-
-    if (sortMode.value === "default") {
-      sortedTasks.value.push(addedTask);
-      taskMan.value.addtask(
-        addedTask.id,
-        addedTask.title,
-        addedTask.description,
-        addedTask.assignees,
-        addedTask.status
-      );
-    } else if (sortMode.value === "Alp") {
-      let index = sortedTasks.value.findIndex(
-        (task) => task.status > addedTask.status
-      );
-      sortedTasks.value.splice(index, 0, addedTask);
-      index = undefined;
-    } else if (sortMode.value === "Rev") {
-      let index = sortedTasks.value.findIndex(
-        (task) => task.status < addedTask.status
-      );
-      sortedTasks.value.splice(index, 0, addedTask);
-      index = undefined;
-    } else {
-      sortedTasks.value.push(addedTask);
-    }
-
-    // console.log(previousTask.value);
+    // sortedTasks.value.push(addedTask);
+    taskMan.value.addtask(addedTask)
+    sortedTasks.value = taskMan.value.gettasks()
+    // if (sortMode.value === "default") {
+    //   sortedTasks.value.push(addedTask);
+    //   taskMan.value.addtask(
+    //     addedTask.id,
+    //     addedTask.title,
+    //     addedTask.description,
+    //     addedTask.assignees,
+    //     addedTask.status
+    //   );
+    // } else if (sortMode.value === "alp") {
+    //   let index = sortedTasks.value.findIndex(
+    //     (task) => task.status > addedTask.status
+    //   );
+    //   console.log(`index =  ${index}`);
+    //   sortedTasks.value.splice(index, 0, addedTask);
+    //   index = undefined;
+    // } else if (sortMode.value === "rev") {
+    //   let index = sortedTasks.value.findIndex(
+    //     (task) => task.status < addedTask.status
+    //   );
+    //   console.log(`index =  ${index}`);
+    //   sortedTasks.value.splice(index, 0, addedTask);
+    //   index = undefined;
+    // }
     router.back();
     toaster.success(`The ${addedTask.title} task has been successfully added`);
     selectTask.value = {
@@ -175,15 +169,6 @@ const editMode = (task) => {
   selectTask.value = task;
 };
 
-const updateStatusId = () => {
-  const selectedStatus = statusArray.value.find(
-    (status) => status.name === selectTask.value.status
-  );
-  if (selectedStatus) {
-    selectTask.value.status = selectedStatus;
-  }
-};
-
 const editTask = async (editedTask) => {
   try {
     selectTask.value = editedTask; // status : id
@@ -194,7 +179,7 @@ const editTask = async (editedTask) => {
     if (selectTask.value.assignees !== null) {
       selectTask.value.assignees = selectTask.value.assignees.trim();
     }
-    const selectedStatus = statusArray.value.find(
+    const selectedStatus = statuses.value.find(
       (status) => status.id == selectTask.value.status
     );
     if (selectedStatus) {
@@ -220,10 +205,17 @@ const editTask = async (editedTask) => {
       );
     }
     const resJson = await res.json();
-    // console.log(res.json());
-    console.log(resJson);
+    console.log(sortMode.value);
+    if (sortMode.value === 'default') {
+      console.log(`sort mode edit = ${sortMode.value}`);
+    } else if(sortMode.value === 'alp') {
+      console.log(`sort mode edit = ${sortMode.value}`);
+    } else {
+      console.log(`sort mode edit = ${sortMode.value}`);
+    }
     taskMan.value.updatetask(resJson);
     sortedTasks.value = taskMan.value.gettasks();
+
     router.back();
     toaster.success(
       `The ${selectTask.value.title} task has been successfully updated`
@@ -270,7 +262,9 @@ const statusFilter = ref([]);
 // Fetch statuses and initialize statusFilter
 const fetchStatuses = async () => {
   try {
-    const fetchedStatuses = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
+    const fetchedStatuses = await getItems(
+      `${import.meta.env.VITE_BASE_URL}/statuses`
+    );
     statuses.value = fetchedStatuses;
     statusFilter.value = statuses.value.map((status) => status.name);
     doFilter(); // Ensure the initial filter is applied
@@ -284,24 +278,24 @@ const doFilter = async () => {
   await nextTick(); // Ensure the next DOM update cycle is completed
   if (statusFilter.value.length > 0) {
     const statusString = statusFilter.value.join(",");
-    console.log(statusString); // Logs the comma-separated string of selected statuses
-    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`);
-    tasksArray.value = res;
-    if (sortAlp.value) {
-      switch (sortAlp.value) {
-        case false:
-          sortTasksByStatusNameAlp();
+     // Logs the comma-separated string of selected statuses
+    const res = await getItems(
+      `${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`
+    );
+    sortedTasks.value = res;
+    if (sortMode.value) {
+      switch (sortMode.value) {
+        case "alp":
+          sortTasksByStatusNamealp();
           break;
-        case true:
-          sortTasksByStatusNameRev();
+        case "rev":
+          sortTasksByStatusNamerev();
           break;
-        default:
+        case "default":
           sortTasksByCreationTime();
           break;
       }
-    } else {
-      sortTasksByCreationTime();
-    }
+    } 
   } else {
     console.log("No statuses selected");
     sortedTasks.value = [];
@@ -315,39 +309,40 @@ onMounted(fetchStatuses);
 watch(statusFilter, doFilter);
 
 // SORT by STATUS
-const sortAlp = ref(false);
+
 // Function to sort tasks by creation time
 const sortTasksByCreationTime = () => {
-  sortedTasks.value = tasksArray.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
+  sortedTasks.value = sortedTasks.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
   sortMode.value = "default";
-  sortAlp.value = false;
-  // console.log(`sort mode = ${sortMode.value}`);
+  console.log(`sort mode = ${sortMode.value}`)
 };
 
 // Function to sort tasks by status name
-const sortTasksByStatusNameAlp = () => {
-  sortedTasks.value = tasksArray.value
+const sortTasksByStatusNamealp = () => {
+  sortedTasks.value = sortedTasks.value
     .slice()
     .sort((a, b) => a.status.localeCompare(b.status));
+  sortMode.value = "alp";
 };
 
-const sortTasksByStatusNameRev = () => {
-  sortedTasks.value = tasksArray.value
+const sortTasksByStatusNamerev = () => {
+  sortedTasks.value = sortedTasks.value
     .slice()
     .sort((a, b) => b.status.localeCompare(a.status));
+  sortMode.value = "rev";
 };
 
 // Function to toggle sorting
 const toggleSortOrder = () => {
-  sortAlp.value = !sortAlp.value;
-  if (sortAlp.value) {
-    sortMode.value = "Alp";
-    console.log(sortMode.value);
-    sortTasksByStatusNameAlp();
+  sortalp.value = !sortalp.value;
+  if (sortalp.value) {
+    sortMode.value = "alp";
+    console.log(`sort mode = ${sortMode.value}`);
+    sortTasksByStatusNamealp();
   } else {
-    sortTasksByStatusNameRev();
-    sortMode.value = "Rev";
-    console.log(sortMode.value);
+    sortTasksByStatusNamerev();
+    sortMode.value = "rev";
+    console.log(`sort mode = ${sortMode.value}`);
   }
 };
 </script>
@@ -393,10 +388,10 @@ const toggleSortOrder = () => {
                   <SortDefault />
                 </button>
                 <div @click="toggleSortOrder" class="flex items-center ml-2">
-                  <button v-if="sortAlp">
+                  <button v-if="sortalp">
                     <SortDown />
                   </button>
-                  <button v-if="!sortAlp">
+                  <button v-if="!sortalp">
                     <SortUp />
                   </button>
                 </div>

@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 @RestController
 @RequestMapping("/v2/tasks")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
@@ -38,29 +37,27 @@ public class TaskController {
     @Autowired
     private StatusService statusService;
     @GetMapping
-    public ResponseEntity<Object> getTasks(@RequestParam(required = false) List<String> statuses,
+    public ResponseEntity<Object> getTasks(@RequestParam(required = false) List<String> filterStatuses,
                                            @RequestParam(required = false) String[] sortBy,
                                            @RequestParam(required = false) String[] direction,
                                            @RequestParam(required = false) String taskAssignees) {
-        // Check for unsupported filter parameters
+
         if (taskAssignees != null) {
             return new ResponseEntity<>(Collections.singletonMap("error", "invalid filter parameter"), HttpStatus.BAD_REQUEST);
         }
 
-        // Process the supported filter parameters
         List<StatusEntity> statusEntities = new ArrayList<>();
-        if (statuses != null) {
-            for (String status : statuses) {
+        if (filterStatuses != null) {
+            for (String status : filterStatuses) {
                 StatusEntity statusEntity = statusService.getStatusByName(status);
                 if (statusEntity != null) {
                     statusEntities.add(statusEntity);
                 }
             }
         } else {
-            statusEntities = statusService.getAllStatus(); // Assuming there's a method to get all statuses
+            statusEntities = statusService.getAllStatus();
         }
 
-        // Get tasks based on statuses and sorting criteria
         List<TaskEntity> tasks = taskService.getTasksByStatuses(statusEntities, sortBy, direction);
         List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class, modelMapper);
 
@@ -80,12 +77,20 @@ public class TaskController {
         if (task == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
         }
-        GetTaskDTO getTaskDTO = modelMapper.map(task, GetTaskDTO.class); // แปลง TaskEntity เป็น TaskDTO
+        GetTaskDTO getTaskDTO = modelMapper.map(task, GetTaskDTO.class);
         return new ResponseEntity<>(getTaskDTO, HttpStatus.OK);
     }
-    // Endpoint to add a task
+    // Old
     @PostMapping
-//    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+        StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
+        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+        taskEntity.setStatus(statusEntity);
+        TaskEntity addedTask = taskService.addTask(taskEntity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+    }
+
+    //    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
 //        TaskEntity taskEntity = new TaskEntity();
 //        taskEntity.setTitle(taskDTO.getTitle());
 //        taskEntity.setDescription(taskDTO.getDescription());
@@ -102,18 +107,6 @@ public class TaskController {
 //        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
 //    }
 
-    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-        StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
-        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-        taskEntity.setStatus(statusEntity);
-        TaskEntity addedTask = taskService.addTask(taskEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-    }
-
-
-
-
-    // Endpoint to delete a task by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
         try {
@@ -128,12 +121,11 @@ public class TaskController {
     public ResponseEntity<?> editTask(@PathVariable Integer id, @RequestBody TaskEntity task) {
         TaskEntity editedTask = taskService.editTask(id, task);
         if (editedTask != null) {
-            // Fetch the StatusEntity associated with the task
+
             StatusEntity statusEntity = statusService.getStatusById(editedTask.getStatus().getId());
 
-            // Map the edited task and explicitly set the status name in PutTaskDTO
             PutTaskDTO responseDTO = modelMapper.map(editedTask, PutTaskDTO.class);
-            responseDTO.setStatus(statusEntity.getName()); // Set the status name
+            responseDTO.setStatus(statusEntity.getName());
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } else {

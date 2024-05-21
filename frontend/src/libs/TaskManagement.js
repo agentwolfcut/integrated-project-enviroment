@@ -37,7 +37,7 @@ class TaskManagement {
           title: newTask.title,
           description: newTask.description,
           assignees: newTask.assignees,
-          status: newTask.status.name
+          status: newTask.status
         }
         : task
     })

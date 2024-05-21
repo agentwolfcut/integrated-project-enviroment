@@ -12,11 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static dev.backendintegratedproject.services.ListMapper.getInstance;
-
 @RestController
 @RequestMapping("/v2/statuses")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")

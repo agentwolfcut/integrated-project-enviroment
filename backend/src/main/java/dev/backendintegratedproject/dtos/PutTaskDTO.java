@@ -12,10 +12,7 @@ public class PutTaskDTO {
     private String title;
     private String description;
     private String assignees;
-
-    // Only include the name from StatusEntity
     private String status;
-
     private String createdOn;
     private String updatedOn;
 }

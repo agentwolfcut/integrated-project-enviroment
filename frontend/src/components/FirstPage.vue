@@ -73,6 +73,7 @@ const taskToDelete = ref(undefined);
 
 const deleteTask = async (removeId) => {
   try {
+    sortMode.value = 'default'
     const status = await deleteItemById(
       `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId

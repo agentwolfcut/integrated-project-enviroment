@@ -139,7 +139,7 @@ const deleteStatus = async () => {
   if (removeStatus === 200) {
     statusMan.value.removeStatus(removeId);
     completeNotify(statusDelete.value.name, "deleted");
-    statusList.value = statusMan.value.getStatuses()
+    statusList.value = statusMan.value.getStatuses();
   } else {
     errorNotify();
   }
@@ -250,7 +250,10 @@ const handelFail = () => {
               >
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
-                  <thead class="bg-slate-200 text">
+                  <thead
+                    class="text-slate-50 text"
+                    style="background-color: #15161a"
+                  >
                     <tr class="focus:outline-none h-16 text-base">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
@@ -276,10 +279,10 @@ const handelFail = () => {
                     <tr
                       v-for="(status, index) in statusList"
                       :key="index"
-                      :class="{ 'bg-pink-50': index % 2 === 0 }"
-                      class="bg-white itbkk-item h-16 box ease-in transition-colors"
+                      :class="{ 'bg-slate-100': index % 2 === 0 }"
+                      class="itbkk-item h-16 box ease-in transition-colors"
                     >
-                    <td class="min-w-60">
+                      <td class="min-w-60">
                         <div class="flex items-center pl-5">
                           <div class="flex flex-row justify-start">
                             <p
@@ -341,7 +344,6 @@ const handelFail = () => {
                           </button>
                         </div>
                       </td>
-
                     </tr>
                   </tbody>
                 </table>
@@ -385,15 +387,14 @@ const handelFail = () => {
             />
           </button>
         </div>
-
-        <div
-          v-show="complete"
-          :class="[
-            'flex justify-center items-center font-semibold italic text-xl mb-8',
-            classNotify,
-          ]"
-          v-text="textNotify"
-        ></div>
+        <div class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex">
+          <p>
+            <span class="text-red-500">
+              {{ statusDelete.name }}
+            </span>
+            status is the default status and cannot be modified
+          </p>
+        </div>
       </div>
     </div>
   </div>

@@ -358,7 +358,7 @@ const toggleSortOrder = () => {
               >
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
-                  <thead class="bg-slate-200 text">
+                  <thead class="text-white" style="background-color: #15161a;">
                     <tr class="focus:outline-none h-16 text-base">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
@@ -374,7 +374,7 @@ const toggleSortOrder = () => {
                         class="p-3 text-base font-medium tracking-wide text-left"
                       >
                         <div
-                          class="task-column status bg-slate-200 flex flex-row items-center"
+                          class="task-column status flex flex-row items-center"
                         >
                           <div>Status</div>
                           <button class="ml-6" @click="sortTasksByCreationTime">
@@ -404,8 +404,8 @@ const toggleSortOrder = () => {
                     <tr
                       v-for="(task, index) in sortedTasks"
                       :key="index"
-                      :class="{ 'bg-pink-50': index % 2 === 0 }"
-                      class="bg-white h-16 box ease-in transition-colors"
+                      :class="{ 'bg-slate-100': index % 2 === 0 }"
+                      class="h-16 box ease-in transition-colors"
                     >
                       <td
                         class="p-3 text-base font-medium text-slate-800 truncate"
@@ -414,7 +414,7 @@ const toggleSortOrder = () => {
                           <p class="pl-4">{{ index + 1 }}</p>
                           <button
                             @click="openDetails(task.id)"
-                            class="pl-4 text-teal-700 hover:underline text-base font-medium leading-none mr-4"
+                            class="pl-4 hover:underline text-base font-medium leading-none mr-4"
                           >
                             {{ task.title }}
                           </button>
@@ -503,7 +503,7 @@ const toggleSortOrder = () => {
         </div>
         <button
           @click="toggleFilter"
-          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500 " style="background-color: #ff5a5a;"
         >
           << Filter by Status
         </button>

@@ -17,6 +17,7 @@ import java.util.List;
 @Service
 public class TaskService {
 
+
     @Autowired
     private TaskRepository taskRepository;
 
@@ -24,18 +25,23 @@ public class TaskService {
         return taskRepository.findById(id).orElse(null);
     }
 
+
     @Transactional
     public TaskEntity addTask(TaskEntity task) {
+        validateTask(task);
+
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
     }
+    @Transactional
     public void deleteTask(Integer id) {
     TaskEntity task = taskRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
     taskRepository.delete(task);
-}
+}   @Transactional
     public TaskEntity editTask(Integer id, TaskEntity task) {
+        validateTask(task);
         TaskEntity existingTask = taskRepository.findById(id).orElse(null);
         if (existingTask != null) {
 
@@ -60,5 +66,28 @@ public class TaskService {
             return taskRepository.findAllByStatusIn(statusEntities);
         }
     }
+
+    private void validateTask(TaskEntity task) {
+        StringBuilder errorMessage = new StringBuilder();
+
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            errorMessage.append("Title must not be null or empty. ");
+        } else if (task.getTitle().length() > 100) {
+            errorMessage.append("Title size must be between 0 and 100. ");
+        }
+
+        if (task.getDescription() != null && task.getDescription().length() > 500) {
+            errorMessage.append("Description size must be between 0 and 500. ");
+        }
+
+        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
+            errorMessage.append("Assignees size must be between 0 and 30. ");
+        }
+
+        if (errorMessage.length() > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
+        }
+    }
+
 
 }

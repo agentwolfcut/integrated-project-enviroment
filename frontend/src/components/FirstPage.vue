@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, nextTick } from "vue";
+import { onMounted, ref, watch, nextTick, computed } from "vue";
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "./TaskDetail.vue";
@@ -13,6 +13,9 @@ import Edit from "@/assets/icons/CiEditPencil01.vue";
 import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
+import SearchForm from "./SearchForm.vue";
+import FilterRadio from "./FilterRadio.vue";
+import FilterDropdown from "./FilterDropdown.vue";
 
 const toaster = createToaster({
   /* options */
@@ -35,6 +38,8 @@ onMounted(async () => {
   // status
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
+  statusFilter.value = statuses.value.map((status) => status.name);
+  doFilter()
 });
 
 // for modal
@@ -73,7 +78,7 @@ const taskToDelete = ref(undefined);
 
 const deleteTask = async (removeId) => {
   try {
-    sortMode.value = 'default'
+    sortMode.value = "default";
     const status = await deleteItemById(
       `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
@@ -265,44 +270,20 @@ const toggleFilter = () => {
 
 // Assuming statuses is an array of status objects provided as a prop or fetched from an API
 const statusFilter = ref([]);
-
 // Fetch statuses and initialize statusFilter
-const fetchStatuses = async () => {
-  try {
-    const fetchedStatuses = await getItems(
-      `${import.meta.env.VITE_BASE_URL}/statuses`
-    );
-    statuses.value = fetchedStatuses;
-    statusFilter.value = statuses.value.map((status) => status.name);
-    doFilter(); // Ensure the initial filter is applied
-  } catch (error) {
-    console.error("Failed to fetch statuses:", error);
-  }
-};
 
 // Apply the filter whenever statusFilter changes
 const doFilter = async () => {
   await nextTick(); // Ensure the next DOM update cycle is completed
   if (statusFilter.value.length > 0) {
     const statusString = statusFilter.value.join(",");
+    console.log(statusString);
     // Logs the comma-separated string of selected statuses
     const res = await getItems(
       `${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`
     );
+    console.log(res);
     sortedTasks.value = res;
-    if (sortMode.value) {
-      switch (sortMode.value) {
-        case "alp":
-          sortTasksByStatusNamealp();
-          break;
-        case "rev":
-          sortTasksByStatusNamerev();
-          break;
-        case "default":
-          sortTasksByCreationTime();
-          break;
-      }
-    }
   } else {
     console.log("No statuses selected");
     sortedTasks.value = [];
@@ -310,10 +291,7 @@ const doFilter = async () => {
 };
 
 // Fetch statuses when the component is mounted
-onMounted(fetchStatuses);
 
-// Watch for changes in statusFilter to trigger filtering
-watch(statusFilter, doFilter);
 
 // SORT by STATUS
 
@@ -352,6 +330,10 @@ const toggleSortOrder = () => {
     console.log(`sort mode = ${sortMode.value}`);
   }
 };
+
+// NEW
+
+
 </script>
 
 <template>
@@ -416,9 +398,7 @@ const toggleSortOrder = () => {
                       </th>
                       <th
                         class="w-24 p-3 text-base font-medium tracking-wide text-left"
-                      >
-                        
-                      </th>
+                      ></th>
                     </tr>
                   </thead>
 
@@ -443,7 +423,9 @@ const toggleSortOrder = () => {
                           </button>
                         </div>
                       </td>
-                      <td class="p-3 text-base font-medium text-slate-800 truncate">
+                      <td
+                        class="p-3 text-base font-medium text-slate-800 truncate"
+                      >
                         <div
                           class="itbkk-assignees"
                           :class="{
@@ -458,10 +440,12 @@ const toggleSortOrder = () => {
                           </span>
                         </div>
                       </td>
-                      <td class="p-3 text-base font-medium text-slate-800 truncate">
+                      <td
+                        class="p-3 text-base font-medium text-slate-800 truncate"
+                      >
                         {{ task.status }}
                       </td>
-                      <td class="p-3 text-base font-medium text-slate-800 ">
+                      <td class="p-3 text-base font-medium text-slate-800">
                         <router-link
                           :to="{
                             name: 'EditTask',
@@ -493,7 +477,7 @@ const toggleSortOrder = () => {
         </div>
       </div>
 
-      <div class="flex justify-end w-11/12 mt-6 sm:px-32">
+      <div class="flex justify-end w-11/12 mt-6 sm:px-20">
         <div id="forFilter" v-if="showFilter">
           <div class="flex flex-row">
             <div class="flex">
@@ -507,8 +491,8 @@ const toggleSortOrder = () => {
                   v-model="statusFilter"
                   id="filter-checkbox"
                   type="checkbox"
-                  :value="status.name"
-                  @click="doFilter"
+                  :value="status.name"                             
+                  @change="doFilter"
                   class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <label

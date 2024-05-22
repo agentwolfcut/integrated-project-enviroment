@@ -64,12 +64,7 @@ public class TaskController {
         return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
     }
 
-//    @GetMapping
-//    public ResponseEntity<Object> getTasks() {
-//        List<TaskEntity> tasks = taskService.getAllTasks();
-//        List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class,modelMapper);
-//        return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
-//    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskById(@PathVariable Integer id) {
@@ -89,23 +84,6 @@ public class TaskController {
         TaskEntity addedTask = taskService.addTask(taskEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
     }
-
-    //    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-//        TaskEntity taskEntity = new TaskEntity();
-//        taskEntity.setTitle(taskDTO.getTitle());
-//        taskEntity.setDescription(taskDTO.getDescription());
-//        taskEntity.setAssignees(taskDTO.getAssignees());
-//
-//        // Fetch the status entity by name
-//        StatusEntity statusEntity = statusService.getStatusByName(taskDTO.getStatus());
-//        if (statusEntity == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
-//        }
-//        taskEntity.setStatus(statusEntity);
-//
-//        TaskEntity addedTask = taskService.addTask(taskEntity);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
@@ -132,8 +110,37 @@ public class TaskController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    // old
-//    @PutMapping("/{id}")
+
+
+
+    //    @GetMapping
+//    public ResponseEntity<Object> getTasks() {
+//        List<TaskEntity> tasks = taskService.getAllTasks();
+//        List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class,modelMapper);
+//        return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
+//    }
+
+
+    //@PostMapping
+    //    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+//        TaskEntity taskEntity = new TaskEntity();
+//        taskEntity.setTitle(taskDTO.getTitle());
+//        taskEntity.setDescription(taskDTO.getDescription());
+//        taskEntity.setAssignees(taskDTO.getAssignees());
+//
+//        // Fetch the status entity by name
+//        StatusEntity statusEntity = statusService.getStatusByName(taskDTO.getStatus());
+//        if (statusEntity == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
+//        }
+//        taskEntity.setStatus(statusEntity);
+//
+//        TaskEntity addedTask = taskService.addTask(taskEntity);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+//    }
+
+    // @PutMapping("/{id}")
+//
 //    public ResponseEntity<TaskEntity> editTask(@PathVariable Integer id, @RequestBody TaskEntity task) {
 //        TaskEntity editedTask = taskService.editTask(id, task);
 //        if (editedTask != null) {

@@ -25,7 +25,7 @@ const sortedTasks = ref([]);
 const sortMode = ref("default"); // 'default', 'alp', 'desc'
 const sortalp = ref(false); // for toggle
 const error = ref(false);
-const complete = ref(false)
+const complete = ref(false);
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
@@ -83,7 +83,7 @@ const deleteTask = async (removeId) => {
       );
       taskMan.value.removetask(removeId);
       sortedTasks.value = taskMan.value.gettasks();
-      complete.value = true
+      complete.value = true;
       setTimeout(() => {
         complete.value = false;
       }, 1000);
@@ -96,10 +96,10 @@ const deleteTask = async (removeId) => {
   } catch (error) {
     console.error("Error deleting task:", error);
     // Handle error as needed
-    error.value = true
+    error.value = true;
     setTimeout(() => {
-    error.value = false
-    }, 1000); 
+      error.value = false;
+    }, 1000);
   }
 };
 
@@ -354,110 +354,140 @@ const toggleSortOrder = () => {
 </script>
 
 <template>
-  <!-- component -->
-  <!-- img/beams.jpg -->
-
   <div class="flex">
     <SideBar />
-    <div class="flex content flex-col items-center h-screen">
+    <!-- <div class="flex content flex-col items-center h-screen"> -->
+    <div class="flex flex-col w-screen h-screen items-center">
       <HeaderIT />
-      <!-- Task List -->
-      <div class="TaskList sm:px-20 overflow-y-scroll h-3/4 w-11/12">
-        <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
-          <div class="flex items-center justify-end mb-9">
-            <router-link to="/task/add">
-              <div
-                class="itbkk-button-add rounded-lg ml-4 sm:ml-8 flex flex-initial"
-              >
-                <buttonSlot size="sm" type="dark">
-                  <template v-slot:title> Add Task </template>
-                </buttonSlot>
-              </div>
-            </router-link>
-          </div>
-
-          <div
-            class="task-list rounded-2xl border border-slate-100 justify-center table-fixed"
-          >
-            <div
-              class="task-list-header font-medium leading-none text-gray-700"
-            >
-              <div class="task-column title bg-slate-200 rounded-tl-2xl">
-                <p class="mr-5">&nbsp; &nbsp; &nbsp; Title</p>
-              </div>
-              <div class="task-column assignees bg-slate-200">Assignees</div>
-              <div
-                class="task-column status bg-slate-200 flex flex-row items-center"
-              >
-                <div>Status</div>
-                <button class="ml-6" @click="sortTasksByCreationTime">
-                  <SortDefault />
-                </button>
-                <div
-                  @click="toggleSortOrder"
-                  class="itbkk-status-sort flex items-center ml-2"
-                >
-                  <button v-if="sortalp">
-                    <SortDown />
-                  </button>
-                  <button v-if="!sortalp">
-                    <SortUp />
-                  </button>
-                </div>
-              </div>
-              <div
-                class="task-column actions bg-slate-200 rounded-tr-2xl"
-              ></div>
-            </div>
-
-            <div
-              class="task-list-item itbkk-item rounded text-base font-medium leading-none"
-              v-for="(task, index) in sortedTasks"
-              :key="index"
-            >
-              <div class="task-column flex flex-row">
-                <p class="text-gray-500 mr-5">{{ index + 1 }}</p>
-                <button
-                  @click="openDetails(task.id)"
-                  class="itbkk-title text-gray-700 truncate max-w-lg"
-                >
-                  {{ task.title }}
-                </button>
-              </div>
-              <div
-                class="itbkk-assignees task-column text-gray-700"
-                :class="{
-                  'italic ': !task.assignees,
-                }"
-              >
-                <span v-if="task.assignees" class="truncate">{{
-                  task.assignees
-                }}</span>
-                <span v-else class="text-slate-300 italic"> Unassigned </span>
-              </div>
-              <div class="itbkk-status task-column text-gray-700 truncate">
-                {{ task.status }}
-              </div>
-              <div class="itbkk-button-action task-column text-gray-700">
-                <router-link
-                  :to="{ name: 'EditTask', params: { taskId: task.id } }"
-                >
-                  <button
-                    @click="editMode(task)"
-                    class="pr-2 itbkk-button-edit"
-                  >
-                    <Edit />
-                  </button>
+      <div class="flex justify-center">
+        <div class="sm:px-20 w-full">
+          <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
+            <div class="overflow-x-auto">
+              <div class="flex justify-end mb-9">
+                <router-link to="/task/add">
+                  <div class="rounded-lg ml-4 sm:ml-8">
+                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                      <template v-slot:title> Add Task </template>
+                    </buttonSlot>
+                  </div>
                 </router-link>
-                <button
-                  @click="(showDeleteModal = true), (taskToDelete = task)"
-                  class="itbkk-button-delete pr-1"
-                >
-                  <Trash />
-                </button>
+              </div>
+
+              <div
+                class="mt-7 overflow-x-auto rounded-2xl border border-gray-100"
+              >
+                <table class="w-full whitespace-nowrap">
+                  <!-- head -->
+                  <thead class="bg-slate-200 text">
+                    <tr class="focus:outline-none h-16 text-base">
+                      <th
+                        class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
+                      >
+                        Title
+                      </th>
+                      <th
+                        class="p-3 text-base font-medium tracking-wide text-left"
+                      >
+                        Assignees
+                      </th>
+                      <th
+                        class="p-3 text-base font-medium tracking-wide text-left"
+                      >
+                        <div
+                          class="task-column status bg-slate-200 flex flex-row items-center"
+                        >
+                          <div>Status</div>
+                          <button class="ml-6" @click="sortTasksByCreationTime">
+                            <SortDefault />
+                          </button>
+                          <div
+                            @click="toggleSortOrder"
+                            class="itbkk-status-sort flex items-center ml-2"
+                          >
+                            <button v-if="sortalp">
+                              <SortDown />
+                            </button>
+                            <button v-if="!sortalp">
+                              <SortUp />
+                            </button>
+                          </div>
+                        </div>
+                      </th>
+                      <th
+                        class="w-24 p-3 text-base font-medium tracking-wide text-left"
+                      >
+                        
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <!-- body content -->
+                  <tbody class="container">
+                    <tr
+                      v-for="(task, index) in sortedTasks"
+                      :key="index"
+                      :class="{ 'bg-pink-50': index % 2 === 0 }"
+                      class="bg-white h-16 box ease-in transition-colors"
+                    >
+                      <td
+                        class="p-3 text-base font-medium text-slate-800 truncate"
+                      >
+                        <div class="flex flex-row">
+                          <p class="pl-4">{{ index + 1 }}</p>
+                          <button
+                            @click="openDetails(task.id)"
+                            class="pl-4 font-bold text-teal-700 hover:underline"
+                          >
+                            {{ task.title }}
+                          </button>
+                        </div>
+                      </td>
+                      <td class="p-3 text-base font-medium text-slate-800 truncate">
+                        <div
+                          class="itbkk-assignees"
+                          :class="{
+                            'italic ': !task.assignees,
+                          }"
+                        >
+                          <span v-if="task.assignees" class="truncate">{{
+                            task.assignees
+                          }}</span>
+                          <span v-else class="text-slate-300 italic">
+                            Unassigned
+                          </span>
+                        </div>
+                      </td>
+                      <td class="p-3 text-base font-medium text-slate-800 truncate">
+                        {{ task.status }}
+                      </td>
+                      <td class="p-3 text-base font-medium text-slate-800 ">
+                        <router-link
+                          :to="{
+                            name: 'EditTask',
+                            params: { taskId: task.id },
+                          }"
+                        >
+                          <button
+                            @click="editMode(task)"
+                            class="pr-2 itbkk-button-edit"
+                          >
+                            <Edit />
+                          </button>
+                        </router-link>
+                        <button
+                          @click="
+                            (showDeleteModal = true), (taskToDelete = task)
+                          "
+                          class="itbkk-button-delete pr-1"
+                        >
+                          <Trash />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-            <!-- Repeat .task-list-item for more tasks -->
           </div>
         </div>
       </div>
@@ -498,14 +528,15 @@ const toggleSortOrder = () => {
       </div>
     </div>
 
-    <div v-show="error || complete"
+    <div
+      v-show="error || complete"
       class="itbkk-message absolute bottom-0 right-0 bg-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12"
     >
-      <span v-show="error">An error has occurred, the status does not exist</span>
+      <span v-show="error"
+        >An error has occurred, the status does not exist</span
+      >
       <span v-show="complete">The task has been deleted</span>
     </div>
-
-
   </div>
 
   <div v-if="showDeleteModal">
@@ -569,24 +600,16 @@ const toggleSortOrder = () => {
   /* light purple color */
 }
 
-.task-list {
-  display: grid;
-  grid-template-columns: 5fr 4fr 3fr 2fr;
+table {
   width: 100%;
+  table-layout: fixed;
 }
 
-.task-list-header,
-.task-list-item {
-  display: contents;
+.box {
+  transition: opacity 0.6s ease;
 }
 
-.task-column {
-  padding: 10px;
-  padding-top: 1.5rem /* 8px */;
-  padding-bottom: 1.5rem /* 8px */;
-  box-sizing: border-box;
-  border-top-width: 1px;
-  --tw-border-opacity: 1;
-  border-color: rgb(243 244 246 / var(--tw-border-opacity));
+.container:hover > :not(:hover) {
+  opacity: 0.2;
 }
 </style>

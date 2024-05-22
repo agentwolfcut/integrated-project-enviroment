@@ -137,7 +137,6 @@ const deleteStatus = async () => {
     setTimeout(() => {
       complete.value = false;
     }, 1000);
-
   } else {
     error.value = true;
     setTimeout(() => {
@@ -371,7 +370,6 @@ const handelFail = () => {
           </div>
         </div>
       </div>
-
 
       <div
         v-show="error || complete"

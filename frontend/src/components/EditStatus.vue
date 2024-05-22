@@ -3,13 +3,6 @@ import router from '@/router';
 import { useRoute } from 'vue-router'
 import { computed, ref, onMounted, watch } from 'vue';
 
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
-
-const toaster = createToaster({ /* options */ })
-const route = useRoute()
-const statusId = ref(route.params.id)
-
-
 const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
 const props = defineProps({
     status: {
@@ -22,8 +15,10 @@ const props = defineProps({
     }
 })
 
-const previousStatus = ref({...props.status})
+const route = useRoute()
+const statusId = ref(route.params.id)
 
+const previousStatus = ref({...props.status})
 if (previousStatus.value.id === undefined || previousStatus.value.name === null || previousStatus.value.name === undefined || previousStatus.value.title == '') {
     // router.back()
     emits('failEdit');

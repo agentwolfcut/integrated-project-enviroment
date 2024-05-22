@@ -179,6 +179,9 @@ const updateStatus = async (editStatus) => {
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
+      if (editingStatus.value.description === '') {
+        editingStatus.value.description === null
+      }
     }
     console.log(editingStatus.value);
     const res = await fetch(

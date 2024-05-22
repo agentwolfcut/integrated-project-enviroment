@@ -450,19 +450,19 @@ const toggleSortOrder = () => {
                       <td
                         class="itbkk-button-action p-3 text-base font-medium text-slate-800"
                       >
-                        <button
-                          @click="editMode(task)"
-                          class="pr-2 itbkk-button-edit"
+                        <router-link
+                          :to="{
+                            name: 'EditTask',
+                            params: { taskId: task.id },
+                          }"
                         >
-                          <router-link
-                            :to="{
-                              name: 'EditTask',
-                              params: { taskId: task.id },
-                            }"
+                          <button
+                            @click="editMode(task)"
+                            class="pr-2 itbkk-button-edit"
                           >
-                            <Edit
-                          /></router-link>
-                        </button>
+                            <Edit />
+                          </button>
+                        </router-link>
 
                         <button
                           @click="

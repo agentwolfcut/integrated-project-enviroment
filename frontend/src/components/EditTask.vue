@@ -3,6 +3,8 @@ import router from '@/router';
 import { ref, onMounted , computed } from 'vue'
 import {  getItems } from '../libs/fetchUtils';
 
+
+const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the custom event
 const props = defineProps({
     task: {
         type: Object,
@@ -21,10 +23,9 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the custom event
+const previousTask = ref({...props.task})
 
 const statusOptions = ref('')
-
 onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
   statusOptions.value = statusRes;
@@ -53,8 +54,6 @@ const saveTask = () => {
     }
 }
 
-const previousTask = ref({...props.task})
-
 if (previousTask.value.title === null || previousTask.value.title === undefined || previousTask.value.title == '') {
     // router.back()
     emit('failEdit');
@@ -63,7 +62,6 @@ if (previousTask.value.title === null || previousTask.value.title === undefined 
     } , 800)
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
-
 const formatLocalDate = (dateString) => {
     if (!dateString) return ''
 
@@ -106,11 +104,9 @@ const limitInputLength = () => {
     }
 };
 
-
-
 // Track the initial state of the status to detect changes
 const initialTask = JSON.parse(JSON.stringify(props.task))
-
+console.log(initialTask);
 const isSaveDisabled = computed(() => {
   return (
     JSON.stringify(previousTask.value) === JSON.stringify(initialTask) ||

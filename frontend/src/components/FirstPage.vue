@@ -97,12 +97,12 @@ const deleteTran = async (removeId) => {
   const status = await deleteTranById(
     import.meta.env.VITE_API_ENDPOINT,
     removeId
-  )
+  );
   if (status == 200) {
-    allTrans.value.removeTransaction(removeId)
-    setCurrMonthYear()
+    allTrans.value.removeTransaction(removeId);
+    setCurrMonthYear();
   }
-}
+};
 
 const deleteTask = async (removeId) => {
   try {
@@ -112,8 +112,8 @@ const deleteTask = async (removeId) => {
     );
     if (status === 200) {
       sortMode.value = "default";
-      taskMan.value.removetask(removeId)
-      sortedTasks.value = taskMan.value.gettasks()
+      taskMan.value.removetask(removeId);
+      sortedTasks.value = taskMan.value.gettasks();
       completeNotify(removeId, "deleted");
     } else {
       errorNotify();
@@ -286,12 +286,10 @@ const doFilter = async () => {
   await nextTick(); // Ensure the next DOM update cycle is completed
   if (statusFilter.value.length > 0) {
     const statusString = statusFilter.value.join(",");
-    console.log(statusString);
     // Logs the comma-separated string of selected statuses
     const res = await getItems(
       `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}`
     );
-    console.log(res);
     sortedTasks.value = res;
   } else {
     console.log("No statuses selected");
@@ -361,9 +359,9 @@ const toggleSortOrder = () => {
               </div>
 
               <div
-                class="mt-7 overflow-x-auto rounded-2xl border border-gray-100 "
+                class="mt-7 overflow-x-auto rounded-2xl border border-gray-100"
               >
-                <table class="w-full whitespace-nowrap ">
+                <table class="w-full whitespace-nowrap">
                   <!-- head -->
                   <thead class="text-white" style="background-color: #15161a">
                     <tr class="focus:outline-none h-16 text-base">
@@ -484,43 +482,46 @@ const toggleSortOrder = () => {
         </div>
       </div>
 
-      <div class="flex justify-end w-11/12 my-6 sm:px-20">
-        <div id="forFilter" v-if="showFilter">
-          <div class="flex flex-row">
-            <div class="flex">
-              <!-- loop -->
-              <div
-                class="flex items-center me-4"
-                v-for="(status, id) in statuses"
-                :key="id"
-              >
-                <input
-                  v-model="statusFilter"
-                  id="filter-checkbox"
-                  type="checkbox"
-                  :value="status.name"
-                  @change="doFilter"
-                  class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <label
-                  for="filter-checkbox"
-                  class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >{{ status.name }}</label
+      <div class="bg-white h-20">
+        <div
+          class="flex justify-end items-center w-11/12 my-6 sm:px-20 absolute bottom-0 right-20"
+        >
+          <div id="forFilter" v-if="showFilter">
+            <div class="flex flex-row">
+              <div class="flex">
+                <!-- loop -->
+                <div
+                  class="flex items-center me-4"
+                  v-for="(status, id) in statuses"
+                  :key="id"
                 >
+                  <input
+                    v-model="statusFilter"
+                    id="filter-checkbox"
+                    type="checkbox"
+                    :value="status.name"
+                    @change="doFilter"
+                    class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label
+                    for="filter-checkbox"
+                    class="ms-2 text-sm font-medium text-black dark:text-gray-300"
+                    >{{ status.name }}</label
+                  >
+                </div>
               </div>
             </div>
           </div>
+          <button
+            @click="toggleFilter"
+            class="itbkk-status-filter inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500"
+            style="background-color: #ff5a99"
+          >
+            << Filter by Status
+          </button>
         </div>
-        <button
-          @click="toggleFilter"
-          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500"
-          style="background-color: #ff5a5a"
-        >
-          << Filter by Status
-        </button>
       </div>
     </div>
-
     <div
       v-show="error || complete"
       :class="[

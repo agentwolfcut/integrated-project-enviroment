@@ -31,7 +31,7 @@ describe(`TC-PBI10-FILTER-TASK-BY-STATUS-1\n
     cy.get('.itbkk-status-sort').should('exist').click() ;
     cy.get('.itbkk-status-filter').should('exist').click() ;
 
-    cy.get('button').contains('To Do').click() ;
+    cy.get('input').contains('To Do').click() ;
     cy.wait(100) ;
 
   })
@@ -40,7 +40,7 @@ describe(`TC-PBI10-FILTER-TASK-BY-STATUS-1\n
     cy.get('.itbkk-status-sort').should('exist').click() ;
     cy.get('.itbkk-status-filter').should('exist').click() ;
 
-    cy.get('button').contains('To Do').click() ;
+    cy.get('input').contains('To Do').click() ;
     cy.wait(100) ;
 
     cy.get('.itbkk-item').eq(0).as('item')

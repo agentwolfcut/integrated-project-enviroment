@@ -267,7 +267,7 @@ const handelFail = () => {
                       </th>
 
                       <th
-                        class="p-3 w-60 text-base font-medium tracking-wide text-left"
+                        class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
                       >
                         Action
                       </th>

@@ -28,7 +28,7 @@ describe(`TC-PBI7-EDIT-STATUS-1-2\n
         cy.wait(100) ;
 
         cy.get('.itbkk-status-name').contains('To Do').parents('.itbkk-item').as('item')
-        cy.get('@item').contains('.itbkk-button-edit','Edit').should('exist').click()
+        cy.get('@item').contains('.itbkk-button-edit').should('exist').click()
         cy.wait(100)
     })
 
@@ -37,7 +37,7 @@ describe(`TC-PBI7-EDIT-STATUS-1-2\n
         cy.wait(100) ;
 
         cy.get('.itbkk-status-name').contains('To Do').parents('.itbkk-item').as('item')
-        cy.get('@item').contains('.itbkk-button-edit','Edit').should('exist').click()
+        cy.get('@item').contains('.itbkk-button-edit').should('exist').click()
         cy.wait(100)
 
 

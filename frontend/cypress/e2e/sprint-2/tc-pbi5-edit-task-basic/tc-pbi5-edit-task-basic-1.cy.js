@@ -52,7 +52,7 @@ describe(`TC-PBI5-EDIT-TASK-BASIC-1\n
   it('The task title is deleted and click the cancel button.',()=>{
     cy.get('.itbkk-title').contains("DevSecOps")
     cy.get('.itbkk-title').contains("DevSecOps").parents(".itbkk-item").as("item")
-    cy.get('@item').find('.itbkk-button-action').click().as('action')
+    cy.get('@item').find('.itbkk-button-action').as('action')
     cy.get('@action').find('.itbkk-button-edit').click()
 
     cy.wait(100)

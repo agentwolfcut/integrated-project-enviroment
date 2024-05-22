@@ -38,7 +38,7 @@ onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statuses.value = statusRes;
   statusFilter.value = statuses.value.map((status) => status.name);
-  doFilter()
+  doFilter();
 });
 
 // for modal
@@ -93,25 +93,33 @@ const cancel = (flag) => {
 const showDeleteModal = ref(false);
 const taskToDelete = ref(undefined);
 
+const deleteTran = async (removeId) => {
+  const status = await deleteTranById(
+    import.meta.env.VITE_API_ENDPOINT,
+    removeId
+  )
+  if (status == 200) {
+    allTrans.value.removeTransaction(removeId)
+    setCurrMonthYear()
+  }
+}
+
 const deleteTask = async (removeId) => {
-  sortMode.value = "default";
   try {
     const status = await deleteItemById(
       `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
     );
     if (status === 200) {
-      sortedTasks.value.splice(
-        sortedTasks.value.findIndex((item) => item.id === removeId)
-      );
-      taskMan.value.removetask(removeId);
-      sortedTasks.value = taskMan.value.gettasks();
-      completeNotify(removeId,'deleted')
+      sortMode.value = "default";
+      taskMan.value.removetask(removeId)
+      sortedTasks.value = taskMan.value.gettasks()
+      completeNotify(removeId, "deleted");
     } else {
-      errorNotify()
+      errorNotify();
     }
   } catch (error) {
-    errorNotify()
+    errorNotify();
   }
 };
 
@@ -167,7 +175,7 @@ const saveTask = async () => {
     //   index = undefined;
     // }
     router.back();
-    completeNotify(addedTask.title,'added')
+    completeNotify(addedTask.title, "added");
     selectTask.value = {
       title: "",
       description: "",
@@ -175,7 +183,7 @@ const saveTask = async () => {
       status: 1,
     };
   } catch (error) {
-    errorNotify()
+    errorNotify();
   }
 };
 
@@ -232,7 +240,7 @@ const editTask = async (editedTask) => {
     sortedTasks.value = taskMan.value.gettasks();
 
     router.back();
-    completeNotify(selectTask.value.title,'updated')
+    completeNotify(selectTask.value.title, "updated");
     selectTask.value = {
       title: "",
       description: "",
@@ -243,7 +251,7 @@ const editTask = async (editedTask) => {
     // Navigate back
     console.error("Error editing task:", error);
     // Handle error as needed
-    errorNotify()
+    errorNotify();
   }
 };
 
@@ -260,7 +268,7 @@ const cancelHandle = () => {
 };
 
 const handelFail = () => {
-  errorNotify()
+  errorNotify();
 };
 
 // Filter
@@ -292,7 +300,6 @@ const doFilter = async () => {
 };
 
 // Fetch statuses when the component is mounted
-
 
 // SORT by STATUS
 
@@ -339,7 +346,7 @@ const toggleSortOrder = () => {
     <!-- <div class="flex content flex-col items-center h-screen"> -->
     <div class="flex flex-col w-screen h-screen items-center">
       <HeaderIT />
-      <div class="flex justify-center">
+      <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
           <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
@@ -354,11 +361,11 @@ const toggleSortOrder = () => {
               </div>
 
               <div
-                class="mt-7 overflow-x-auto rounded-2xl border border-gray-100"
+                class="mt-7 overflow-x-auto rounded-2xl border border-gray-100 "
               >
-                <table class="w-full whitespace-nowrap">
+                <table class="w-full whitespace-nowrap ">
                   <!-- head -->
-                  <thead class="text-white" style="background-color: #15161a;">
+                  <thead class="text-white" style="background-color: #15161a">
                     <tr class="focus:outline-none h-16 text-base">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
@@ -405,10 +412,10 @@ const toggleSortOrder = () => {
                       v-for="(task, index) in sortedTasks"
                       :key="index"
                       :class="{ 'bg-slate-100': index % 2 === 0 }"
-                      class="h-16 box ease-in transition-colors"
+                      class="itbkk-item h-16 box ease-in transition-colors"
                     >
                       <td
-                        class="p-3 text-base font-medium text-slate-800 truncate"
+                        class="itbkk-title p-3 text-base font-medium text-slate-800 truncate"
                       >
                         <div class="flex flex-row">
                           <p class="pl-4">{{ index + 1 }}</p>
@@ -438,24 +445,27 @@ const toggleSortOrder = () => {
                         </div>
                       </td>
                       <td
-                        class="p-3 text-base font-medium text-slate-800 truncate"
+                        class="itbkk-status p-3 text-base font-medium text-slate-800 truncate"
                       >
                         {{ task.status }}
                       </td>
-                      <td class="p-3 text-base font-medium text-slate-800">
-                        <router-link
-                          :to="{
-                            name: 'EditTask',
-                            params: { taskId: task.id },
-                          }"
+                      <td
+                        class="itbkk-button-action p-3 text-base font-medium text-slate-800"
+                      >
+                        <button
+                          @click="editMode(task)"
+                          class="pr-2 itbkk-button-edit"
                         >
-                          <button
-                            @click="editMode(task)"
-                            class="pr-2 itbkk-button-edit"
+                          <router-link
+                            :to="{
+                              name: 'EditTask',
+                              params: { taskId: task.id },
+                            }"
                           >
-                            <Edit />
-                          </button>
-                        </router-link>
+                            <Edit
+                          /></router-link>
+                        </button>
+
                         <button
                           @click="
                             (showDeleteModal = true), (taskToDelete = task)
@@ -474,7 +484,7 @@ const toggleSortOrder = () => {
         </div>
       </div>
 
-      <div class="flex justify-end w-11/12 mt-6 sm:px-20">
+      <div class="flex justify-end w-11/12 my-6 sm:px-20">
         <div id="forFilter" v-if="showFilter">
           <div class="flex flex-row">
             <div class="flex">
@@ -488,7 +498,7 @@ const toggleSortOrder = () => {
                   v-model="statusFilter"
                   id="filter-checkbox"
                   type="checkbox"
-                  :value="status.name"                             
+                  :value="status.name"
                   @change="doFilter"
                   class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
@@ -503,7 +513,8 @@ const toggleSortOrder = () => {
         </div>
         <button
           @click="toggleFilter"
-          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500 " style="background-color: #ff5a5a;"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500"
+          style="background-color: #ff5a5a"
         >
           << Filter by Status
         </button>
@@ -511,13 +522,13 @@ const toggleSortOrder = () => {
     </div>
 
     <div
-        v-show="error || complete"
-        :class="[
-          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
-          classNotify,
-        ]"
-        v-text="textNotify"
-      ></div>
+      v-show="error || complete"
+      :class="[
+        'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+        classNotify,
+      ]"
+      v-text="textNotify"
+    ></div>
   </div>
 
   <div v-if="showDeleteModal">

@@ -93,7 +93,7 @@ const saveTask = () => {
                 <div class="m-4">
                     <label for="title" class="font-medium text-base">Title</label>
                     <input v-model="previousTask.title"
-                        class="itbkk-title-add p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
+                        class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
                         type="text" @input="limitInputLength">
                     </input>
                     <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
@@ -102,7 +102,7 @@ const saveTask = () => {
 
                 <!-- center -->
                 <div class="flex flex-row gap-4 m-4">
-                    <div class="itbkk-description-add  w-8/12">
+                    <div class="itbkk-description w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
                         <input v-model="previousTask.description" class="text-base rounded-md py-1 h-24 w-full mb-2"
                             style='padding: 10px;' type="text" @input="limitInputLength">
@@ -115,7 +115,7 @@ const saveTask = () => {
                    
                     <div class="flex flex-col w-5/12">
                         <div>
-                            <div class="itbkk-assignees-add">
+                            <div class="itbkk-assignees">
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees"
                                     class=" w-full text-base rounded-md border p-1" @input="limitInputLength" />
@@ -128,7 +128,7 @@ const saveTask = () => {
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
                                     <select id="status" v-model="previousTask.status"
-                                        class="itbkk-status-add bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                        class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                         <option v-for="status in statusOptions" :key="status.name" :value="status.id">
                                             {{ status.name }}
                                         </option>
@@ -188,7 +188,7 @@ const saveTask = () => {
     /* เพิ่มระยะห่างด้านบน */
 }
 
-.itbkk-description-add {
+.itbkk-description {
     border: 2px solid #4a5568;
     /* เพิ่มเส้นขอบสีเทาให้กับ description */
     padding: 10px;

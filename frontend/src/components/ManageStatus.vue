@@ -230,7 +230,7 @@ const handelFail = () => {
     <SideBar />
     <div class="flex flex-col w-screen h-screen items-center">
       <HeaderIT />
-      <div class="flex justify-center">
+      <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
           <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div>
@@ -319,14 +319,14 @@ const handelFail = () => {
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
-                          <router-link
+                          <router-link class="itbkk-button-edit"
                             :to="{
                               name: 'EditStatus',
                               params: { id: status.id },
                             }"
                           >
                             <button
-                              class="pr-2 itbkk-button-edit"
+                              class="pr-2 "
                               @click="openToEdit(status)"
                             >
                               <Edit />

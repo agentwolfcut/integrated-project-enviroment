@@ -139,6 +139,7 @@ const deleteStatus = async () => {
   if (removeStatus === 200) {
     statusMan.value.removeStatus(removeId);
     completeNotify(statusDelete.value.name, "deleted");
+    statusList.value = statusMan.value.getStatuses()
   } else {
     errorNotify();
   }

@@ -150,30 +150,6 @@ const saveTask = async () => {
     // sortedTasks.value.push(addedTask);
     taskMan.value.addtask(addedTask);
     sortedTasks.value = taskMan.value.gettasks();
-    // if (sortMode.value === "default") {
-    //   sortedTasks.value.push(addedTask);
-    //   taskMan.value.addtask(
-    //     addedTask.id,
-    //     addedTask.title,
-    //     addedTask.description,
-    //     addedTask.assignees,
-    //     addedTask.status
-    //   );
-    // } else if (sortMode.value === "alp") {
-    //   let index = sortedTasks.value.findIndex(
-    //     (task) => task.status > addedTask.status
-    //   );
-    //   console.log(`index =  ${index}`);
-    //   sortedTasks.value.splice(index, 0, addedTask);
-    //   index = undefined;
-    // } else if (sortMode.value === "rev") {
-    //   let index = sortedTasks.value.findIndex(
-    //     (task) => task.status < addedTask.status
-    //   );
-    //   console.log(`index =  ${index}`);
-    //   sortedTasks.value.splice(index, 0, addedTask);
-    //   index = undefined;
-    // }
     router.back();
     completeNotify(addedTask.title, "added");
     selectTask.value = {
@@ -223,6 +199,7 @@ const editTask = async (editedTask) => {
       }
     );
     if (!res.ok) {
+      router.back()
       throw new Error(
         `Failed to update task. Server responded with status ${res.status}`
       );

@@ -31,7 +31,23 @@ onMounted(async () => {
 });
 
 const statusList = ref(statusMan.value.getStatuses());
+const errorNotify = () => {
+  error.value = true;
+  classNotify.value = "bg-red-500";
+  textNotify.value = `An error has occurred, the status does not exist.`;
+  setTimeout(() => {
+    error.value = false;
+  }, 1000);
+};
 
+const completeNotify = (status, action) => {
+  complete.value = true;
+  classNotify.value = "bg-green-600";
+  textNotify.value = `The status ${status} has been successfully ${action}.`;
+  setTimeout(() => {
+    complete.value = false;
+  }, 1500);
+};
 // ADD
 const editingStatus = ref({ id: undefined, name: "", description: "" });
 const addStatus = async () => {
@@ -41,7 +57,6 @@ const addStatus = async () => {
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
     }
-
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/statuses`, {
       method: "POST",
       headers: {
@@ -50,7 +65,9 @@ const addStatus = async () => {
       body: JSON.stringify(editingStatus.value),
     });
     if (!res.ok) {
-      error.value = true;
+      router.back();
+      clearEdit();
+      errorNotify();
       throw new Error(
         `Failed to add status. Server responded with status ${res.status}`
       );
@@ -64,20 +81,10 @@ const addStatus = async () => {
       addedItem.description
     );
     router.back();
-    complete.value = true;
-    classNotify.value = "bg-green-500";
-    textNotify.value = `The ${addedItem.name} status has been added`;
-
-    setTimeout(() => {
-      complete.value = false;
-    }, 1000);
+    completeNotify(addedItem.name, "added");
   } catch (error) {
     // Navigate back
-    error.value = true;
-    setTimeout(() => {
-      error.value = false;
-    }, 1000);
-    router.back();
+    errorNotify();
     // Handle error as needed
   }
 };
@@ -131,17 +138,9 @@ const deleteStatus = async () => {
   // front
   if (removeStatus === 200) {
     statusMan.value.removeStatus(removeId);
-    complete.value = true;
-    classNotify.value = "bg-green-600";
-    textNotify.value = `The ${statusDelete.value.name} status has been deleted`;
-    setTimeout(() => {
-      complete.value = false;
-    }, 1000);
+    completeNotify(statusDelete.value.name, "deleted");
   } else {
-    error.value = true;
-    setTimeout(() => {
-      error.value = false;
-    }, 1500);
+    errorNotify();
   }
   confirmDelete.value = false;
 };
@@ -157,20 +156,15 @@ const transferAndDeleteStatus = async () => {
     );
     if (result === 200) {
       statusMan.value.removeStatus(removeId);
-      toaster.success(
-        `The tasks have been transferred and the status has been deleted.`
+      completeNotify(
+        statusDelete.value.name,
+        "deleted , and tasks have been transferred"
       );
-    } else if (result === 404) {
-      error.value = true;
     } else {
-      error.value = true;
+      errorNotify();
     }
   } catch (error) {
-    error.value = true;
-    console.error("Error transferring tasks and deleting status:", error);
-    toaster.error(
-      `Failed to transfer tasks and delete status. Please try again later.`
-    );
+    errorNotify();
   }
   confirmTransfer.value = false;
   destinationStatusId.value = null;
@@ -207,20 +201,14 @@ const updateStatus = async (editStatus) => {
     statusMan.value.updateStatus(resJson);
     statusList.value = statusMan.value.getStatuses();
     router.back();
-    toaster.success(
-      `The ${editingStatus.value.name} task has been successfully updated`
-    );
+    completeNotify(editingStatus.value.name, "updated");
     editingStatus.value = {
       id: undefined,
       name: "",
       description: null,
     };
   } catch (error) {
-    error.value = true;
-    // Navigate back
-    console.error("Error editing task:", error);
-    // Handle error as needed
-    toaster.error(`The task can't update please try again`);
+    errorNotify();
   }
 };
 
@@ -244,7 +232,7 @@ const handelFail = () => {
       <div class="flex justify-center">
         <div class="sm:px-20 w-full">
           <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
-            <div class="overflow-x-auto">
+            <div>
               <!-- button add -->
               <div class="flex justify-end mb-9">
                 <router-link to="/status/add">
@@ -263,31 +251,22 @@ const handelFail = () => {
                   <!-- head -->
                   <thead class="bg-slate-200 text">
                     <tr class="focus:outline-none h-16 text-base">
-                      <td>
-                        <div class="flex items-center pl-5">
-                          <p
-                            class="font-medium leading-none text-gray-700 ml-6"
-                          >
-                            Name
-                          </p>
-                        </div>
-                      </td>
-                      <td></td>
-                      <td>
-                        <div
-                          class="font-medium leading-none text-gray-700 mr-2"
-                        >
-                          Description
-                        </div>
-                      </td>
-                      <td></td>
-                      <td>
-                        <div
-                          class="px-10 font-medium leading-none text-gray-700 mr-2"
-                        >
-                          Action
-                        </div>
-                      </td>
+                      <th
+                        class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
+                      >
+                        Name
+                      </th>
+                      <th
+                        class="p-3 text-base font-medium tracking-wide text-left"
+                      >
+                        Description
+                      </th>
+
+                      <th
+                        class="p-3 w-60 text-base font-medium tracking-wide text-left"
+                      >
+                        Action
+                      </th>
                     </tr>
                   </thead>
 
@@ -296,9 +275,10 @@ const handelFail = () => {
                     <tr
                       v-for="(status, index) in statusList"
                       :key="index"
-                      class="itbkk-item box h-16 border-t border-gray-100 rounded"
+                      :class="{ 'bg-pink-50': index % 2 === 0 }"
+                      class="bg-white itbkk-item h-16 box ease-in transition-colors"
                     >
-                      <td class="min-w-60">
+                    <td class="min-w-60">
                         <div class="flex items-center pl-5">
                           <div class="flex flex-row justify-start">
                             <p
@@ -315,7 +295,7 @@ const handelFail = () => {
                           </div>
                         </div>
                       </td>
-                      <td></td>
+
                       <td class="">
                         <div
                           v-if="status.description"
@@ -331,9 +311,7 @@ const handelFail = () => {
                         </div>
                       </td>
 
-                      <td></td>
-
-                      <td class="px-10">
+                      <td class="p-3">
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
@@ -362,6 +340,7 @@ const handelFail = () => {
                           </button>
                         </div>
                       </td>
+
                     </tr>
                   </tbody>
                 </table>

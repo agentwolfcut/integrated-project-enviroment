@@ -13,9 +13,6 @@ import Edit from "@/assets/icons/CiEditPencil01.vue";
 import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
-import SearchForm from "./SearchForm.vue";
-import FilterRadio from "./FilterRadio.vue";
-import FilterDropdown from "./FilterDropdown.vue";
 
 const toaster = createToaster({
   /* options */
@@ -29,6 +26,8 @@ const sortMode = ref("default"); // 'default', 'alp', 'desc'
 const sortalp = ref(false); // for toggle
 const error = ref(false);
 const complete = ref(false);
+const classNotify = ref("");
+const textNotify = ref("");
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
@@ -52,6 +51,24 @@ const selectTask = ref({
   createdOn: "",
   updatedOn: "",
 });
+
+const errorNotify = () => {
+  error.value = true;
+  classNotify.value = "bg-red-500";
+  textNotify.value = `An error has occurred, the task does not exist.`;
+  setTimeout(() => {
+    error.value = false;
+  }, 1000);
+};
+
+const completeNotify = (task, action) => {
+  complete.value = true;
+  classNotify.value = "bg-green-600";
+  textNotify.value = `The task ${task} has been successfully ${action}.`;
+  setTimeout(() => {
+    complete.value = false;
+  }, 1500);
+};
 
 const openDetails = async (id) => {
   //console.log(id);
@@ -77,8 +94,8 @@ const showDeleteModal = ref(false);
 const taskToDelete = ref(undefined);
 
 const deleteTask = async (removeId) => {
+  sortMode.value = "default";
   try {
-    sortMode.value = "default";
     const status = await deleteItemById(
       `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
@@ -89,23 +106,12 @@ const deleteTask = async (removeId) => {
       );
       taskMan.value.removetask(removeId);
       sortedTasks.value = taskMan.value.gettasks();
-      complete.value = true;
-      setTimeout(() => {
-        complete.value = false;
-      }, 1000);
+      completeNotify(removeId,'deleted')
     } else {
-      error.value = true;
-      setTimeout(() => {
-        error.value = false;
-      }, 1000);
+      errorNotify()
     }
   } catch (error) {
-    console.error("Error deleting task:", error);
-    // Handle error as needed
-    error.value = true;
-    setTimeout(() => {
-      error.value = false;
-    }, 1000);
+    errorNotify()
   }
 };
 
@@ -161,7 +167,7 @@ const saveTask = async () => {
     //   index = undefined;
     // }
     router.back();
-    toaster.success(`The ${addedTask.title} task has been successfully added`);
+    completeNotify(addedTask.title,'added')
     selectTask.value = {
       title: "",
       description: "",
@@ -169,10 +175,7 @@ const saveTask = async () => {
       status: 1,
     };
   } catch (error) {
-    // Navigate back
-    console.error("Error adding task:", error);
-    // Handle error as needed
-    toaster.error(`The task can't add please try again`);
+    errorNotify()
   }
 };
 
@@ -229,9 +232,7 @@ const editTask = async (editedTask) => {
     sortedTasks.value = taskMan.value.gettasks();
 
     router.back();
-    toaster.success(
-      `The ${selectTask.value.title} task has been successfully updated`
-    );
+    completeNotify(selectTask.value.title,'updated')
     selectTask.value = {
       title: "",
       description: "",
@@ -242,7 +243,7 @@ const editTask = async (editedTask) => {
     // Navigate back
     console.error("Error editing task:", error);
     // Handle error as needed
-    toaster.error(`The task can't update please try again`);
+    errorNotify()
   }
 };
 
@@ -259,7 +260,7 @@ const cancelHandle = () => {
 };
 
 const handelFail = () => {
-  toaster.error(`An error has occurred, the status does not exist.`);
+  errorNotify()
 };
 
 // Filter
@@ -280,7 +281,7 @@ const doFilter = async () => {
     console.log(statusString);
     // Logs the comma-separated string of selected statuses
     const res = await getItems(
-      `${import.meta.env.VITE_BASE_URL}/tasks?statuses=${statusString}`
+      `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}`
     );
     console.log(res);
     sortedTasks.value = res;
@@ -330,10 +331,6 @@ const toggleSortOrder = () => {
     console.log(`sort mode = ${sortMode.value}`);
   }
 };
-
-// NEW
-
-
 </script>
 
 <template>
@@ -417,7 +414,7 @@ const toggleSortOrder = () => {
                           <p class="pl-4">{{ index + 1 }}</p>
                           <button
                             @click="openDetails(task.id)"
-                            class="pl-4 font-bold text-teal-700 hover:underline"
+                            class="pl-4 text-teal-700 hover:underline text-base font-medium leading-none mr-4"
                           >
                             {{ task.title }}
                           </button>
@@ -514,14 +511,13 @@ const toggleSortOrder = () => {
     </div>
 
     <div
-      v-show="error || complete"
-      class="itbkk-message absolute bottom-0 right-0 bg-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12"
-    >
-      <span v-show="error"
-        >An error has occurred, the status does not exist</span
-      >
-      <span v-show="complete">The task has been deleted</span>
-    </div>
+        v-show="error || complete"
+        :class="[
+          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+          classNotify,
+        ]"
+        v-text="textNotify"
+      ></div>
   </div>
 
   <div v-if="showDeleteModal">

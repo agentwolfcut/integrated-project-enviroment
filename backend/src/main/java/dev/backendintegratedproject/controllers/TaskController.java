@@ -8,6 +8,8 @@ import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.services.ListMapper;
 import dev.backendintegratedproject.services.StatusService;
 import dev.backendintegratedproject.services.TaskService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,7 +79,7 @@ public class TaskController {
     }
     // Old
     @PostMapping
-    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
+    public ResponseEntity<Object> addTask(@Valid @RequestBody TaskDTO taskDTO) {
         StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
         TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
         taskEntity.setStatus(statusEntity);

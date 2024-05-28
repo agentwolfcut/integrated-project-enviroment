@@ -24,14 +24,19 @@ public class TaskEntity {
 
 
     @Column(name = "taskTitle", length = 100, nullable = false)
+    @NotNull(message = "Title cannot be null")
+    @NotBlank(message = "Title cannot be blank")
+    @Size(max = 100, message = "Title must be less than 100 characters")
     private String title;
 
 
     @Column(name = "taskDescription", length = 500)
+    @Size(max = 500, message = "Description must be less than 500 characters")
     private String description;
 
 
     @Column(name = "taskAssignees", length = 30)
+    @Size(max = 30, message = "Assignees must be less than 30 characters")
     private String assignees;
 
 
@@ -54,19 +59,14 @@ public class TaskEntity {
         this.assignees = assignees == null?null:assignees.trim().length()==0?null:assignees.trim();
     }
     public void setTitle(String title){
-        this.title = title == null || title.trim().isEmpty()?null:title.trim();
+        this.title = (title == null || title.trim().isEmpty()) ? null : title.trim();
     }
 
 
 
 
-    public String getCreatedOn() throws ParseException {
-        return dateformat(createdOn);
-    }
 
-    public String getUpdatedOn() throws ParseException {
-        return dateformat(updatedOn);
-    }
+
     private String dateformat(Date date_s) throws ParseException {
         if (date_s ==null) date_s = new Date();
         SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");

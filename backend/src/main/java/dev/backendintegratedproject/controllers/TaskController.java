@@ -38,34 +38,16 @@ public class TaskController {
     private ListMapper listMapper;
     @Autowired
     private StatusService statusService;
-    @GetMapping
-    public ResponseEntity<Object> getTasks(@RequestParam(required = false) List<String> filterStatuses,
-                                           @RequestParam(required = false) String[] sortBy,
-                                           @RequestParam(required = false) String[] direction,
-                                           @RequestParam(required = false) String taskAssignees) {
+    @GetMapping("")
+    public ResponseEntity<Object> getTasks(
+            @RequestParam(required = false) List<String> filterStatuses,
+            @RequestParam(required = false,defaultValue = "") String[] sortBy,
+            @RequestParam(required = false,defaultValue = "ASC") String[] direction) {
 
-        if (taskAssignees != null) {
-            return new ResponseEntity<>(Collections.singletonMap("error", "invalid filter parameter"), HttpStatus.BAD_REQUEST);
-        }
-
-        List<StatusEntity> statusEntities = new ArrayList<>();
-        if (filterStatuses != null) {
-            for (String status : filterStatuses) {
-                StatusEntity statusEntity = statusService.getStatusByName(status);
-                if (statusEntity != null) {
-                    statusEntities.add(statusEntity);
-                }
-            }
-        } else {
-            statusEntities = statusService.getAllStatus();
-        }
-
-        List<TaskEntity> tasks = taskService.getTasksByStatuses(statusEntities, sortBy, direction);
+        List<TaskEntity> tasks = taskService.getAllTasks(filterStatuses, sortBy, direction);
         List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class, modelMapper);
-
-        return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
+        return ResponseEntity.ok(taskDTOList);
     }
-
 
 
     @GetMapping("/{id}")
@@ -98,7 +80,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editTask(@PathVariable Integer id, @RequestBody TaskEntity task) {
+    public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
         TaskEntity editedTask = taskService.editTask(id, task);
         if (editedTask != null) {
 

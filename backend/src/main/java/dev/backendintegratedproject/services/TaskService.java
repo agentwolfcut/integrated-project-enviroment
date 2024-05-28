@@ -2,6 +2,7 @@ package dev.backendintegratedproject.services;
 
 import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.entities.TaskEntity;
+import dev.backendintegratedproject.repositories.StatusRepository;
 import dev.backendintegratedproject.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -13,13 +14,18 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import static dev.backendintegratedproject.services.ListMapper.listMapper;
 
 @Service
 public class TaskService {
 
-
+    @Autowired
+    private StatusRepository statusRepository;
     @Autowired
     private TaskRepository taskRepository;
+
 
     public TaskEntity getTaskById(Integer id) {
         return taskRepository.findById(id).orElse(null);
@@ -34,12 +40,15 @@ public class TaskService {
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
     }
+
     @Transactional
     public void deleteTask(Integer id) {
-    TaskEntity task = taskRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
-    taskRepository.delete(task);
-}   @Transactional
+        TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
+        taskRepository.delete(task);
+    }
+
+    @Transactional
     public TaskEntity editTask(Integer id, TaskEntity task) {
 //        validateTask(task);
         TaskEntity existingTask = taskRepository.findById(id).orElse(null);
@@ -55,17 +64,41 @@ public class TaskService {
         return null;
     }
 
-    public List<TaskEntity> getTasksByStatuses(List<StatusEntity> statusEntities, String[] sortBy, String[] direction) {
-        if (sortBy != null && sortBy.length > 0) {
-            List<Sort.Order> sortOrderList = new ArrayList<>();
+    public List<TaskEntity> getAllTasks(List<String> filterStatuses, String[] sortBy, String[] direction) {
+        List<Sort.Order> sortOrderList = new ArrayList<>();
+
+
+        if ((sortBy.length != 0 && !(sortBy[0].equals("status.name"))) || sortBy.length > 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid filter parameter");
+        }
+
+        if (sortBy.length != 0) {
             for (int i = 0; i < sortBy.length; i++) {
-                sortOrderList.add(new Sort.Order(Sort.Direction.valueOf(direction[i].toUpperCase()), sortBy[i]));
+                sortOrderList.add(new Sort.Order(
+                        direction[i].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                        sortBy[i]
+                ));
             }
-            return taskRepository.findAllByStatusIn(statusEntities, Sort.by(sortOrderList));
         } else {
-            return taskRepository.findAllByStatusIn(statusEntities);
+            sortOrderList.add(new Sort.Order(Sort.Direction.ASC, "createdOn"));
+        }
+
+        if (filterStatuses != null && !filterStatuses.isEmpty()) {
+            List<StatusEntity> statuses = new ArrayList<>();
+            for (String name : filterStatuses) {
+                Optional<StatusEntity> statusOptional = statusRepository.findByName(name);
+                statusOptional.ifPresent(statuses::add);
+            }
+            return taskRepository.findAllByStatusIn(statuses, Sort.by(sortOrderList));
+        }else {
+            return taskRepository.findAll(Sort.by(sortOrderList));
         }
     }
+}
+
+
+
+
 
 //    private void validateTask(TaskEntity task) {
 //        StringBuilder errorMessage = new StringBuilder();
@@ -90,4 +123,4 @@ public class TaskService {
 //    }
 
 
-}
+

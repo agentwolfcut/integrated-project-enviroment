@@ -3,6 +3,7 @@ package dev.backendintegratedproject.controllers;
 import dev.backendintegratedproject.dtos.StatusDTO;
 import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.services.StatusService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class StatusController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> addStatus(@RequestBody StatusDTO statusDTO) {
+    public ResponseEntity<Object> addStatus(@Valid @RequestBody StatusDTO statusDTO) {
         StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
         StatusEntity addedStatus = statusService.addStatus(status);
         StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
@@ -52,7 +53,7 @@ public class StatusController {
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Object> editStatus(@PathVariable Integer id, @RequestBody StatusEntity status) {
+    public ResponseEntity<Object> editStatus(@Valid @PathVariable Integer id, @RequestBody StatusEntity status) {
         if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
         StatusEntity editedStatus = statusService.editStatus(id,status);
         return ResponseEntity.ok(editedStatus);

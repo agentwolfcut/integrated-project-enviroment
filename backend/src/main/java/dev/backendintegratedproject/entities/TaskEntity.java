@@ -59,9 +59,8 @@ public class TaskEntity {
         this.assignees = assignees == null?null:assignees.trim().length()==0?null:assignees.trim();
     }
     public void setTitle(String title){
-        this.title = (title == null || title.trim().isEmpty()) ? null : title.trim();
+        this.title = title == null || title.trim().isEmpty()?null:title.trim();
     }
-
 
 
 

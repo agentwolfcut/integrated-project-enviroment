@@ -12,8 +12,9 @@ import lombok.Data;
 @Data
 public class TaskDTO {
     private Integer id;
-    @NotBlank(message = "must not be null")
-    @Size(max = 100, message = "Title size must be between 1 and 100")
+    @NotNull(message = "Title cannot be null")
+    @NotBlank(message = "Title cannot be blank")
+    @Size(max = 100, message = "Title must be less than 100 characters")
     private String title;
     @Size(max = 500, message = "Description size must be between 1 and 500")
     private String description;

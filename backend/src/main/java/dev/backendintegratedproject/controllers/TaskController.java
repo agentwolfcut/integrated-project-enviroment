@@ -63,27 +63,6 @@ public class TaskController {
     // Old
     @PostMapping
     public ResponseEntity<Object> addTask(@Valid @RequestBody TaskDTO taskDTO) {
-//        // เพิ่มเงื่อนไขเพื่อตรวจสอบว่าข้อมูลถูกต้องหรือไม่
-//        if (taskDTO.getTitle() == null || taskDTO.getTitle().isEmpty()) {
-//            // หากข้อมูลไม่ถูกต้อง ให้สร้าง ErrorResponse และส่งคืน Response ที่มีสถานะ 400 Bad Request
-//            ErrorResponse errorResponse = new ErrorResponse(
-//                    HttpStatus.BAD_REQUEST.value(),
-//                    "Validation error. Check 'errors' field for details.",
-//                    "uri=/v2/tasks"
-//            );
-//            errorResponse.addValidationError("title", "must not be null or blank");
-//            return ResponseEntity.badRequest().body(errorResponse);
-//        }
-//        if (taskDTO.getAssignees() != null && taskDTO.getAssignees().length() > 30) {
-//            ErrorResponse errorResponse = new ErrorResponse(
-//                    HttpStatus.BAD_REQUEST.value(),
-//                    "Validation error. Check 'errors' field for details.",
-//                    "uri=/v2/tasks"
-//            );
-//            errorResponse.addValidationError("assignees", "size must be between 0 and 30");
-//            return ResponseEntity.badRequest().body(errorResponse);
-//        }
-//
         StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
         TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
         taskEntity.setStatus(statusEntity);

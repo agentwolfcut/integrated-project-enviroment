@@ -77,7 +77,6 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
-        taskValidator.validateTaskExists(id);
         try {
             taskService.deleteTask(id);
             return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);

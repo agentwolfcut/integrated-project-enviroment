@@ -25,6 +25,8 @@ public class TaskService {
     private StatusRepository statusRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private TaskValidator taskValidator;
 
 
     public TaskEntity getTaskById(Integer id) {
@@ -42,9 +44,7 @@ public class TaskService {
 
     @Transactional
     public void deleteTask(Integer id) {
-        TaskEntity task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist"));
-        taskRepository.delete(task);
+        taskValidator.validateTaskExists(id);
     }
 
     @Transactional

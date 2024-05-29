@@ -1,10 +1,7 @@
 package dev.backendintegratedproject.dtos;
 
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+
 import lombok.Data;
 
 
@@ -12,13 +9,12 @@ import lombok.Data;
 @Data
 public class TaskDTO {
     private Integer id;
-    @NotNull(message = "Title cannot be null")
-    @NotBlank(message = "Title cannot be blank")
-    @Size(max = 100, message = "Title must be less than 100 characters")
+
     private String title;
-    @Size(max = 500, message = "Description size must be between 1 and 500")
+
     private String description;
-    @Size(max = 30, message = "Assignees size must be up to 30 characters")
+
     private String assignees;
+
     private String status;
 }

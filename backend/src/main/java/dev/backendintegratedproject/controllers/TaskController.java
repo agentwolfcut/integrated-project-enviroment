@@ -84,7 +84,6 @@ public class TaskController {
 //            return ResponseEntity.badRequest().body(errorResponse);
 //        }
 //
-//        // นำข้อมูลที่ถูกต้องมาใช้งานต่อไป
         StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
         TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
         taskEntity.setStatus(statusEntity);
@@ -119,45 +118,6 @@ public class TaskController {
     }
 
 
-
-
-
-    //    @GetMapping
-//    public ResponseEntity<Object> getTasks() {
-//        List<TaskEntity> tasks = taskService.getAllTasks();
-//        List<TaskDTO> taskDTOList = listMapper.mapList(tasks, TaskDTO.class,modelMapper);
-//        return new ResponseEntity<>(taskDTOList, HttpStatus.OK);
-//    }
-
-
-    //@PostMapping
-    //    public ResponseEntity<?> addTask(@RequestBody TaskDTO taskDTO) {
-//        TaskEntity taskEntity = new TaskEntity();
-//        taskEntity.setTitle(taskDTO.getTitle());
-//        taskEntity.setDescription(taskDTO.getDescription());
-//        taskEntity.setAssignees(taskDTO.getAssignees());
-//
-//        // Fetch the status entity by name
-//        StatusEntity statusEntity = statusService.getStatusByName(taskDTO.getStatus());
-//        if (statusEntity == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid status name");
-//        }
-//        taskEntity.setStatus(statusEntity);
-//
-//        TaskEntity addedTask = taskService.addTask(taskEntity);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
-//    }
-
-    // @PutMapping("/{id}")
-//
-//    public ResponseEntity<TaskEntity> editTask(@PathVariable Integer id, @RequestBody TaskEntity task) {
-//        TaskEntity editedTask = taskService.editTask(id, task);
-//        if (editedTask != null) {
-//            return new ResponseEntity<>(editedTask, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
 
 }
 

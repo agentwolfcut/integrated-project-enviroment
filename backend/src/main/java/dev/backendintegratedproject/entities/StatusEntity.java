@@ -30,6 +30,7 @@ public class StatusEntity {
     @OneToMany(mappedBy = "status")
     private List<TaskEntity> tasks;
 
+    @JsonIgnore
     public String getStatusName() {
         return name;
     }

@@ -53,7 +53,7 @@ public class StatusController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<Object> editStatus(@Valid @PathVariable Integer id, @RequestBody StatusEntity status) {
-        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
+        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status and Done Cannot be Edited");}
         StatusEntity editedStatus = statusService.editStatus(id,status);
         return ResponseEntity.ok(editedStatus);
     }
@@ -61,7 +61,7 @@ public class StatusController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteStatus(@PathVariable("id") Integer id) {
-        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);}
+        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status and Done Cannot be deleted");}
         statusService.deleteStatus(id);
         return ResponseEntity.ok().body(new HashMap<>());
     }

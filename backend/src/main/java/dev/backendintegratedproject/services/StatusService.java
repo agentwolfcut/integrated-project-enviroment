@@ -1,4 +1,5 @@
 package dev.backendintegratedproject.services;
+import dev.backendintegratedproject.dtos.StatusDTO;
 import dev.backendintegratedproject.entities.StatusEntity;
 import dev.backendintegratedproject.entities.TaskEntity;
 import dev.backendintegratedproject.repositories.StatusRepository;
@@ -22,38 +23,42 @@ public class StatusService {
     }
 
     public StatusEntity getStatusById(Integer id) {
-        return statusRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        StatusEntity status = statusRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + id + " does not exist"));
+        return status;
     }
 
     public StatusEntity addStatus(StatusEntity status) {
+        validateStatus(status);
+
         if (status.getDescription() != null && status.getDescription().isEmpty()) {
             status.setDescription(null);
         }
+
         return statusRepository.save(status);
     }
-    public StatusEntity getStatusByName(String name) {
-        return statusRepository.findByName(name).orElse(null);
-    }
-//    public void editStatus(StatusEntity status) {
-//        statusRepository.save(status);
-//    }
-    public StatusEntity editStatus(Integer id ,StatusEntity status){
-        StatusEntity editStatus = statusRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if(editStatus != null){
-            // update
-            editStatus.setName(status.getName());
-            editStatus.setDescription(status.getDescription());
 
-            return statusRepository.save(editStatus);
-        }
-        return null;
+    public StatusEntity editStatus(Integer id, StatusEntity status) {
+        validateStatus(status);
+
+        StatusEntity editStatus = statusRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        editStatus.setName(status.getName());
+        editStatus.setDescription(status.getDescription());
+
+        return statusRepository.save(editStatus);
     }
 
     public void deleteStatus(Integer id) {
-        StatusEntity task = statusRepository.findById(id)
+        StatusEntity status = statusRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + id + " does not exist"));
-        statusRepository.delete(task);
 
+        if (StatusInUse(status)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete Status with ID " + id + " as it is currently in use.");
+        }
+
+        statusRepository.delete(status);
     }
 
     @Transactional
@@ -70,5 +75,26 @@ public class StatusService {
 
         statusRepository.delete(currentStatus);
     }
+
+    public boolean StatusInUse(StatusEntity status) {
+        return taskRepository.existsByStatus(status);
+    }
+
+    private void validateStatus(StatusEntity status) {
+        if (status.getName() == null || status.getName().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name must not be null or empty");
+        }
+
+        if (statusRepository.existsByName(status.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name must be unique");
+        }
+
+        if (status.getName().length() > 50 || (status.getDescription() != null && status.getDescription().length() > 200)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name size must be between 0 and 50, description size must be between 0 and 200");
+        }
+
+    }
 }
+
+
 

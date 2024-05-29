@@ -9,6 +9,7 @@ import dev.backendintegratedproject.exceptions.ErrorResponse;
 import dev.backendintegratedproject.services.ListMapper;
 import dev.backendintegratedproject.services.StatusService;
 import dev.backendintegratedproject.services.TaskService;
+import dev.backendintegratedproject.services.TaskValidator;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
@@ -39,6 +40,8 @@ public class TaskController {
     private ListMapper listMapper;
     @Autowired
     private StatusService statusService;
+    @Autowired
+    private TaskValidator taskValidator;
     @GetMapping("")
     public ResponseEntity<Object> getTasks(
             @RequestParam(required = false) List<String> filterStatuses,
@@ -63,15 +66,18 @@ public class TaskController {
     // Old
     @PostMapping
     public ResponseEntity<Object> addTask(@Valid @RequestBody TaskDTO taskDTO) {
+
         StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
         TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
         taskEntity.setStatus(statusEntity);
+        taskValidator.validateTask(taskEntity);
         TaskEntity addedTask = taskService.addTask(taskEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
+        taskValidator.validateTaskExists(id);
         try {
             taskService.deleteTask(id);
             return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);
@@ -82,6 +88,8 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
+        taskValidator.validateTaskExists(id);
+        taskValidator.validateTask(task);
         TaskEntity editedTask = taskService.editTask(id, task);
         if (editedTask != null) {
 

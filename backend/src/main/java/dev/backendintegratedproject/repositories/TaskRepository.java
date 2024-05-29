@@ -12,5 +12,6 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Integer> {
     List<TaskEntity> findAllByStatus(StatusEntity statusEntity);
     List<TaskEntity> findAllByStatusIn(List<StatusEntity> statusEntities, Sort sort);
 
+    boolean existsByStatus(StatusEntity status);
 }
 

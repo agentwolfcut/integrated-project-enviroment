@@ -14,7 +14,6 @@ public class ApplicationConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
 
-        // Customize mapping for PutTaskDTO
         modelMapper.createTypeMap(StatusEntity.class, PutTaskDTO.class)
                 .addMappings(mapper -> mapper.map(src -> src.getName(), PutTaskDTO::setStatus));
 

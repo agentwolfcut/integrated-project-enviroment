@@ -7,7 +7,7 @@ import EditTask from '@/components/EditTask.vue'
 import ManageStatus from '@/components/ManageStatus.vue'
 import AddStatus from '@/components/AddStatus.vue'
 import EditStatus from '@/components/EditStatus.vue'
-
+import Login from '@/components/Login.vue'
 // set history of stor path when visit
 const history = createWebHistory(import.meta.env.BASE_URL)
 
@@ -43,7 +43,8 @@ const routes = [
     name: 'TaskDetail',
     component: NotFoundId,
   },
-  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/task' }
+  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/task' },
+  { path: '/login' , name: 'Login' , component: Login }
 ]
 const router = createRouter({
   history,

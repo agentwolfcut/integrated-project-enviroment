@@ -1,4 +1,4 @@
-package dev.backendintegratedproject;
+package dev.backendintegratedproject.configs;
 
 import dev.backendintegratedproject.dtos.PutTaskDTO;
 import dev.backendintegratedproject.entities.StatusEntity;

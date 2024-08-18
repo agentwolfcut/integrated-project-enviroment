@@ -1,3 +1,4 @@
+// DataConfig.java
 package dev.backendintegratedproject.configs;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -17,9 +18,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.Map;
 
 @Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(
+        basePackages = "dev.backendintegratedproject.repositories",
+        entityManagerFactoryRef = "primaryEntityManagerFactory",
+        transactionManagerRef = "primaryTransactionManager"
+)
 public class DataConfig {
+
     @Bean
     @Primary
     @ConfigurationProperties("spring.datasource")
@@ -35,8 +44,24 @@ public class DataConfig {
     }
 
     @Bean
+    @Primary
+    public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(EntityManagerFactoryBuilder builder) {
+        return builder
+                .dataSource(primaryDataSource())
+                .packages("dev.backendintegratedproject.entities")
+                .persistenceUnit("primary")
+                .build();
+    }
+
+    @Bean
+    @Primary
+    public PlatformTransactionManager primaryTransactionManager(EntityManagerFactory primaryEntityManagerFactory) {
+        return new JpaTransactionManager(primaryEntityManagerFactory);
+    }
+
+    @Bean
     @Qualifier("loginDataSource")
-    @ConfigurationProperties("spring.login.datasource")
+    @ConfigurationProperties("spring.login-datasource")
     public DataSourceProperties loginDataSourceProperties() {
         return new DataSourceProperties();
     }
@@ -48,20 +73,4 @@ public class DataConfig {
                 .type(DriverManagerDataSource.class).build();
     }
 
-    @Bean
-    @Qualifier("loginEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean loginEntityManagerFactory(EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(loginDataSource())
-                .packages("dev.backendintegratedproject.entities")
-                .persistenceUnit("login")
-                .build();
-    }
-
-    @Bean
-    @Qualifier("loginTransactionManager")
-    public PlatformTransactionManager loginTransactionManager(
-            final @Qualifier("loginEntityManagerFactory") LocalContainerEntityManagerFactoryBean loginEntityManagerFactory) {
-        return new JpaTransactionManager(loginEntityManagerFactory.getObject());
-    }
 }

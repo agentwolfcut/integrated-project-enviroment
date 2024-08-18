@@ -13,7 +13,7 @@
     <div class="flex items-center w-full py-4 px-4 border-b border-gray-200">
       <img
         class="w-12 h-12 rounded-full"
-        src="https://via.placeholder.com/150"
+        src="https://imgur.com/UhqEppI.png"
         alt="User Avatar"
       />
       <div class="ml-5">

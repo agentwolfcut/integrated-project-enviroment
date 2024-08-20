@@ -1,278 +1,278 @@
 <script setup>
-import { onMounted, ref, watch, nextTick, computed } from "vue";
-import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils";
-import { TaskManagement } from "@/libs/TaskManagement";
-import TaskDetail from "./TaskDetail.vue";
-import { createToaster } from "../../node_modules/@meforma/vue-toaster";
-import HeaderIT from "./Header.vue";
-import SideBar from "./SideBar.vue";
-import router from "@/router";
-import buttonSlot from "./Button.vue";
-import Trash from "@/assets/icons/CiTrashFull.vue";
-import Edit from "@/assets/icons/CiEditPencil01.vue";
-import SortDown from "@/assets/icons/SortDown.vue";
-import SortUp from "@/assets/icons/SortUp.vue";
-import SortDefault from "@/assets/icons/SortDefault.vue";
+import { onMounted, ref, watch, nextTick, computed } from 'vue'
+import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils'
+import { TaskManagement } from '@/libs/TaskManagement'
+import TaskDetail from './TaskDetail.vue'
+import { createToaster } from '../../node_modules/@meforma/vue-toaster'
+import HeaderIT from './Header.vue'
+import SideBar from './SideBar.vue'
+import router from '@/router'
+import buttonSlot from './Button.vue'
+import Trash from '@/assets/icons/CiTrashFull.vue'
+import Edit from '@/assets/icons/CiEditPencil01.vue'
+import SortDown from '@/assets/icons/SortDown.vue'
+import SortUp from '@/assets/icons/SortUp.vue'
+import SortDefault from '@/assets/icons/SortDefault.vue'
 
 const toaster = createToaster({
   /* options */
-});
-const taskMan = ref(new TaskManagement());
-const showModalDetail = ref(false);
+})
+const taskMan = ref(new TaskManagement())
+const showModalDetail = ref(false)
 // const taskList = taskMan.value.gettasks();
-const statuses = ref({});
-const sortedTasks = ref([]);
-const sortMode = ref("default"); // 'default', 'alp', 'desc'
-const sortalp = ref(false); // for toggle
-const error = ref(false);
-const complete = ref(false);
-const classNotify = ref("");
-const textNotify = ref("");
+const statuses = ref({})
+const sortedTasks = ref([])
+const sortMode = ref('default') // 'default', 'alp', 'desc'
+const sortalp = ref(false) // for toggle
+const error = ref(false)
+const complete = ref(false)
+const classNotify = ref('')
+const textNotify = ref('')
 // GET items
 onMounted(async () => {
-  const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
+  const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`)
   //tasks.value = taskRes // reverse and slice to show the most
-  taskMan.value.addtasks(taskRes);
-  sortedTasks.value = taskMan.value.gettasks();
+  taskMan.value.addtasks(taskRes)
+  sortedTasks.value = taskMan.value.gettasks()
   // status
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
-  statuses.value = statusRes;
-  statusFilter.value = statuses.value.map((status) => status.name);
-  doFilter();
-});
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
+  statuses.value = statusRes
+  statusFilter.value = statuses.value.map((status) => status.name)
+  doFilter()
+})
 
 // for modal
 const selectTask = ref({
   id: undefined,
-  title: "",
-  description: "",
-  assignees: "",
+  title: '',
+  description: '',
+  assignees: '',
   status: 1,
-  createdOn: "",
-  updatedOn: "",
-});
+  createdOn: '',
+  updatedOn: '',
+})
 
 const errorNotify = () => {
-  error.value = true;
-  classNotify.value = "bg-red-500";
-  textNotify.value = `An error has occurred, the task does not exist.`;
+  error.value = true
+  classNotify.value = 'bg-red-500'
+  textNotify.value = `An error has occurred, the task does not exist.`
   setTimeout(() => {
-    error.value = false;
-  }, 1000);
-};
+    error.value = false
+  }, 1000)
+}
 
 const completeNotify = (task, action) => {
-  complete.value = true;
-  classNotify.value = "bg-green-600";
-  textNotify.value = `The task ${task} has been successfully ${action}.`;
+  complete.value = true
+  classNotify.value = 'bg-green-600'
+  textNotify.value = `The task ${task} has been successfully ${action}.`
   setTimeout(() => {
-    complete.value = false;
-  }, 1500);
-};
+    complete.value = false
+  }, 1500)
+}
 
 const openDetails = async (id) => {
   //console.log(id);
-  const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id);
-  selectTask.value = item;
+  const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id)
+  selectTask.value = item
   // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
-  showModalDetail.value = true;
+  showModalDetail.value = true
   // router.push(`/task/${id}`)
-};
+}
 
 const cancel = (flag) => {
-  showModalDetail.value = flag;
+  showModalDetail.value = flag
   selectTask.value = {
-    title: "",
-    description: "",
-    assignees: "",
+    title: '',
+    description: '',
+    assignees: '',
     status: 1,
-  };
-};
+  }
+}
 
 // DELETE
-const showDeleteModal = ref(false);
-const taskToDelete = ref(undefined);
+const showDeleteModal = ref(false)
+const taskToDelete = ref(undefined)
 
 const deleteTran = async (removeId) => {
   const status = await deleteTranById(
     import.meta.env.VITE_API_ENDPOINT,
     removeId
-  );
+  )
   if (status == 200) {
-    allTrans.value.removeTransaction(removeId);
-    setCurrMonthYear();
+    allTrans.value.removeTransaction(removeId)
+    setCurrMonthYear()
   }
-};
+}
 
 const deleteTask = async (removeId) => {
   try {
     const status = await deleteItemById(
       `${import.meta.env.VITE_BASE_URL}/tasks`,
       removeId
-    );
+    )
     if (status === 200) {
-      sortMode.value = "default";
-      taskMan.value.removetask(removeId);
-      sortedTasks.value = taskMan.value.gettasks();
-      completeNotify(removeId, "deleted");
+      sortMode.value = 'default'
+      taskMan.value.removetask(removeId)
+      sortedTasks.value = taskMan.value.gettasks()
+      completeNotify(removeId, 'deleted')
     } else {
-      errorNotify();
+      errorNotify()
     }
   } catch (error) {
-    errorNotify();
+    errorNotify()
   }
-};
+}
 
 // ADD
 const saveTask = async () => {
-  selectTask.value.title = selectTask.value.title.trim();
+  selectTask.value.title = selectTask.value.title.trim()
   if (selectTask.value.description !== null) {
-    selectTask.value.description = selectTask.value.description.trim();
+    selectTask.value.description = selectTask.value.description.trim()
   }
   if (selectTask.value.assignees !== null) {
-    selectTask.value.assignees = selectTask.value.assignees.trim();
+    selectTask.value.assignees = selectTask.value.assignees.trim()
   }
   try {
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(selectTask.value),
-    });
+    })
     if (!res.ok) {
       throw new Error(
         `Failed to add task. Server responded with status ${res.status}`
-      );
+      )
     }
-    const addedTask = await res.json();
-    addedTask.status = addedTask.status.name;
+    const addedTask = await res.json()
+    addedTask.status = addedTask.status.name
     // sortedTasks.value.push(addedTask);
-    taskMan.value.addtask(addedTask);
-    sortedTasks.value = taskMan.value.gettasks();
-    router.back();
-    completeNotify(addedTask.title, "added");
+    taskMan.value.addtask(addedTask)
+    sortedTasks.value = taskMan.value.gettasks()
+    router.back()
+    completeNotify(addedTask.title, 'added')
     selectTask.value = {
-      title: "",
-      description: "",
-      assignees: "",
+      title: '',
+      description: '',
+      assignees: '',
       status: 1,
-    };
+    }
   } catch (error) {
-    errorNotify();
+    errorNotify()
   }
-};
+}
 
 // EDIT
 const editMode = (task) => {
-  selectTask.value = task;
-};
+  selectTask.value = task
+}
 
 const editTask = async (editedTask) => {
   try {
-    selectTask.value = editedTask; // status : id
-    selectTask.value.title = selectTask.value.title.trim();
+    selectTask.value = editedTask // status : id
+    selectTask.value.title = selectTask.value.title.trim()
     if (selectTask.value.description !== null) {
-      selectTask.value.description = selectTask.value.description.trim();
+      selectTask.value.description = selectTask.value.description.trim()
     }
     if (selectTask.value.assignees !== null) {
-      selectTask.value.assignees = selectTask.value.assignees.trim();
+      selectTask.value.assignees = selectTask.value.assignees.trim()
     }
     const selectedStatus = statuses.value.find(
       (status) => status.id == selectTask.value.status
-    );
+    )
     if (selectedStatus) {
-      selectTask.value.status = selectedStatus;
+      selectTask.value.status = selectedStatus
     }
     // const transformedTask = transformTaskFormat(selectTask.value);
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}/tasks/${selectTask.value.id}`,
       {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
         // body: JSON.stringify({
         //   ...selectTask.value,
         // }),
         body: JSON.stringify(selectTask.value),
       }
-    );
+    )
     if (!res.ok) {
       router.back()
       throw new Error(
         `Failed to update task. Server responded with status ${res.status}`
-      );
+      )
     }
-    const resJson = await res.json();
+    const resJson = await res.json()
     // console.log(sortMode.value);
-    if (sortMode.value === "default") {
+    if (sortMode.value === 'default') {
       // console.log(`sort mode edit = ${sortMode.value}`);
-    } else if (sortMode.value === "alp") {
+    } else if (sortMode.value === 'alp') {
       // console.log(`sort mode edit = ${sortMode.value}`);
     } else {
       // console.log(`sort mode edit = ${sortMode.value}`);
     }
-    taskMan.value.updatetask(resJson);
-    sortedTasks.value = taskMan.value.gettasks();
+    taskMan.value.updatetask(resJson)
+    sortedTasks.value = taskMan.value.gettasks()
 
-    router.back();
-    completeNotify(selectTask.value.title, "updated");
+    router.back()
+    completeNotify(selectTask.value.title, 'updated')
     selectTask.value = {
-      title: "",
-      description: "",
-      assignees: "",
+      title: '',
+      description: '',
+      assignees: '',
       status: 1,
-    };
+    }
   } catch (error) {
     // Navigate back
-    console.error("Error editing task:", error);
+    console.error('Error editing task:', error)
     // Handle error as needed
-    errorNotify();
+    errorNotify()
   }
-};
+}
 
 const cancelHandle = () => {
   selectTask.value = {
     id: undefined,
-    title: "",
-    description: "",
-    assignees: "",
+    title: '',
+    description: '',
+    assignees: '',
     status: 1,
-    createdOn: "",
-    updatedOn: "",
-  };
-};
+    createdOn: '',
+    updatedOn: '',
+  }
+}
 
 const handelFail = () => {
-  errorNotify();
-};
+  errorNotify()
+}
 
 // Filter
-const showFilter = ref(false);
+const showFilter = ref(false)
 const toggleFilter = () => {
-  showFilter.value = !showFilter.value;
-};
+  showFilter.value = !showFilter.value
+}
 
 // Assuming statuses is an array of status objects provided as a prop or fetched from an API
-const statusFilter = ref([]);
+const statusFilter = ref([])
 // Fetch statuses and initialize statusFilter
 
 // Apply the filter whenever statusFilter changes
 const doFilter = async () => {
-  await nextTick(); // Ensure the next DOM update cycle is completed
+  await nextTick() // Ensure the next DOM update cycle is completed
   if (statusFilter.value.length > 0) {
-    const statusString = statusFilter.value.join(",");
+    const statusString = statusFilter.value.join(',')
     // Logs the comma-separated string of selected statuses
     const res = await getItems(
       `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}`
-    );
-    sortedTasks.value = res;
+    )
+    sortedTasks.value = res
   } else {
-    console.log("No statuses selected");
-    sortedTasks.value = [];
+    console.log('No statuses selected')
+    sortedTasks.value = []
   }
-};
+}
 
 // Fetch statuses when the component is mounted
 
@@ -280,39 +280,39 @@ const doFilter = async () => {
 
 // Function to sort tasks by creation time
 const sortTasksByCreationTime = () => {
-  sortedTasks.value = sortedTasks.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
-  sortMode.value = "default";
+  sortedTasks.value = sortedTasks.value.slice().sort((a, b) => a.id - b.id) // Assuming `id` reflects creation time
+  sortMode.value = 'default'
   // console.log(`sort mode = ${sortMode.value}`)
-};
+}
 
 // Function to sort tasks by status name
 const sortTasksByStatusNamealp = () => {
   sortedTasks.value = sortedTasks.value
     .slice()
-    .sort((a, b) => a.status.localeCompare(b.status));
-  sortMode.value = "alp";
-};
+    .sort((a, b) => a.status.localeCompare(b.status))
+  sortMode.value = 'alp'
+}
 
 const sortTasksByStatusNamerev = () => {
   sortedTasks.value = sortedTasks.value
     .slice()
-    .sort((a, b) => b.status.localeCompare(a.status));
-  sortMode.value = "rev";
-};
+    .sort((a, b) => b.status.localeCompare(a.status))
+  sortMode.value = 'rev'
+}
 
 // Function to toggle sorting
 const toggleSortOrder = () => {
-  sortalp.value = !sortalp.value;
+  sortalp.value = !sortalp.value
   if (sortalp.value) {
-    sortMode.value = "alp";
-    console.log(`sort mode = ${sortMode.value}`);
-    sortTasksByStatusNamealp();
+    sortMode.value = 'alp'
+    console.log(`sort mode = ${sortMode.value}`)
+    sortTasksByStatusNamealp()
   } else {
-    sortTasksByStatusNamerev();
-    sortMode.value = "rev";
-    console.log(`sort mode = ${sortMode.value}`);
+    sortTasksByStatusNamerev()
+    sortMode.value = 'rev'
+    console.log(`sort mode = ${sortMode.value}`)
   }
-};
+}
 </script>
 
 <template>
@@ -443,7 +443,7 @@ const toggleSortOrder = () => {
 
                         <button
                           @click="
-                            (showDeleteModal = true), (taskToDelete = task)
+                            ;(showDeleteModal = true), (taskToDelete = task)
                           "
                           class="itbkk-button-delete pr-1"
                         >

@@ -32,6 +32,11 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @GetMapping
+    public List<UserEntity> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         List<String> errors = new ArrayList<>();

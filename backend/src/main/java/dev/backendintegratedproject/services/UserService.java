@@ -18,13 +18,13 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UserEntity login(String username, String password) {
-        return userRepository.findByUsernameAndPassword(username, password);
-    }
-
-    public UserEntity getUserById(String oid) {
-        return userRepository.findById(oid).orElse(null);
-    }
+//    public UserEntity login(String username, String password) {
+//        return userRepository.findByUsernameAndPassword(username, password);
+//    }
+//
+//    public UserEntity getUserById(Integer oid) {
+//        return userRepository.findById(oid).orElse(null);
+//    }
 
 
 }

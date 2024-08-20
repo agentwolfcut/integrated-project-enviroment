@@ -14,6 +14,8 @@ public class UserService {
     private UserRepository userRepository;
 
 
+
+
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }

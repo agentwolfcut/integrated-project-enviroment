@@ -29,7 +29,7 @@ public class UserEntity {
     @Size(max = 50)
     @NotNull
     @Column(name = "username", nullable = false, length = 50)
-    private String username;
+    private String userName;
 
     @Size(max = 50)
     @NotNull

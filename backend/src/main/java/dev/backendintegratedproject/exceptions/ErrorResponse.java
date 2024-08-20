@@ -1,13 +1,9 @@
 package dev.backendintegratedproject.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import dev.backendintegratedproject.entities.TaskEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;

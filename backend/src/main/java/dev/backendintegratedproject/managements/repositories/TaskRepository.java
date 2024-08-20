@@ -1,7 +1,7 @@
-package dev.backendintegratedproject.repositories;
+package dev.backendintegratedproject.managements.repositories;
 
-import dev.backendintegratedproject.entities.StatusEntity;
-import dev.backendintegratedproject.entities.TaskEntity;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
+import dev.backendintegratedproject.managements.entities.TaskEntity;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

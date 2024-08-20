@@ -1,7 +1,7 @@
 package dev.backendintegratedproject.services;
 
-import dev.backendintegratedproject.entities.UserEntity;
-import dev.backendintegratedproject.repositories.UserRepository;
+import dev.backendintegratedproject.userManage.UserEntity;
+import dev.backendintegratedproject.userManage.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

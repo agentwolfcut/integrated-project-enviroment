@@ -1,4 +1,4 @@
-package dev.backendintegratedproject.entities;
+package dev.backendintegratedproject.managements.entities;
 
 import jakarta.persistence.*;
 import lombok.*;

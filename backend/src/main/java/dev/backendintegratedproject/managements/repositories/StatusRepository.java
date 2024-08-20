@@ -1,5 +1,5 @@
-package dev.backendintegratedproject.repositories;
-import dev.backendintegratedproject.entities.StatusEntity;
+package dev.backendintegratedproject.managements.repositories;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

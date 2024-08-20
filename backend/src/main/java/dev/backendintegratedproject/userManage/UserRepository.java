@@ -1,8 +1,10 @@
-package dev.backendintegratedproject.repositories;
+package dev.backendintegratedproject.userManage;
 
-import dev.backendintegratedproject.entities.UserEntity;
+import dev.backendintegratedproject.userManage.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 
 @Repository
@@ -10,4 +12,6 @@ public interface UserRepository extends JpaRepository<UserEntity,String> {
 
 
     UserEntity findByUsernameAndPassword(String username, String password);
+
+    Optional<UserEntity> findByUsername(String oid);
 }

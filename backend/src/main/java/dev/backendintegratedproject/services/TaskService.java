@@ -1,9 +1,9 @@
 package dev.backendintegratedproject.services;
 
-import dev.backendintegratedproject.entities.StatusEntity;
-import dev.backendintegratedproject.entities.TaskEntity;
-import dev.backendintegratedproject.repositories.StatusRepository;
-import dev.backendintegratedproject.repositories.TaskRepository;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
+import dev.backendintegratedproject.managements.entities.TaskEntity;
+import dev.backendintegratedproject.managements.repositories.StatusRepository;
+import dev.backendintegratedproject.managements.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;

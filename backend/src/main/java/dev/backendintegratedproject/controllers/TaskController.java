@@ -3,15 +3,13 @@ package dev.backendintegratedproject.controllers;
 import dev.backendintegratedproject.dtos.GetTaskDTO;
 import dev.backendintegratedproject.dtos.PutTaskDTO;
 import dev.backendintegratedproject.dtos.TaskDTO;
-import dev.backendintegratedproject.entities.StatusEntity;
-import dev.backendintegratedproject.entities.TaskEntity;
-import dev.backendintegratedproject.exceptions.ErrorResponse;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
+import dev.backendintegratedproject.managements.entities.TaskEntity;
 import dev.backendintegratedproject.services.ListMapper;
 import dev.backendintegratedproject.services.StatusService;
 import dev.backendintegratedproject.services.TaskService;
 import dev.backendintegratedproject.services.TaskValidator;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 @RestController
 @RequestMapping("/v2/tasks")

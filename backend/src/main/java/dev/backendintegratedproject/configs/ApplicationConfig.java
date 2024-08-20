@@ -1,7 +1,7 @@
 package dev.backendintegratedproject.configs;
 
 import dev.backendintegratedproject.dtos.PutTaskDTO;
-import dev.backendintegratedproject.entities.StatusEntity;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
 import dev.backendintegratedproject.services.ListMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,7 @@
 package dev.backendintegratedproject.controllers;
 
 import dev.backendintegratedproject.dtos.StatusDTO;
-import dev.backendintegratedproject.entities.StatusEntity;
+import dev.backendintegratedproject.managements.entities.StatusEntity;
 import dev.backendintegratedproject.services.StatusService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;

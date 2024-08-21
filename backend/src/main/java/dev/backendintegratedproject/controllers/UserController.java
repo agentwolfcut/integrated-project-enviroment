@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/login")
+@RequestMapping("/v2/login")
 
 @CrossOrigin(origins = {"http://localhost:5173",
         "http://ip23ft.sit.kmutt.ac.th",

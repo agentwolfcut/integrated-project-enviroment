@@ -4,6 +4,10 @@ import { ref } from 'vue';
 
 // input username password
 const usrpw = ref({userName : undefined , password : undefined})
+const error = ref(false);
+const complete = ref(false);
+const classNotify = ref('');
+const textNotify = ref('');
 const inputUsrpw = async () => {
   try {
     // wait for agent api
@@ -15,15 +19,42 @@ const inputUsrpw = async () => {
       body: JSON.stringify(usrpw.value),
     });
     if (!res.ok) {
+      errorNotify()
       router.back
       throw new Error(
         // text for error
         ` somehting ${res.status}`
       )
     }
+    // success
+    completeNotify(usrpw.value.userName, "logged in")
+    router.push('/task');
   } catch (error) {
     // error
+    errorNotify()
   }
+}
+const errorNotify = () => {
+  error.value = true;
+  classNotify.value = "bg-red-500";
+  textNotify.value = `Username or Password is incorrect.`;
+  setTimeout(() => {
+    error.value = false;
+  }, 1500);
+};
+
+const completeNotify = (status, action) => {
+  complete.value = true;
+  classNotify.value = "bg-green-600";
+  textNotify.value = `The status ${status} has been successfully ${action}.`;
+  setTimeout(() => {
+    complete.value = false;
+  }, 1500);
+};
+
+const canLogin = () => {
+  return usrpw.value.userName.trim().length > 0 && usrpw.value.password.trim().length > 0;
+
 }
 
 </script>
@@ -82,7 +113,7 @@ const inputUsrpw = async () => {
               </div>
 
               <div class="!mt-8">
-                <button @click="inputUsrpw" type="button" class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                <button @click="inputUsrpw"  type="button" class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                   Log in
                 </button>
               </div>
@@ -90,6 +121,14 @@ const inputUsrpw = async () => {
           </div>
         </div>
       </div>
+      <div
+        v-show="error || complete"
+        :class="[
+          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+          classNotify,
+        ]"
+        v-text="textNotify"
+      ></div>
     </div>
 </template>
  

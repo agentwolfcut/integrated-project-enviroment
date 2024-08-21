@@ -14,10 +14,9 @@ const history = createWebHistory(import.meta.env.BASE_URL)
 // give roue paths
 const routes = [
   // first page & wait t. give endpoint
-  {
-    path: '/',
-    redirect: '/task'
+  { path: '/', redirect: '/login'
   },
+  { path: '/login' , name: 'Login' , component: Login },
   {
     path: '/task',
     component: FirstPage,
@@ -43,8 +42,8 @@ const routes = [
     name: 'TaskDetail',
     component: NotFoundId,
   },
-  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/task' },
-  { path: '/login' , name: 'Login' , component: Login }
+  { path: '/:notfoundpath(.*)', name: 'NotFound', component: NotFound, redirect: '/login' },
+  
 ]
 const router = createRouter({
   history,

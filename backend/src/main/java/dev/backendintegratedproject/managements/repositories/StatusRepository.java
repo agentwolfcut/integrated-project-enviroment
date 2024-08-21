@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface StatusRepository extends JpaRepository<StatusEntity, Integer> {
     Optional<StatusEntity> findByName(String name);
     boolean existsByName(String name);
+//    boolean existsByNameAndIdNot(String name, Integer id);
 }
 
 

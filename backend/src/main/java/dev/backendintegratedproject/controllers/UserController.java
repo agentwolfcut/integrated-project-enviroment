@@ -17,23 +17,37 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/login")
+
+@CrossOrigin(origins = {"http://localhost:5173",
+        "http://ip23ft.sit.kmutt.ac.th",
+        "http://intproj23.sit.kmutt.ac.th"})
 
 public class UserController {
     @Autowired
     private UserService userService;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping
+
+//    @PostMapping()
+//    public ResponseEntity<Void> loginUser(@RequestBody LoginRequest loginRequest) {
+//        boolean isValidUser = userService.validateUser(loginRequest.getUserName(), loginRequest.getPassword());
+//        if (isValidUser) {
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//    }
+
+    @GetMapping()
     public List<UserEntity> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/login")
+    @PostMapping()
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         List<String> errors = new ArrayList<>();
 
@@ -53,12 +67,13 @@ public class UserController {
             return ResponseEntity.badRequest().body(String.join(", ", errors));
         }
 
-        Optional<UserEntity> userOptional = userRepository.findByUserName(loginRequest.getUserName());
+        UserEntity user = userRepository.findByUserName(loginRequest.getUserName());
 
-        if (userOptional.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), userOptional.get().getPassword())) {
+        if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("The username or password is incorrect.");
         }
     }
+
 }

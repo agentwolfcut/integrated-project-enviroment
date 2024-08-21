@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 @Data
 public class LoginRequest {
+    // DTO
     @NotEmpty(message = "Username cannot be empty")
     @Size(max = 50, message = "Username must be at most 50 characters long")
     private String userName;

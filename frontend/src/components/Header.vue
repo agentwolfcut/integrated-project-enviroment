@@ -12,29 +12,25 @@
   }
 }
 
-.gradient-animation {
-  background: linear-gradient(
-    to left,
 
-    blue,
-    teal,
-    cyan
-  );
-  background-size: 300% 300%;
-  animation: gradientChange 5s linear infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.header-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 </style>
 
 <template>
-  <div class="flex justify-center m-6">
-    <h1
-      class="mb-4 text-2xl font-extrabold text-gray-900 dark:text-white md:text-2xl lg:text-4xl glow"
-    >
-      <span class="gradient-animation"> IT-Bangmod Kradan Kanban </span>
-    </h1>
+  <div class="header-container px-2">
+    <img src="./SIT-Logo-for-web-120px.png" class="h-7 w-29">
   </div>
+
+
+<div class="text-center text-4xl ">
+  <p class="font-sans md:font-serif font-bold">IT-Bangmod Kradan Kanban </p>
+</div>
+
+
 </template>
 
 <style scoped></style>

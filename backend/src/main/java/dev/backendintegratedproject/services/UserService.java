@@ -20,25 +20,4 @@ public class UserService {
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }
-
-//    public boolean validateUser(String username, String password) {
-//        UserEntity user = userRepository.findByUserName(username);
-//        Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder(16, 32, 1, 60000, 10);
-//        if (user != null) {
-//            return passwordEncoder.matches(password, user.getPassword());
-//        }
-//        return false;
-//    }
-
-
-//
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    public List<UserEntity> getAllUsers() {
-//        return userRepository.findAll();
-//    }
-
-
 }

@@ -1,9 +1,9 @@
 <script setup>
 import router from '@/router';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 // input username password
-const usrpw = ref({userName : undefined , password : undefined})
+const usrpw = ref({userName : '' , password : ''})
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref('');
@@ -28,7 +28,7 @@ const inputUsrpw = async () => {
     }
     // success
     completeNotify(usrpw.value.userName, "logged in")
-    router.push('/task');
+    // router.push('/task');
   } catch (error) {
     // error
     errorNotify()
@@ -40,7 +40,7 @@ const errorNotify = () => {
   textNotify.value = `Username or Password is incorrect.`;
   setTimeout(() => {
     error.value = false;
-  }, 1500);
+  }, 2000);
 };
 
 const completeNotify = (status, action) => {
@@ -52,10 +52,9 @@ const completeNotify = (status, action) => {
   }, 1500);
 };
 
-const canLogin = () => {
-  return usrpw.value.userName.trim().length > 0 && usrpw.value.password.trim().length > 0;
-
-}
+const canLogin = computed(() => {
+  return (usrpw.value.password.length > 0 && usrpw.value.userName.length > 0)
+})
 
 </script>
  
@@ -90,7 +89,7 @@ const canLogin = () => {
                 <label class="text-white text-sm mb-2 block">User name</label>
                 <div class="relative flex items-center">
 
-                  <input v-model="usrpw.userName" name="username" type="text" required class="bg-white w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter user name" />
+                  <input v-model="usrpw.userName" name="username" type="text" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter user name" />
                   
                   <!-- icon -->
                   
@@ -104,7 +103,7 @@ const canLogin = () => {
               <div>
                 <label class="text-white text-sm mb-2 block">Password</label>
                 <div class="relative flex items-center">
-                  <input v-model="usrpw.password" name="password" type="password" required class="bg-white w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter password" />
+                  <input v-model="usrpw.password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter password" />
                   
                   <!-- icon -->
 
@@ -135,7 +134,7 @@ const canLogin = () => {
               </div>
 
               <div class="!mt-8">
-                <button @click="inputUsrpw"  type="button" class="btn w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-500 hover:bg-blue-600 focus:outline-none">
+                <button @click="inputUsrpw"  type="button" class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
                   Log in
                 </button>
               </div>
@@ -146,7 +145,7 @@ const canLogin = () => {
       <div
         v-show="error || complete"
         :class="[
-          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+          'itbkk-message absolute bottom-0 right-0 text-white font-medium py-3 px-6 rounded-lg shadow-xl m-12',
           classNotify,
         ]"
         v-text="textNotify"

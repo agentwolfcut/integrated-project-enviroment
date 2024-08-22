@@ -37,8 +37,8 @@ const showProfileInfo = ref(false);
 
 
   <aside
-    class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center border-r bg-slate-900">
-  <div id='profileview' class="flex items-center w-full p-5" @click="showProfileInfo = true">
+    class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center  bg-slate-900">
+  <div id='profileview' class="flex items-center w-full py-8 px-5" @click="showProfileInfo = true">
     <div class="relative">
       <img
         class="w-12 h-12 rounded-full border-2 border-green-400"
@@ -52,7 +52,7 @@ const showProfileInfo = ref(false);
     <div class="ml-5">
       <p class="text-white font-semibold">{{ randomPair.name }}</p>
 
-      <p class="text-gray-400 text-sm ">{{ randomPair.role }}<p class="loading loading-ball loading-xs"></p></p>
+      <p class="text-gray-400 text-sm ">{{ randomPair.role }}  <p class="loading loading-ring loading-xs h-3"></p></p>
     </div>
   </div>
 
@@ -66,7 +66,19 @@ const showProfileInfo = ref(false);
         />
         <p class="text-center text-white font-semibold text-lg">{{ randomPair.fname }}</p>
         <p class="text-center text-white text-sm">{{ randomPair.frole }}</p>
-        <div class="flex items-center justify-center">        <button @click="showProfileInfo = false" class="btn glass mt-4 px-4 py-2 bg-red-500 text-white" alt="X">close</button>
+        <div class="flex items-center justify-center">        
+          
+                    <div
+        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out p-9"
+      >
+        <router-link to="/login" class="block">
+          <div
+            type="button" class="btn glass mt-4 px-4 py-0 bg-red-500 text-white">
+            Logout
+          </div>
+        </router-link>
+      </div>
+          
 </div>
       </div>
     </div>
@@ -97,18 +109,18 @@ const showProfileInfo = ref(false);
           </div>
         </router-link>
       </div>
+
+            <div
+        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
+      >
+<span class="loading loading-ball loading-xs"></span>
+<span class="loading loading-ball loading-sm"></span>
+<span class="loading loading-ball loading-md"></span>
+<span class="loading loading-ball loading-lg"></span>
+      </div>
     </nav>
 
-          <div
-        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out p-9"
-      >
-        <router-link to="/login" class="block">
-          <div
-            type="button" class="focus:outline-none text-white bg-red-900 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-            Logout
-          </div>
-        </router-link>
-      </div>
+
   </aside>
 </template>
 

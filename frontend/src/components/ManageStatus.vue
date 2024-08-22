@@ -231,11 +231,11 @@ const handelFail = () => {
 <template>
   <div class="flex">
     <SideBar />
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-600">
+    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-600">
+          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-200">
             <div>
               <!-- button add -->
               <div class="flex justify-end mb-9">

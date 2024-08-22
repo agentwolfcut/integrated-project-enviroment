@@ -89,7 +89,7 @@ const canLogin = computed(() => {
                 <label class="text-white text-sm mb-2 block">User name</label>
                 <div class="relative flex items-center">
 
-                  <input v-model="usrpw.userName" name="username" type="text" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter user name" />
+                  <input v-model="usrpw.userName" name="username" type="text" required class="w-full text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter user name" />
                   
                   <!-- icon -->
                   
@@ -103,7 +103,7 @@ const canLogin = computed(() => {
               <div>
                 <label class="text-white text-sm mb-2 block">Password</label>
                 <div class="relative flex items-center">
-                  <input v-model="usrpw.password" name="password" type="password" required class="w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter password" />
+                  <input v-model="usrpw.password" name="password" type="password" required class="w-full text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600" placeholder="Enter password" />
                   
                   <!-- icon -->
 

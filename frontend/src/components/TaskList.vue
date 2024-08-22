@@ -43,7 +43,7 @@ const taskToDelete = ref(undefined)
 <template>
   <div>
     <div class="sm:px-20 w-full ">
-      <div class="bg-white py-2 md:py-4 px-4 md:px-8 xl:px-10">
+      <div class="bg-grey-500 py-2 md:py-4 px-4 md:px-8 xl:px-10">
 
         <div class="mt-7 overflow-x-auto rounded-2xl border border-gray-100">
           <table class="w-full whitespace-nowrap rounded-md">

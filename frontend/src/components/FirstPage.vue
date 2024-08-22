@@ -319,11 +319,11 @@ const toggleSortOrder = () => {
   <div class="flex">
     <SideBar />
     <!-- <div class="flex content flex-col items-center h-screen"> -->
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-600">
+    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="bg-gray-600 py-2 md:py-4 px-4 md:px-8 xl:px-10">
+          <div class="bg-gray-200 py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
               <div class="flex justify-end mb-9">
                 <router-link to="/task/add">
@@ -414,7 +414,7 @@ const toggleSortOrder = () => {
                           <span v-if="task.assignees" class="truncate">{{
                             task.assignees
                           }}</span>
-                          <span v-else class="text-slate-300 italic">
+                          <span v-else class="text-red-700 italic">
                             Unassigned
                           </span>
                         </div>

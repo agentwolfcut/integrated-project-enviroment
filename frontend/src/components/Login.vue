@@ -19,38 +19,35 @@ const inputUsrpw = async () => {
       body: JSON.stringify(usrpw.value),
     });
     if (!res.ok) {
-      errorNotify();
-      router.back;
-      throw new Error(
-        // text for error
-        ` somehting ${res.status}`
-      );
+      if (res.status === 400 || res.status === 401) {
+        errorNotify("Username or Password is incorrect.");
+      } else {
+        errorNotify("There is a problem. Please try again later.");
+        router.back;
+      }
     }
-    // success
-    completeNotify(usrpw.value.userName, "logged in");
-    router.push("/task");
   } catch (error) {
-    // error
-    errorNotify();
+    errorNotify("There is a problem. Please try again later.");
   }
 };
-const errorNotify = () => {
+const errorNotify = (text) => {
   error.value = true;
   classNotify.value = "bg-red-500";
-  textNotify.value = `Username or Password is incorrect.`;
+  textNotify.value = text;
+  // textNotify.value = `Username or Password is incorrect.`;
   setTimeout(() => {
     error.value = false;
   }, 2000);
 };
 
-const completeNotify = (status, action) => {
-  complete.value = true;
-  classNotify.value = "bg-green-600";
-  textNotify.value = `The status ${status} has been successfully ${action}.`;
-  setTimeout(() => {
-    complete.value = false;
-  }, 1500);
-};
+// const completeNotify = (status, action) => {
+//   complete.value = true;
+//   classNotify.value = "bg-green-600";
+//   textNotify.value = `The status ${status} has been successfully ${action}.`;
+//   setTimeout(() => {
+//     complete.value = false;
+//   }, 1500);
+// };
 
 const canLogin = computed(() => {
   return usrpw.value.password.length > 0 && usrpw.value.userName.length > 0;
@@ -88,6 +85,7 @@ const canLogin = computed(() => {
                     name="username"
                     type="text"
                     required
+                    maxlength="50"
                     class="w-full text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
                     placeholder="Enter user name"
                   />
@@ -109,6 +107,7 @@ const canLogin = computed(() => {
                     name="password"
                     type="password"
                     required
+                    maxlength="14"
                     class="w-full text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
                     placeholder="Enter password"
                   />
@@ -153,7 +152,7 @@ const canLogin = computed(() => {
                   type="button"
                   class="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                 >
-                  Log in
+                  Sign in
                 </button>
               </div>
             </form>

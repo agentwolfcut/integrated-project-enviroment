@@ -147,12 +147,15 @@ const canLogin = computed(() => {
               </div>
 
               <div class="!mt-8">
-                <button @click="inputUsrpw"  type="button" :disabled="!canLogin"
-                :class="!canLogin ? 'disabled' : ''"
-                class="itbkk-button-signin disabled:cursor-not-allowed disabled:bg-slate-300  disabled:text-slate-900 w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                <button
+                  @click="inputUsrpw"
+                  type="button"
+                  :disabled="!canLogin"
+                  :class="!canLogin ? 'disabled' : ''"
+                  class="itbkk-button-signin disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-900 w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                >
                   Sign in
                 </button>
-                
               </div>
             </form>
           </div>

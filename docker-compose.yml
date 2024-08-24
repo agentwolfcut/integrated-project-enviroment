@@ -6,7 +6,7 @@ services:
     container_name: database
     restart: always
     ports:
-      - '3306:3306'
+      - '3307:3306'
     networks:
       - backend_net
     environment:
@@ -22,7 +22,7 @@ services:
     build: ./backend
     container_name: backend
     ports:
-      - '8080:8080'
+      - '8081:8080'
     restart: always
     networks:
       - backend_net
@@ -40,7 +40,7 @@ services:
     build: ./frontend
     container_name: frontend
     ports:
-      - 80:80
+      - 8080:80
     networks:
       - frontend_net
     depends_on:

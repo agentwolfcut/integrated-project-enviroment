@@ -18,7 +18,7 @@ public class BackendIntegratedProjectApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry reg) {
-				reg.addMapping("/*/*")
+				reg.addMapping("/**")
 						.allowedOrigins("http://localhost:5173", "ip23kk3@sit.kmutt.ac.th" , "http://intproj23.sit.kmutt.ac.th")
 						.allowedMethods("GET", "POST", "PUT", "DELETE")
 						.allowedHeaders("*")

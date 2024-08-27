@@ -42,7 +42,6 @@ services:
       - frontend_net
     depends_on:
       - backend
-
   proxy:
     image: "nginx:alpine"
     container_name: proxy

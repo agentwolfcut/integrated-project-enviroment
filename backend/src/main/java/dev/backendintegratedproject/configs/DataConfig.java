@@ -15,6 +15,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Configuration
@@ -45,9 +47,16 @@ public class DataConfig {
     @Primary
     public LocalContainerEntityManagerFactoryBean projectManagementEntityManagerFactory(
             EntityManagerFactoryBuilder builder) {
+
+        // เพิ่มการตั้งค่า Hibernate properties
+        Map<String, String> jpaProperties = new HashMap<>();
+        jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"); // ระบุ dialect ของ MySQL
+        jpaProperties.put("hibernate.hbm2ddl.auto", "update");
+
         return builder
                 .dataSource(projectManagementDataSource())
                 .packages("dev.backendintegratedproject.managements")
+                .properties(jpaProperties) // เพิ่ม properties ลงไปใน EntityManagerFactory
                 .build();
     }
 

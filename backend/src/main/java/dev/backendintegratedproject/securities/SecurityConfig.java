@@ -1,4 +1,4 @@
-package dev.backendintegratedproject.configs;
+package dev.backendintegratedproject.securities;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -13,6 +13,8 @@ import Edit from '@/assets/icons/CiEditPencil01.vue'
 import SortDown from '@/assets/icons/SortDown.vue'
 import SortUp from '@/assets/icons/SortUp.vue'
 import SortDefault from '@/assets/icons/SortDefault.vue'
+import VueJwtDecode from "vue-jwt-decode";
+
 
 const toaster = createToaster({
   /* options */
@@ -28,6 +30,7 @@ const error = ref(false)
 const complete = ref(false)
 const classNotify = ref('')
 const textNotify = ref('')
+const userFullName = ref('')
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`)
@@ -39,6 +42,13 @@ onMounted(async () => {
   statuses.value = statusRes
   statusFilter.value = statuses.value.map((status) => status.name)
   doFilter()
+
+  // token
+  // const token = localStorage.getItem('token')
+  // if (token) {
+  //   const decoded = jwtDecode(token)
+  //   userFullName.value = decoded.name
+  // }
 })
 
 // for modal

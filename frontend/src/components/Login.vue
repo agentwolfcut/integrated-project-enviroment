@@ -1,13 +1,15 @@
 <script setup>
 import router from "@/router";
 import { computed, ref } from "vue";
-
+import VueJwtDecode from "vue-jwt-decode";
 // input username password
 const usrpw = ref({ userName: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
+
+const userFullName = ref("");
 const inputUsrpw = async () => {
   try {
     // wait for agent api
@@ -25,6 +27,20 @@ const inputUsrpw = async () => {
         errorNotify("There is a problem. Please try again later.");
         router.back;
       }
+      // if 200 ok
+    } else {
+      const data = await res.json();
+      const token = data.token;
+      // save token to local storage
+      localStorage.setItem("token", token);
+      // decode token
+      const decoded = VueJwtDecode.decode(token);
+      console.log(decoded);
+      userFullName.value = decoded.name;
+      console.log("Login successful");
+
+      // redirect to tasks page
+      router.push("/tasks");
     }
   } catch (error) {
     errorNotify("There is a problem. Please try again later.");
@@ -40,18 +56,15 @@ const errorNotify = (text) => {
   }, 2000);
 };
 
-// const completeNotify = (status, action) => {
-//   complete.value = true;
-//   classNotify.value = "bg-green-600";
-//   textNotify.value = `The status ${status} has been successfully ${action}.`;
-//   setTimeout(() => {
-//     complete.value = false;
-//   }, 1500);
-// };
-
 const canLogin = computed(() => {
-  return usrpw.value.password.length > 0 && usrpw.value.userName.length > 0;
+  return (
+    usrpw.value.userName.length > 0 &&
+    usrpw.value.password.length > 0 &&
+    usrpw.value.userName.length <= 50 &&
+    usrpw.value.password.length <= 14
+  );
 });
+
 </script>
 
 <template>

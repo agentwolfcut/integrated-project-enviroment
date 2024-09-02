@@ -9,8 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
-@Getter
-@Setter
+
 @Data
 @Entity
 @Table(name = "users")

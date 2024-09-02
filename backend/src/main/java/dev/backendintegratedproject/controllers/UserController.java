@@ -66,7 +66,7 @@ public class UserController {
             String token = jwtTokenUtil.generateToken(user);
             return ResponseEntity.ok(Map.of("access_token", token));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The username or password is incorrect."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "The username or password is incorrect.");
         }
     }
 }

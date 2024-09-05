@@ -1,15 +1,14 @@
 <script setup>
 import router from "@/router";
-import { computed, ref } from "vue";
-import VueJwtDecode from "vue-jwt-decode";
+import { computed, ref  , provide} from "vue";
+import VueJwtDecode from 'vue-jwt-decode';
+
 // input username password
 const usrpw = ref({ userName: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-
-const userFullName = ref("");
 const inputUsrpw = async () => {
   try {
     // wait for agent api
@@ -30,22 +29,31 @@ const inputUsrpw = async () => {
       // if 200 ok
     } else {
       const data = await res.json();
-      const token = data.token;
+      const token = data.access_token;
       // save token to local storage
       localStorage.setItem("token", token);
-      // decode token
-      const decoded = VueJwtDecode.decode(token);
-      console.log(decoded);
-      userFullName.value = decoded.name;
-      console.log("Login successful");
-
-      // redirect to tasks page
-      router.push("/tasks");
+      console.log(token);
+      decode();
+      router.push("/task");
     }
   } catch (error) {
     errorNotify("There is a problem. Please try again later.");
   }
-};
+}
+const current_user = ref(null);
+const decode = () => {
+      // Take token from window local storage
+      let token = localStorage.getItem('token');
+      try {
+        let decoded = VueJwtDecode.decode(token);
+        current_user.value = decoded.name; // Store the decoded token
+        console.log(current_user.value);
+        
+      } catch (err) {
+        console.log('token is null: ', err);
+      }
+    };
+
 const errorNotify = (text) => {
   error.value = true;
   classNotify.value = "bg-red-500";
@@ -64,6 +72,7 @@ const canLogin = computed(() => {
     usrpw.value.password.length <= 14
   );
 });
+
 
 </script>
 

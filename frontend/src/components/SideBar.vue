@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref , inject } from 'vue'
+
 const pairs = [
   {
     image: 'https://i.imgur.com/wRtOzkV.jpeg',
@@ -32,10 +33,6 @@ const showProfileInfo = ref(false);
 </script>
 
 <template>
-
-
-
-
   <aside
     class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center  bg-slate-900">
   <div id='profileview' class="flex items-center w-full py-8 px-5" @click="showProfileInfo = true">

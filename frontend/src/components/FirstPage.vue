@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, nextTick, computed } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils'
 import { TaskManagement } from '@/libs/TaskManagement'
 import TaskDetail from './TaskDetail.vue'
@@ -13,7 +13,6 @@ import Edit from '@/assets/icons/CiEditPencil01.vue'
 import SortDown from '@/assets/icons/SortDown.vue'
 import SortUp from '@/assets/icons/SortUp.vue'
 import SortDefault from '@/assets/icons/SortDefault.vue'
-import VueJwtDecode from "vue-jwt-decode";
 
 
 const toaster = createToaster({
@@ -42,13 +41,6 @@ onMounted(async () => {
   statuses.value = statusRes
   statusFilter.value = statuses.value.map((status) => status.name)
   doFilter()
-
-  // token
-  // const token = localStorage.getItem('token')
-  // if (token) {
-  //   const decoded = jwtDecode(token)
-  //   userFullName.value = decoded.name
-  // }
 })
 
 // for modal

@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, ref, nextTick } from 'vue'
+import { onMounted, ref, nextTick, provide } from 'vue'
 import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils'
 import { TaskManagement } from '@/libs/TaskManagement'
 import TaskDetail from './TaskDetail.vue'
-import { createToaster } from '../../node_modules/@meforma/vue-toaster'
 import HeaderIT from './Header.vue'
 import SideBar from './SideBar.vue'
 import router from '@/router'
@@ -13,11 +12,10 @@ import Edit from '@/assets/icons/CiEditPencil01.vue'
 import SortDown from '@/assets/icons/SortDown.vue'
 import SortUp from '@/assets/icons/SortUp.vue'
 import SortDefault from '@/assets/icons/SortDefault.vue'
+import { useRoute } from 'vue-router';
+import VueJwtDecode from 'vue-jwt-decode';
 
 
-const toaster = createToaster({
-  /* options */
-})
 const taskMan = ref(new TaskManagement())
 const showModalDetail = ref(false)
 // const taskList = taskMan.value.gettasks();
@@ -29,7 +27,12 @@ const error = ref(false)
 const complete = ref(false)
 const classNotify = ref('')
 const textNotify = ref('')
-const userFullName = ref('')
+
+// sem2
+const route = useRoute()
+const currentUser = ref(null);
+
+
 // GET items
 onMounted(async () => {
   const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`)
@@ -41,7 +44,18 @@ onMounted(async () => {
   statuses.value = statusRes
   statusFilter.value = statuses.value.map((status) => status.name)
   doFilter()
+  if (route.state && route.state.currentUser) {
+    currentUser.value = route.state.currentUser;
+  } else {
+    // Fallback if state is not available
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = VueJwtDecode.decode(token);
+      currentUser.value = decoded.name;      
+    }
+  }
 })
+provide('currentUser', currentUser)
 
 // for modal
 const selectTask = ref({
@@ -94,17 +108,6 @@ const cancel = (flag) => {
 // DELETE
 const showDeleteModal = ref(false)
 const taskToDelete = ref(undefined)
-
-const deleteTran = async (removeId) => {
-  const status = await deleteTranById(
-    import.meta.env.VITE_API_ENDPOINT,
-    removeId
-  )
-  if (status == 200) {
-    allTrans.value.removeTransaction(removeId)
-    setCurrMonthYear()
-  }
-}
 
 const deleteTask = async (removeId) => {
   try {
@@ -319,7 +322,7 @@ const toggleSortOrder = () => {
 
 <template>
   <div class="flex">
-    <SideBar />
+    <SideBar :user="currentUser"/>
     <!-- <div class="flex content flex-col items-center h-screen"> -->
     <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />

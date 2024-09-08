@@ -24,7 +24,8 @@ const inputUsrpw = async () => {
         errorNotify("Username or Password is incorrect.");
       } else {
         errorNotify("There is a problem. Please try again later.");
-        router.back;
+        console.log(res.status);
+        
       }
       // if 200 ok
     } else {
@@ -32,12 +33,15 @@ const inputUsrpw = async () => {
       const token = data.access_token;
       // save token to local storage
       localStorage.setItem("token", token);
-      console.log(token);
       decode();
-      router.push("/task");
+      // router.push("/task");
+      router.push({ name: 'Task', state: { currentUser: current_user.value } });
+
     }
   } catch (error) {
     errorNotify("There is a problem. Please try again later.");
+    console.log(error);
+    
   }
 }
 const current_user = ref(null);
@@ -46,9 +50,7 @@ const decode = () => {
       let token = localStorage.getItem('token');
       try {
         let decoded = VueJwtDecode.decode(token);
-        current_user.value = decoded.name; // Store the decoded token
-        console.log(current_user.value);
-        
+        current_user.value = decoded.name; // Store the decoded token        
       } catch (err) {
         console.log('token is null: ', err);
       }

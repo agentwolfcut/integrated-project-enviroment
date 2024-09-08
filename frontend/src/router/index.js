@@ -18,6 +18,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   {
     path: "/task",
+    name: "Task" ,
     component: FirstPage,
     children: [
       { path: "add", component: AddTask, name: "AddTask" },

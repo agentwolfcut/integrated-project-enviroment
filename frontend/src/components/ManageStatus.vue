@@ -1,11 +1,10 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref  , provide} from "vue";
 import HeaderIT from "./Header.vue";
 import {
   getItems,
   transferTasksAndDeleteStatus,
-  deleteItemById,
-  editItem,
+  deleteItemById
 } from "../libs/fetchUtils";
 import { StatusManagement } from "@/libs/StatusManagement";
 import SideBar from "./SideBar.vue";
@@ -13,6 +12,8 @@ import buttonSlot from "./Button.vue";
 import Trash from "@/assets/icons/CiTrashFull.vue";
 import Edit from "@/assets/icons/CiEditPencil01.vue";
 import router from "@/router";
+import { useRoute } from "vue-router";
+import VueJwtDecode from "vue-jwt-decode";
 import { createToaster } from "../../node_modules/@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
 
@@ -24,11 +25,26 @@ const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
+const currentUser = ref('')
+const route = useRoute()
+
 // GET
 onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
   statusMan.value.addStatuses(statusRes);
+  if (route.state && route.state.currentUser) {
+    currentUser.value = route.state.currentUser;
+  } else {
+    // Fallback if state is not available
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = VueJwtDecode.decode(token);
+      currentUser.value = decoded.name;      
+    }
+  }
 });
+provide('currentUser', currentUser)
+
 
 const statusList = ref(statusMan.value.getStatuses());
 const errorNotify = () => {
@@ -109,7 +125,7 @@ const checkTasksBeforeDelete = async (status) => {
   } else {
     const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
     tasks.value = { ...res };
-    // console.log(tasks.value);
+    // console.log(tasks.value);F
     const clean = JSON.parse(JSON.stringify(tasks.value));
     // console.log(clean);
     const tasksArray = Object.values(clean);
@@ -230,7 +246,7 @@ const handelFail = () => {
 
 <template>
   <div class="flex">
-    <SideBar />
+    <SideBar :user="currentUser"/>
     <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">

@@ -1,59 +1,38 @@
 <script setup>
-import { ref , inject } from 'vue'
+import { defineProps, inject, ref } from 'vue'
 
-const pairs = [
-  {
-    image: 'https://i.imgur.com/wRtOzkV.jpeg',
-    name: 'Poy 2G.',
-    frole: 'Frontend Developer',
-    fname: 'Nattawan Kumapao',
-    role: 'FE Dev',
-  },
-  {
-    image: 'https://i.imgur.com/vwFi6N5.jpeg',
-    name: 'Gent A.',
-    fname: 'Phurikorn Saengsuwan',
-    frole: 'Backend Developer',
-    role: 'BE Dev',
-  },
-  {
-    image: 'https://i.imgur.com/ypeEWRe.jpeg',
-    name: 'Pora W.',
-    frole: 'Project Coordinator',
-    fname: 'Poramade Winyunawan',
-    role: 'Infra',
-  },
-]
-const getRandomIndex = (array) => Math.floor(Math.random() * array.length)
-const randomPair = ref(pairs[0])
-window.addEventListener('load', () => {
-  randomPair.value = pairs[getRandomIndex(pairs)]
-})
-const showProfileInfo = ref(false);
+// const props = defineProps({
+//     user: {
+//         type: String,
+//         default: 'Guest'
+//     }
+// })
+const currentUser = inject('currentUser')
+
 </script>
 
 <template>
   <aside
     class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center  bg-slate-900">
-  <div id='profileview' class="flex items-center w-full py-8 px-5" @click="showProfileInfo = true">
+  <div id='profileview' class="flex items-center w-full py-8 px-5" >
     <div class="relative">
-      <img
+      <!-- <img
         class="w-12 h-12 rounded-full border-2 border-green-400"
         :src="randomPair.image"
         alt="User Avatar"
       />
       <span
         class="loading loading-infinity top-10 left-2 absolute w-8 h-8 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"
-      ></span>
+      ></span> -->
     </div>
     <div class="ml-5">
-      <p class="text-white font-semibold">{{ randomPair.name }}</p>
+      <p class="text-white font-semibold"> {{ currentUser }} </p>
 
-      <p class="text-gray-400 text-sm ">{{ randomPair.role }}  <p class="loading loading-ring loading-xs h-3"></p></p>
+      <p class="text-gray-400 text-sm ">  Welcome <p class="loading loading-ring loading-xs h-3"></p></p>
     </div>
   </div>
 
-  <transition name="fade-in">
+  <!-- <transition name="fade-in">
     <div @click="showProfileInfo = false"  v-if="showProfileInfo" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class=" p-8 rounded-lg" >
         <img
@@ -79,8 +58,7 @@ const showProfileInfo = ref(false);
 </div>
       </div>
     </div>
-  </transition>
-
+  </transition> -->
 
     <nav class="flex flex-1 flex-col items-center gap-y-4 pt-10">
       <div
@@ -116,7 +94,6 @@ const showProfileInfo = ref(false);
 <span class="loading loading-ball loading-lg"></span>
       </div>
     </nav>
-
 
   </aside>
 </template>

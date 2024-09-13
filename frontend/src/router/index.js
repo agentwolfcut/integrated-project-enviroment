@@ -16,19 +16,12 @@ const routes = [
   // first page & wait t. give endpoint
   { path: "/", redirect: "/login" },
   { path: "/login", name: "Login", component: Login },
-  {
-    path: "/task",
-    name: "Task" ,
-    component: FirstPage,
-    children: [
+  {path: "/task", name: "Task" , component: FirstPage, children: [
       { path: "add", component: AddTask, name: "AddTask" },
       { path: ":taskId/edit", component: EditTask, name: "EditTask" },
     ],
   },
-  {
-    path: "/status",
-    component: ManageStatus,
-    children: [
+  {path: "/status",component: ManageStatus,children: [
       {
         path: "add",
         component: AddStatus,
@@ -42,21 +35,22 @@ const routes = [
       },
     ],
   },
-  {
-    path: "/task/:id",
-    name: "TaskDetail",
-    component: NotFoundId,
-  },
-  {
-    path: "/:notfoundpath(.*)",
-    name: "NotFound",
-    component: NotFound,
-    redirect: "/login",
-  },
+  {path: "/task/:id", name: "TaskDetail", component: NotFoundId,},
+  {path: "/:notfoundpath(.*)", name: "NotFound", component: NotFound,redirect: "/login", },
 ];
+
 const router = createRouter({
   history,
   routes,
   linkActiveClass: "text-blue-300",
 });
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ["/login"]
+  const authRequired = !publicPages.includes(to.path)
+  const loggedIn = localStorage.getItem("token")
+
+  if (authRequired && !loggedIn) return next("/login")
+  next()
+})
 export default router;

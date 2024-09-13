@@ -16,6 +16,7 @@ import { useRoute } from "vue-router";
 import VueJwtDecode from "vue-jwt-decode";
 import { createToaster } from "../../node_modules/@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
+import { post, put } from "@/libs/Utils";
 
 const toaster = createToaster({
   /* options */
@@ -27,10 +28,22 @@ const classNotify = ref("");
 const textNotify = ref("");
 const currentUser = ref('')
 const route = useRoute()
+const destinationStatusId = ref(null);
+const hasTasksToTransfer = ref(false);
+const confirmDelete = ref(false);
+const statusDelete = ref(undefined);
+const confirmTransfer = ref(false);
+const deleteDefault = ref(false);
+const taskCount = ref(undefined);
+const tasks = ref("");
+const editingStatus = ref({ id: undefined, name: "", description: "" });
 
+
+// sem2
+const token = localStorage.getItem('token');
 // GET
 onMounted(async () => {
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`);
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token );
   statusMan.value.addStatuses(statusRes);
   if (route.state && route.state.currentUser) {
     currentUser.value = route.state.currentUser;
@@ -43,8 +56,8 @@ onMounted(async () => {
     }
   }
 });
-provide('currentUser', currentUser)
 
+provide('currentUser', currentUser)
 
 const statusList = ref(statusMan.value.getStatuses());
 const errorNotify = () => {
@@ -65,7 +78,6 @@ const completeNotify = (status, action) => {
   }, 1500);
 };
 // ADD
-const editingStatus = ref({ id: undefined, name: "", description: "" });
 const addStatus = async () => {
   try {
     // Trim name and description
@@ -77,6 +89,7 @@ const addStatus = async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization" : `${token}`
       },
       body: JSON.stringify(editingStatus.value),
     });
@@ -88,6 +101,11 @@ const addStatus = async () => {
         `Failed to add status. Server responded with status ${res.status}`
       );
     }
+    // const res = await post(
+    //   `${import.meta.env.VITE_BASE_URL}/statuses`,
+    //   editingStatus.value,
+    //   token
+    // )
     const addedItem = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด
     editingStatus.value = { id: undefined, name: "", description: "" };
     // console.log(previousTask.value);
@@ -100,22 +118,17 @@ const addStatus = async () => {
     completeNotify(addedItem.name, "added");
   } catch (error) {
     // Navigate back
-    errorNotify();
+    router.back()
+    clearEdit()
+    errorNotify()
+    console.error(`Failed to add status: ${error}`);
+
     // Handle error as needed
   }
 };
 
+
 // DELETE
-const destinationStatusId = ref(null);
-const hasTasksToTransfer = ref(false);
-const confirmDelete = ref(false);
-const statusDelete = ref(undefined);
-const confirmTransfer = ref(false);
-const deleteDefault = ref(false);
-const taskCount = ref(undefined);
-
-const tasks = ref("");
-
 const checkTasksBeforeDelete = async (status) => {
   if (status.id === 1 || status.name === "Done") {
     deleteDefault.value = true;
@@ -123,7 +136,7 @@ const checkTasksBeforeDelete = async (status) => {
       deleteDefault.value = false;
     }, 1000);
   } else {
-    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`);
+    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks` , token);
     tasks.value = { ...res };
     // console.log(tasks.value);F
     const clean = JSON.parse(JSON.stringify(tasks.value));
@@ -149,7 +162,7 @@ const deleteStatus = async () => {
   const removeId = statusDelete.value.id;
   const removeStatus = await deleteItemById(
     `${import.meta.env.VITE_BASE_URL}/statuses`,
-    removeId
+    removeId , token
   );
   // front
   if (removeStatus === 200) {
@@ -169,7 +182,8 @@ const transferAndDeleteStatus = async () => {
     const result = await transferTasksAndDeleteStatus(
       `${import.meta.env.VITE_BASE_URL}/statuses`,
       removeId,
-      destinationId
+      destinationId ,
+      token
     );
     if (result === 200) {
       statusMan.value.removeStatus(removeId);
@@ -199,25 +213,30 @@ const updateStatus = async (editStatus) => {
         editingStatus.value.description === null
       }
     }
-    console.log(editingStatus.value);
-    const res = await fetch(
+
+    const resJson = await put(
       `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(editingStatus.value),
-      }
+      editingStatus.value,
+      token
     );
-    if (!res.ok) {
-      throw new Error(
-        `Failed to update task. Server responded with status ${res.status}`
-      );
-    }
-    const resJson = await res.json();
-    // console.log(res.json());
+
     console.log(resJson);
+    // const res = await fetch(
+    //   `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
+    //   {
+    //     method: "PUT",
+    //     headers: {
+    //       "content-type": "application/json",
+    //     },
+    //     body: JSON.stringify(editingStatus.value),
+    //   }
+    // );
+    // if (!res.ok) {
+    //   throw new Error(
+    //     `Failed to update task. Server responded with status ${res.status}`
+    //   );
+    // }
+    // const resJson = await res.json();
     statusMan.value.updateStatus(resJson);
     statusList.value = statusMan.value.getStatuses();
     router.back();

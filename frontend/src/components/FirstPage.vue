@@ -14,6 +14,7 @@ import SortUp from '@/assets/icons/SortUp.vue'
 import SortDefault from '@/assets/icons/SortDefault.vue'
 import { useRoute } from 'vue-router';
 import VueJwtDecode from 'vue-jwt-decode';
+import { get , post , del} from '@/libs/Utils'
 
 
 const taskMan = ref(new TaskManagement())
@@ -27,20 +28,32 @@ const error = ref(false)
 const complete = ref(false)
 const classNotify = ref('')
 const textNotify = ref('')
-
+const showDeleteModal = ref(false)
+const taskToDelete = ref(undefined)
+// for modal
+const selectTask = ref({
+  id: undefined,
+  title: '',
+  description: '',
+  assignees: '',
+  status: 1,
+  createdOn: '',
+  updatedOn: '',
+})
 // sem2
 const route = useRoute()
 const currentUser = ref(null);
+const token = localStorage.getItem('token');
 
 
 // GET items
 onMounted(async () => {
-  const taskRes = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`)
+  const taskRes = await get(`${import.meta.env.VITE_BASE_URL}/tasks` , token)
   //tasks.value = taskRes // reverse and slice to show the most
   taskMan.value.addtasks(taskRes)
   sortedTasks.value = taskMan.value.gettasks()
   // status
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
+  const statusRes = await get(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
   statuses.value = statusRes
   statusFilter.value = statuses.value.map((status) => status.name)
   doFilter()
@@ -57,16 +70,7 @@ onMounted(async () => {
 })
 provide('currentUser', currentUser)
 
-// for modal
-const selectTask = ref({
-  id: undefined,
-  title: '',
-  description: '',
-  assignees: '',
-  status: 1,
-  createdOn: '',
-  updatedOn: '',
-})
+
 
 const errorNotify = () => {
   error.value = true
@@ -86,14 +90,25 @@ const completeNotify = (task, action) => {
   }, 1500)
 }
 
+// const openDetails = async (id) => {
+//   //console.log(id);
+//   const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id)
+//   selectTask.value = item
+//   // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
+//   showModalDetail.value = true
+//   // router.push(`/task/${id}`)
+// }
+
 const openDetails = async (id) => {
-  //console.log(id);
-  const item = await getItemById(`${import.meta.env.VITE_BASE_URL}/tasks`, id)
-  selectTask.value = item
-  // selectTask.value.status = selectTask.value.status.split('_').map(words => words.charAt(0).toUpperCase() + words.slice(1).toLowerCase()).join(' ')
-  showModalDetail.value = true
-  // router.push(`/task/${id}`)
-}
+  try {
+    const item = await get(`${import.meta.env.VITE_BASE_URL}/tasks/${id}` , token);
+    selectTask.value = item;
+    showModalDetail.value = true;
+  } catch (error) {
+    console.error('Error fetching item details:', error);
+    // Handle error appropriately
+  }
+};
 
 const cancel = (flag) => {
   showModalDetail.value = flag
@@ -105,28 +120,6 @@ const cancel = (flag) => {
   }
 }
 
-// DELETE
-const showDeleteModal = ref(false)
-const taskToDelete = ref(undefined)
-
-const deleteTask = async (removeId) => {
-  try {
-    const status = await deleteItemById(
-      `${import.meta.env.VITE_BASE_URL}/tasks`,
-      removeId
-    )
-    if (status === 200) {
-      sortMode.value = 'default'
-      taskMan.value.removetask(removeId)
-      sortedTasks.value = taskMan.value.gettasks()
-      completeNotify(removeId, 'deleted')
-    } else {
-      errorNotify()
-    }
-  } catch (error) {
-    errorNotify()
-  }
-}
 
 // ADD
 const saveTask = async () => {
@@ -142,6 +135,7 @@ const saveTask = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        "Authorization" : `${token}`
       },
       body: JSON.stringify(selectTask.value),
     })
@@ -167,6 +161,75 @@ const saveTask = async () => {
     errorNotify()
   }
 }
+// new add that use Utils.js
+// const saveTask = async() => {
+//   selectTask.value.title = selectTask.value.title.trim()
+//   if (selectTask.value.description !== null) {
+//     selectTask.value.description = selectTask.value.description.trim()
+//   }
+//   if (selectTask.value.assignees !== null) {
+//     selectTask.value.assignees = selectTask.value.assignees.trim()
+//   }
+
+//   try {
+//     const addedTask = await post(`${import.meta.env.VITE_BASE_URL}/tasks`, selectTask.value)
+//     addedTask.status = addedTask.status.name
+//     taskMan.value.addtask(addedTask)
+//     sortedTasks.value = taskMan.value.gettasks()
+//     router.back()
+//     completeNotify(addedTask.title, 'added')
+//     selectTask.value = {
+//       title: '',
+//       description: '',
+//       assignees: '',
+//       status: 1,
+//     }
+//   } catch (error) {
+//     errorNotify()
+//   }
+// }
+
+
+// DELETE
+
+
+// DELETE
+// const deleteTask = async (removeId) => {
+//   try {
+//     const status = await deleteItemById(
+//       `${import.meta.env.VITE_BASE_URL}/tasks`,
+//       removeId
+//     )
+//     if (status === 200) {
+//       sortMode.value = 'default'
+//       taskMan.value.removetask(removeId)
+//       sortedTasks.value = taskMan.value.gettasks()
+//       completeNotify(removeId, 'deleted')
+//     } else {
+//       errorNotify()
+//     }
+//   } catch (error) {
+//     errorNotify()
+//   }
+// }
+
+const deleteTask = async (removeId) => {
+  try {
+    const response = await del(`${import.meta.env.VITE_BASE_URL}/tasks/${removeId}` , token);
+    if (response.status === 200) {
+      sortMode.value = 'default';
+      taskMan.value.removetask(removeId);
+      sortedTasks.value = taskMan.value.gettasks();
+      completeNotify(removeId, 'deleted');
+    } else {
+      errorNotify();
+    }
+  } catch (error) {
+    errorNotify();
+  }
+};
+
+
 
 // EDIT
 const editMode = (task) => {
@@ -196,6 +259,7 @@ const editTask = async (editedTask) => {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
+          "Authorization" : `${token}`
         },
         // body: JSON.stringify({
         //   ...selectTask.value,
@@ -270,7 +334,7 @@ const doFilter = async () => {
     const statusString = statusFilter.value.join(',')
     // Logs the comma-separated string of selected statuses
     const res = await getItems(
-      `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}`
+      `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}` , token
     )
     sortedTasks.value = res
   } else {

@@ -45,12 +45,20 @@ const router = createRouter({
   linkActiveClass: "text-blue-300",
 });
 
-router.beforeEach((to, from, next) => {
-  const publicPages = ["/login"]
-  const authRequired = !publicPages.includes(to.path)
-  const loggedIn = localStorage.getItem("token")
+// router.beforeEach((to, from, next) => {
+//   const publicPages = ["/login"]
+//   const authRequired = !publicPages.includes(to.path)
+//   const loggedIn = localStorage.getItem("token")
+//   if (authRequired && !loggedIn) return next("/login")
+//   next()
+// })
 
-  if (authRequired && !loggedIn) return next("/login")
-  next()
-})
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+  if (!token && to.path !== '/login') {
+    next('/login');
+  } else {
+    next();
+  }
+});
 export default router;

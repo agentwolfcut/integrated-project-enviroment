@@ -1,12 +1,24 @@
 // async task must wait , inside are promise
-async function getItems(url) {
-  //ส่งurl
+async function getItems(url, token = null) {
   try {
-    const data = await fetch(url); //GET METHOD อย่างเดียว default + await รอ promise ของ fetch
-    const items = await data.json(); // converse json => js object
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `${token}`;
+    }
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const items = await response.json();
     return items;
   } catch (error) {
     console.log(`error: ${error}`);
+    throw error; // Re-throw the error to handle it in the calling function
   }
 }
 
@@ -20,11 +32,17 @@ async function getItemById(url, id) {
   }
 }
 
-async function deleteItemById(url, id) {
-  //console.log(`${url}/${id}`)
+async function deleteItemById(url, id ,token = null) {
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `${token}`;
+    }
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE",
+      headers: headers,
     });
     return res.status; // number of network
   } catch (error) {
@@ -32,10 +50,17 @@ async function deleteItemById(url, id) {
   }
 }
 
-async function transferTasksAndDeleteStatus(url, id, desId) {
+async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `${token}`;
+    }
     const res = await fetch(`${url}/${id}/${desId}`, {
       method: "DELETE",
+      headers: headers,
     });
     return res.status;
   } catch (error) {

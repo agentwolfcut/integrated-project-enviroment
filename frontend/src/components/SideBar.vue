@@ -26,7 +26,7 @@ const currentUser = inject('currentUser')
       ></span> -->
     </div>
     <div class="ml-5">
-      <p class="text-white font-semibold"> {{ currentUser }} </p>
+      <p class="itbkk-fullname text-white font-semibold"> {{ currentUser }} </p>
 
       <p class="text-gray-400 text-sm ">  Welcome <p class="loading loading-ring loading-xs h-3"></p></p>
     </div>

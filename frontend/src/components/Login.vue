@@ -1,7 +1,8 @@
 <script setup>
 import router from "@/router";
-import { computed, ref  , provide} from "vue";
+import { computed, ref } from "vue";
 import VueJwtDecode from 'vue-jwt-decode';
+import { post } from "@/libs/Utils";
 
 // input username password
 const usrpw = ref({ userName: "", password: "" });
@@ -9,41 +10,59 @@ const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
+
+// const inputUsrpw = async () => {
+//   try {
+//     // wait for agent api
+//     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(usrpw.value),
+//     });
+//     if (!res.ok) {
+//       if (res.status === 400 || res.status === 401) {
+//         errorNotify("Username or Password is incorrect.");
+//       } else {
+//         errorNotify("There is a problem. Please try again later.");
+//         console.log(res.status);
+        
+//       }
+//       // if 200 ok
+//     } else {
+//       const data = await res.json();
+//       const token = data.access_token;
+//       // save token to local storage
+//       localStorage.setItem("token", token);
+//       decode();
+//       // router.push("/task");
+//       router.push({ name: 'Task', state: { currentUser: current_user.value } });
+
+//     }
+//   } catch (error) {
+//     errorNotify("There is a problem. Please try again later.");
+//     console.log(error);
+    
+//   }
+// }
 const inputUsrpw = async () => {
   try {
-    // wait for agent api
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(usrpw.value),
-    });
-    if (!res.ok) {
-      if (res.status === 400 || res.status === 401) {
-        errorNotify("Username or Password is incorrect.");
-      } else {
-        errorNotify("There is a problem. Please try again later.");
-        console.log(res.status);
-        
-      }
-      // if 200 ok
+    const data = await post(`${import.meta.env.VITE_BASE_URL}/login`, usrpw.value);
+    const token = data.access_token;
+    localStorage.setItem("token", token);
+    console.log(token);
+    decode();
+    router.push({ name: 'Task', state: { currentUser: current_user.value } });
+} catch (error) {
+    if (error.message.includes('401')) {
+      errorNotify("Username or Password is incorrect.");
     } else {
-      const data = await res.json();
-      const token = data.access_token;
-      // save token to local storage
-      localStorage.setItem("token", token);
-      decode();
-      // router.push("/task");
-      router.push({ name: 'Task', state: { currentUser: current_user.value } });
-
+      errorNotify("There is a problem. Please try again later.");
+      router.back();
     }
-  } catch (error) {
-    errorNotify("There is a problem. Please try again later.");
-    console.log(error);
-    
   }
-}
+};
 const current_user = ref(null);
 const decode = () => {
       // Take token from window local storage

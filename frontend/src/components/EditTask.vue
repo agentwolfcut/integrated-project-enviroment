@@ -24,10 +24,11 @@ const props = defineProps({
 });
 
 const previousTask = ref({...props.task})
-
 const statusOptions = ref('')
+const token = localStorage.getItem('token');
+
 onMounted(async () => {
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
   statusOptions.value = statusRes;
 })
 

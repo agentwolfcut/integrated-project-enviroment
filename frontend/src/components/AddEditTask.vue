@@ -3,7 +3,6 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
 import { getItems } from '../libs/fetchUtils';
-
 import router from '@/router';
 
 const props = defineProps({
@@ -21,14 +20,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['saveUpdateTask' , 'cancelOpe']); // Define the custom event
-
 const previousTask = computed(() => props.task)
-
-
 const statusOptions = ref('')
 
+const token = localStorage.getItem('token');
+
+
 onMounted(async () => {
-    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses`)
+    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {

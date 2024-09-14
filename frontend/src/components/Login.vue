@@ -25,7 +25,6 @@ const inputUsrpw = async () => {
       const token = data.access_token;
       // save token to local storage
       localStorage.setItem("token", token);
-      console.log(token);
       decode();
       router.push("/task");
       // router.push("/task");

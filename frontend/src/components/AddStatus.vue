@@ -15,15 +15,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['saveStatus','cancelAdd'])
-
 const previousStatus = computed(() => props.status)
-
 const textColorClass = computed(() => {
     if (previousStatus.value.description !== null) {
           return previousStatus.value.name.length > 49 || previousStatus.value.description.length > 199 ? 'text-red-600' : 'text-blue-600';
     }
 });
-
 const limitInputLength = () => {
     if (previousStatus.value.name.length > 50) {
         previousStatus.value.name = previousStatus.value.name.slice(0, 50);

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, nextTick, provide } from 'vue'
-import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils'
+import { getItems } from '../libs/fetchUtils'
 import { TaskManagement } from '@/libs/TaskManagement'
 import TaskDetail from './TaskDetail.vue'
 import HeaderIT from './Header.vue'
@@ -14,12 +14,11 @@ import SortUp from '@/assets/icons/SortUp.vue'
 import SortDefault from '@/assets/icons/SortDefault.vue'
 import { useRoute } from 'vue-router';
 import VueJwtDecode from 'vue-jwt-decode';
-import { get , post , del} from '@/libs/Utils'
+import { get  , del} from '@/libs/Utils'
 
 
 const taskMan = ref(new TaskManagement())
 const showModalDetail = ref(false)
-// const taskList = taskMan.value.gettasks();
 const statuses = ref({})
 const sortedTasks = ref([])
 const sortMode = ref('default') // 'default', 'alp', 'desc'
@@ -120,7 +119,6 @@ const cancel = (flag) => {
   }
 }
 
-
 // ADD
 const saveTask = async () => {
   selectTask.value.title = selectTask.value.title.trim()
@@ -191,7 +189,6 @@ const saveTask = async () => {
 
 
 // DELETE
-
 
 // DELETE
 // const deleteTask = async (removeId) => {

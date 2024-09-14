@@ -9,6 +9,8 @@ const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
 
+const current_user = ref(null);
+
 const inputUsrpw = async () => {
   try {
     // wait for agent api
@@ -44,7 +46,6 @@ const inputUsrpw = async () => {
     console.log(error);
   }
 }
-const current_user = ref(null);
 const decode = () => {
       // Take token from window local storage
       let token = localStorage.getItem('token');

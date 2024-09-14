@@ -3,7 +3,6 @@ import router from '@/router';
 import { useRoute } from 'vue-router'
 import { computed, ref, onMounted, watch } from 'vue';
 
-const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
 const props = defineProps({
     status: {
         type: Object,
@@ -14,9 +13,11 @@ const props = defineProps({
         }
     }
 })
-
+const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
 const route = useRoute()
-const statusId = ref(route.params.id)
+// const statusId = ref(route.params.id)
+const initialStatus = JSON.parse(JSON.stringify(props.status))
+console.log(initialStatus);
 
 const previousStatus = ref({...props.status})
 if (previousStatus.value.id === undefined || previousStatus.value.name === null || previousStatus.value.name === undefined || previousStatus.value.title == '') {
@@ -29,8 +30,7 @@ if (previousStatus.value.id === undefined || previousStatus.value.name === null 
 }
 
 // Track the initial state of the status to detect changes
-const initialStatus = JSON.parse(JSON.stringify(props.status))
-console.log(initialStatus);
+
 
 const isSaveDisabled = computed(() => {
   return (

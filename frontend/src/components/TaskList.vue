@@ -1,5 +1,4 @@
 <script setup>
-import { useRouter } from 'vue-router'
 import Trash from '@/assets/icons/CiTrashFull.vue'
 import Edit from '@/assets/icons/CiEditPencil01.vue'
 import { computed, ref } from 'vue'
@@ -27,12 +26,6 @@ const showDeleteModal = ref(false)
 
 const cancelDelete = () => {
   showDeleteModal.value = false
-}
-
-const showAlert = ref(false)
-const handleTaskAdded = (statusCode) => {
-  showAlert.value = true
-  console.log('Task added with status code:', statusCode)
 }
 
 const taskToDelete = ref(undefined)

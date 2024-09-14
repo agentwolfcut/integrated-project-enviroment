@@ -1,12 +1,6 @@
 <script setup>
 import { defineProps, inject, ref } from 'vue'
 
-// const props = defineProps({
-//     user: {
-//         type: String,
-//         default: 'Guest'
-//     }
-// })
 const currentUser = inject('currentUser')
 
 </script>

@@ -38,7 +38,6 @@ const taskCount = ref(undefined);
 const tasks = ref("");
 const editingStatus = ref({ id: undefined, name: "", description: "" });
 
-
 // sem2
 const token = localStorage.getItem('token');
 // GET

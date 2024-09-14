@@ -18,13 +18,13 @@ const props = defineProps({
         require: true
     }
 })
-
 const emit = defineEmits(['saveUpdateTask' , 'cancelOpe']); // Define the custom event
 const previousTask = computed(() => props.task)
 const statusOptions = ref('')
+const route = useRoute();
+const taskId = ref(route.params.taskId)
 
 const token = localStorage.getItem('token');
-
 
 onMounted(async () => {
     const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
@@ -34,9 +34,6 @@ onMounted(async () => {
         previousTask.value.status = defaultStatus.id;
     }
 })
-
-const route = useRoute();
-const taskId = ref(route.params.taskId)
 
 const textColorClass = computed(() => {
     if (previousTask.value.description !== null) {  

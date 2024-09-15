@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: gpm@password
       MYSQL_ROOT_PASSWORD: gpm
     volumes:
-      - ./database/data:/var/lib/mysql
+      - ./database/data:/var/lib/mysql/
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./database/my.cnf:/etc/my.cnf
 

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v2/statuses")
 @CrossOrigin(origins = {"http://localhost:5173",
-        "http://ip23ft.sit.kmutt.ac.th",
+        "http://ip23kk3.sit.kmutt.ac.th",
         "http://intproj23.sit.kmutt.ac.th"})
 public class StatusController {
     @Autowired

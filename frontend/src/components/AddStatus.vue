@@ -2,7 +2,6 @@
 import router from '@/router';
 import { computed, ref } from 'vue';
 
-
 const props = defineProps({
     status: {
         type: Object,

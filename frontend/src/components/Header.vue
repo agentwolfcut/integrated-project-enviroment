@@ -34,11 +34,11 @@
     <a
       class="p-2 px-4 text-xl text-white"
       style="background-color: rgb(14, 21, 39)"
-      >𝙆𝙧𝙖𝙙𝙖𝙣𝙆𝙖𝙣𝙗𝙖𝙣 <img src="./logo.gif" class="p-1 h-10 w-10"
+      >𝙆𝙧𝙖𝙙𝙖𝙣𝙆𝙖𝙣𝙗𝙖𝙣 <img src="../../public/logo.gif" class="p-1 h-10 w-10"
     /></a>
 
     <div class="header-container px-2">
-      <img src="./SIT-Logo-for-web-120px.png" class="h-7 w-29" />
+      <img src="../../public/logoSIT.png" class="h-7 w-29" />
     </div>
   </div>
 </template>

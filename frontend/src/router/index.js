@@ -8,9 +8,11 @@ import ManageStatus from "@/components/ManageStatus.vue";
 import AddStatus from "@/components/AddStatus.vue";
 import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/components/Login.vue";
+import Board from "@/views/Board.vue";
+import AddBoard from "@/components/AddBoard.vue";
+
 // set history of stor path when visit
 const history = createWebHistory(import.meta.env.BASE_URL);
-
 // give roue paths
 const routes = [
   // first page & wait t. give endpoint
@@ -37,6 +39,10 @@ const routes = [
   },
   {path: "/task/:id", name: "TaskDetail", component: NotFoundId,},
   {path: "/:notfoundpath(.*)", name: "NotFound", component: NotFound,redirect: "/login", },
+  {path: "/board" , name: "Board" , component: Board , children: [
+    {path: 'add' , component: AddBoard , name: 'AddBoard'}
+  ]} ,
+
 ];
 
 const router = createRouter({
@@ -44,14 +50,6 @@ const router = createRouter({
   routes,
   linkActiveClass: "text-blue-300",
 });
-
-// router.beforeEach((to, from, next) => {
-//   const publicPages = ["/login"]
-//   const authRequired = !publicPages.includes(to.path)
-//   const loggedIn = localStorage.getItem("token")
-//   if (authRequired && !loggedIn) return next("/login")
-//   next()
-// })
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');

@@ -1,4 +1,3 @@
-// JwtTokenUtil.java
 package dev.backendintegratedproject.securities;
 
 import dev.backendintegratedproject.userManage.UserEntity;
@@ -7,8 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -37,7 +36,7 @@ public class JwtTokenUtil {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT") // Explicitly set the token type as JWT
                 .setClaims(information)
-                .setIssuer("https://intproj23.sit.kmutt.ac.th/kw3/") // Set the correct issuer
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/kk3/") // Set the correct issuer
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(secretKey) // Sign with HS256
@@ -50,5 +49,21 @@ public class JwtTokenUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final Claims claims = getClaimsFromToken(token);
+        final String username = claims.getSubject();
+        final Date expirationDate = claims.getExpiration();
+
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(expirationDate));
+    }
+
+    private Boolean isTokenExpired(Date expirationDate) {
+        return expirationDate.before(new Date());
+    }
+
+    public String getUsernameFromToken(String jwtToken) {
+        return getClaimsFromToken(jwtToken).getSubject();
     }
 }

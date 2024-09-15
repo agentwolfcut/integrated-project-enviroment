@@ -18,31 +18,33 @@ import java.util.Map;
 public class JwtTokenUtil {
 
     private SecretKey secretKey;
-    private final long expiration = 1800L; // 30 minutes in seconds
+    private final long expiration = 18000L;  // Token expiration time in seconds (30 minutes)
 
     @PostConstruct
     public void init() {
-        // Generate a secure key for HS256
+        // Generate secure key for HS256
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
+    // Generate JWT with user information
     public String generateToken(UserEntity user) {
-        Map<String, Object> information = new HashMap<>();
-        information.put("name", user.getName());
-        information.put("oid", user.getOid());
-        information.put("email", user.getEmail());
-        information.put("role", user.getRole());
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("name", user.getName());
+        claims.put("oid", user.getOid());
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
 
         return Jwts.builder()
-                .setHeaderParam("typ", "JWT") // Explicitly set the token type as JWT
-                .setClaims(information)
-                .setIssuer("https://intproj23.sit.kmutt.ac.th/kk3/") // Set the correct issuer
+                .setClaims(claims)
+                .setSubject(user.getEmail())  // Subject is the username or email
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/kk3/")  // Set the correct issuer
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
-                .signWith(secretKey) // Sign with HS256
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))  // Expiration time
+                .signWith(secretKey)  // Sign with HS256
                 .compact();
     }
 
+    // Parse claims from the JWT
     public Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -51,11 +53,11 @@ public class JwtTokenUtil {
                 .getBody();
     }
 
+    // Validate token by comparing subject and expiration
     public Boolean validateToken(String token, UserDetails userDetails) {
         final Claims claims = getClaimsFromToken(token);
         final String username = claims.getSubject();
         final Date expirationDate = claims.getExpiration();
-
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(expirationDate));
     }
 
@@ -63,6 +65,7 @@ public class JwtTokenUtil {
         return expirationDate.before(new Date());
     }
 
+    // Retrieve username from token (subject)
     public String getUsernameFromToken(String jwtToken) {
         return getClaimsFromToken(jwtToken).getSubject();
     }

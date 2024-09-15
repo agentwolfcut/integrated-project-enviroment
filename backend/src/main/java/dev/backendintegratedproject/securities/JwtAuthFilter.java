@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -33,46 +33,50 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        // Skip JWT validation for public endpoints like /login
+        String uri = request.getRequestURI();
+        if (uri.equals("/login") || uri.equals("/v2/api-docs")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         final String requestTokenHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwtToken = null;
 
+        // Extract token if it starts with "Bearer "
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            jwtToken = requestTokenHeader.substring(7);  // Remove "Bearer " prefix
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException e) {
                 logger.error("JWT Token has expired", e);
-                request.setAttribute("jwt_error", "JWT Token has expired");
-            } catch (MalformedJwtException e) {
-                logger.error("JWT Token is not well-formed", e);
-                request.setAttribute("jwt_error", "JWT Token is not well-formed");
-            } catch (UnsupportedJwtException e) {
-                logger.error("JWT Token is not supported", e);
-                request.setAttribute("jwt_error", "JWT Token is not supported");
-            } catch (SignatureException e) {
-                logger.error("JWT Token has been tampered with", e);
-                request.setAttribute("jwt_error", "JWT Token has been tampered with");
-            } catch (IllegalArgumentException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");  // Send 401
+                return;
+            } catch (Exception e) {
                 logger.error("JWT Token is invalid", e);
-                request.setAttribute("jwt_error", "JWT Token is invalid");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");  // Send 401
+                return;
             }
-
         } else {
-            logger.warn("JWT Token is missing or invalid");
-            request.setAttribute("jwt_error", "JWT Token is missing or invalid");
+            logger.warn("JWT Token is missing or does not start with 'Bearer '");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT Token is missing or invalid");
+            return;
         }
 
+        // Validate and set security context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", new ArrayList<>());
 
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token is invalid or expired");
+                return;
             }
         }
 

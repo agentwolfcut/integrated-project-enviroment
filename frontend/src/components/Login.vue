@@ -54,7 +54,7 @@ const decode = () => {
         current_user.value = decoded.name; // Store the decoded token        
       } catch (err) {
         console.log('token is null: ', err);
-      }      
+      }
     };
 
 const errorNotify = (text) => {

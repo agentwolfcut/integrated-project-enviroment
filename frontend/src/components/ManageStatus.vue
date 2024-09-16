@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, ref, provide } from "vue";
+import { onMounted, ref  , provide} from "vue";
 import HeaderIT from "./Header.vue";
 import {
   getItems,
   transferTasksAndDeleteStatus,
-  deleteItemById,
+  deleteItemById
 } from "../libs/fetchUtils";
 import { StatusManagement } from "@/libs/StatusManagement";
 import SideBar from "./SideBar.vue";
@@ -26,8 +26,8 @@ const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-const currentUser = ref("");
-const route = useRoute();
+const currentUser = ref('')
+const route = useRoute()
 const destinationStatusId = ref(null);
 const hasTasksToTransfer = ref(false);
 const confirmDelete = ref(false);
@@ -39,35 +39,30 @@ const tasks = ref("");
 const editingStatus = ref({ id: undefined, name: "", description: "" });
 
 // sem2
-const token = localStorage.getItem("token");
+const token = localStorage.getItem('token');
 // GET
 onMounted(async () => {
-  const statusRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/statuses`,
-    token
-  );
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token );
   statusMan.value.addStatuses(statusRes);
   if (route.state && route.state.currentUser) {
     currentUser.value = route.state.currentUser;
   } else {
     // Fallback if state is not available
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       const decoded = VueJwtDecode.decode(token);
-      currentUser.value = decoded.name;
+      currentUser.value = decoded.name;      
     }
   }
 });
 
-provide("currentUser", currentUser);
+provide('currentUser', currentUser)
 
 const statusList = ref(statusMan.value.getStatuses());
-
 const errorNotify = () => {
   error.value = true;
   classNotify.value = "bg-red-500";
   textNotify.value = `An error has occurred, the status does not exist.`;
-  // textNotify.value = text;
   setTimeout(() => {
     error.value = false;
   }, 1000);
@@ -81,16 +76,6 @@ const completeNotify = (status, action) => {
     complete.value = false;
   }, 1500);
 };
-
-const error2 = () => {
-  error.value = true;
-  classNotify.value = "bg-red-600";
-  textNotify.value = 'Status name must be uniques, please choose another name'
-  setTimeout(() => {
-    error.value = false;
-  }, 1500);
-};
-
 // ADD
 const addStatus = async () => {
   try {
@@ -103,18 +88,23 @@ const addStatus = async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `${token}`,
+        "Authorization" : `Bearer ${token}`
       },
       body: JSON.stringify(editingStatus.value),
     });
     if (!res.ok) {
-      errorNotify();
-      router.go('/status');
+      router.back();
       clearEdit();
+      errorNotify();
       throw new Error(
         `Failed to add status. Server responded with status ${res.status}`
       );
     }
+    // const res = await post(
+    //   `${import.meta.env.VITE_BASE_URL}/statuses`,
+    //   editingStatus.value,
+    //   token
+    // )
     const addedItem = await res.json(); //respondจากbackend  ยังไม่ได้ใช้เพราะidที่ส่งมาผิด
     editingStatus.value = { id: undefined, name: "", description: "" };
     // console.log(previousTask.value);
@@ -127,25 +117,25 @@ const addStatus = async () => {
     completeNotify(addedItem.name, "added");
   } catch (error) {
     // Navigate back
-    router.back();
-    clearEdit();
+    router.back()
+    clearEdit()
+    errorNotify()
     console.error(`Failed to add status: ${error}`);
-    error2()
+
     // Handle error as needed
   }
 };
 
+
 // DELETE
 const checkTasksBeforeDelete = async (status) => {
-  console.log(status.name);
-
-  if (status.name === "​Done" || status.name === "No Status") {
+  if (status.id === 1 || status.name === "Done") {
     deleteDefault.value = true;
     setTimeout(() => {
       deleteDefault.value = false;
     }, 1000);
   } else {
-    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks`, token);
+    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/tasks` , token);
     tasks.value = { ...res };
     // console.log(tasks.value);F
     const clean = JSON.parse(JSON.stringify(tasks.value));
@@ -171,8 +161,7 @@ const deleteStatus = async () => {
   const removeId = statusDelete.value.id;
   const removeStatus = await deleteItemById(
     `${import.meta.env.VITE_BASE_URL}/statuses`,
-    removeId,
-    token
+    removeId , token
   );
   // front
   if (removeStatus === 200) {
@@ -192,7 +181,7 @@ const transferAndDeleteStatus = async () => {
     const result = await transferTasksAndDeleteStatus(
       `${import.meta.env.VITE_BASE_URL}/statuses`,
       removeId,
-      destinationId,
+      destinationId ,
       token
     );
     if (result === 200) {
@@ -219,24 +208,22 @@ const updateStatus = async (editStatus) => {
     editingStatus.value.name = editingStatus.value.name.trim();
     if (editingStatus.value.description !== null) {
       editingStatus.value.description = editingStatus.value.description.trim();
-      if (editingStatus.value.description === "") {
-        editingStatus.value.description === null;
+      if (editingStatus.value.description === '') {
+        editingStatus.value.description === null
       }
     }
+
     const resJson = await put(
       `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
-      editingStatus.value
+      editingStatus.value,
+      token
     );
+
     console.log(resJson);
-    if (resJson.status === 404) {
-      errorNotify();
-      router.go('/status');
-    } else {
-      completeNotify(editingStatus.value.name, "updated");
-    }
     statusMan.value.updateStatus(resJson);
     statusList.value = statusMan.value.getStatuses();
     router.back();
+    completeNotify(editingStatus.value.name, "updated");
     editingStatus.value = {
       id: undefined,
       name: "",
@@ -261,7 +248,7 @@ const handelFail = () => {
 
 <template>
   <div class="flex">
-    <SideBar :user="currentUser" />
+    <SideBar :user="currentUser"/>
     <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
@@ -279,7 +266,9 @@ const handelFail = () => {
                 </router-link>
               </div>
 
-              <div class="mt-7 overflow-x-auto rounded-2xl">
+              <div
+                class="mt-7 overflow-x-auto rounded-2xl"
+              >
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
                   <thead
@@ -351,14 +340,16 @@ const handelFail = () => {
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
-                          <router-link
-                            class="itbkk-button-edit"
+                          <router-link class="itbkk-button-edit"
                             :to="{
                               name: 'EditStatus',
                               params: { id: status.id },
                             }"
                           >
-                            <button class="pr-2" @click="openToEdit(status)">
+                            <button
+                              class="pr-2 "
+                              @click="openToEdit(status)"
+                            >
                               <Edit />
                             </button>
                           </router-link>
@@ -417,9 +408,7 @@ const handelFail = () => {
             />
           </button>
         </div>
-        <div
-          class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex"
-        >
+        <div class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex">
           <p>
             <span class="text-red-500">
               {{ statusDelete.name }}

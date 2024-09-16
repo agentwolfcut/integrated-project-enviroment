@@ -3,8 +3,9 @@ async function getItems(url) {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization' : 'Bearer ' + localStorage.getItem('token')
     };
+    console.log(headers);
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
@@ -30,14 +31,11 @@ async function getItemById(url, id) {
   }
 }
 
-async function deleteItemById(url, id ) {
+async function deleteItemById(url, id ,token = null) {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      'Authorization' : 'Bearer ' + token
     }
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE",
@@ -53,11 +51,8 @@ async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
   try {
     const headers = {
       'Content-Type': 'application/json',
-      'authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Authorization' : 'Bearer ' + token
     };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
     const res = await fetch(`${url}/${id}/${desId}`, {
       method: "DELETE",
       headers: headers,
@@ -74,8 +69,8 @@ async function addItem(url, newItem) {
       method: "POST", // add
       headers: {
         "content-type": "application/json", // add contents
-        "authorization": `Bearer ${localStorage.getItem('token')}`,
-      },
+        'Authorization' : 'Bearer ' + token
+      },      
       body: JSON.stringify({
         ...newItem, // sent add data . destructuring object
       }), // js to  json
@@ -87,15 +82,13 @@ async function addItem(url, newItem) {
   }
 }
 
-// update with replace entire items
-// but PATCH modify some field
 async function editItem(url, id, editItem) {
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
-        "authorization": `Bearer ${localStorage.getItem('token')}`,
+        'Authorization' : 'Bearer ' + token
       },
       body: JSON.stringify({
         ...editItem,

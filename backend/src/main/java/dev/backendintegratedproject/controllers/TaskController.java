@@ -59,50 +59,72 @@ public class TaskController {
         GetTaskDTO getTaskDTO = modelMapper.map(task, GetTaskDTO.class);
         return new ResponseEntity<>(getTaskDTO, HttpStatus.OK);
     }
-    // Old
+
     @PostMapping
     public ResponseEntity<Object> addTask(@Valid @RequestBody TaskDTO taskDTO) {
-
-        StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
-        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-        taskEntity.setStatus(statusEntity);
-        taskValidator.validateTask(taskEntity);
-        TaskEntity addedTask = taskService.addTask(taskEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+        // ไว้ดูlogตอนerror
+        try {
+            System.out.println("Received taskDTO: " + taskDTO);
+            Integer statusId = Integer.valueOf(taskDTO.getStatus());
+            StatusEntity statusEntity = statusService.getStatusById(statusId);
+            TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+            taskEntity.setStatus(statusEntity);
+            taskValidator.validateTask(taskEntity);
+            TaskEntity addedTask = taskService.addTask(taskEntity);
+            System.out.println("Added taskEntity: " + addedTask);
+            return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
+        } catch (Exception e) {
+            // Log the exception
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+//        StatusEntity statusEntity = statusService.getStatusById(Integer.valueOf(taskDTO.getStatus()));
+//        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
+//        taskEntity.setStatus(statusEntity);
+//        taskValidator.validateTask(taskEntity);
+//        TaskEntity addedTask = taskService.addTask(taskEntity);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(addedTask);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskDTO> removeTask(@PathVariable Integer id) {
-        TaskDTO taskDTO = taskService.deleteById(id);
-        return ResponseEntity.ok(taskDTO);
+    public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
+        try {
+            System.out.println("Attempting to delete task with ID: " + id);
+            taskService.deleteTask(id);
+            System.out.println("Successfully deleted task with ID: " + id);
+            return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);
+        } catch (HttpClientErrorException.NotFound e) {
+            System.err.println("Task with ID " + id + " not found: " + e.getMessage());
+            return new ResponseEntity<>("An error has occurred, the task does not exist", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.err.println("Unknown error occurred while deleting task with ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>("Unknown error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+//        try {
+//            taskService.deleteTask(id);
+//            return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);
+//        } catch (HttpClientErrorException.NotFound e) {
+//            return new ResponseEntity<>("An error has occurred, the task does not exist", HttpStatus.NOT_FOUND);
+//        }
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
-//        taskValidator.validateTaskExists(id);
-//        taskValidator.validateTask(task);
-//        TaskEntity editedTask = taskService.editTask(id, task);
-//        if (editedTask != null) {
-//
-//            StatusEntity statusEntity = statusService.getStatusById(editedTask.getStatus().getId());
-//
-//            PutTaskDTO responseDTO = modelMapper.map(editedTask, PutTaskDTO.class);
-//            responseDTO.setStatus(statusEntity.getName());
-//
-//            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Object> editTask(@PathVariable Integer id, @Valid @RequestBody PutTaskDTO putTaskDTO) {
-        TaskEntity taskEntity = modelMapper.map(putTaskDTO, TaskEntity.class);
-        TaskEntity editedTask = taskService.editTask(id, taskEntity);
-        if (editedTask == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
+    public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
+        taskValidator.validateTaskExists(id);
+        taskValidator.validateTask(task);
+        TaskEntity editedTask = taskService.editTask(id, task);
+        if (editedTask != null) {
+
+            StatusEntity statusEntity = statusService.getStatusById(editedTask.getStatus().getId());
+
+            PutTaskDTO responseDTO = modelMapper.map(editedTask, PutTaskDTO.class);
+            responseDTO.setStatus(statusEntity.getName());
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(editedTask);
     }
 }
 

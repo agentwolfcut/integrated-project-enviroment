@@ -43,28 +43,28 @@ public class UserController {
         if (loginRequest.getUserName() == null || loginRequest.getUserName().isEmpty()) {
             errors.add("Username cannot be empty");
         } else if (loginRequest.getUserName().length() > 50) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username must be at most 50 characters long.");
+             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Username must be at most 50 characters long.");
         }
 
         // Validate password
         if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
             errors.add("Password cannot be empty");
         } else if (loginRequest.getPassword().length() > 14) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password must be at most 14 characters long.");
+             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Password must be at most 14 characters long.");
         }
 
         // If there are validation errors, return them all
         if (!errors.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", String.join(", ", errors)));
+             ResponseEntity.badRequest().body(Map.of("message", String.join(", ", errors)));
         }
 
-        // Authentication process
+        // If validation passes, proceed with authentication
         UserEntity user = userRepository.findByUserName(loginRequest.getUserName());
 
         if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             // Generate JWT token
             String token = jwtTokenUtil.generateToken(user);
-            return ResponseEntity.ok(Map.of("access_token", token));  // Return access_token
+            return ResponseEntity.ok(Map.of("access_token", token));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The username or password is incorrect."));
         }

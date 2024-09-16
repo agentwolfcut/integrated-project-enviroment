@@ -1,5 +1,8 @@
+// src/main/java/dev/backendintegratedproject/securities/SecurityConfig.java
 package dev.backendintegratedproject.securities;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,10 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -22,22 +21,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers( "/login","/v2/**", "/decode-token").permitAll()  // Allow unauthenticated access to login and decode-token
-                        .anyRequest().authenticated()  // All other requests require authentication
+                        .requestMatchers("/v2/login","v2/**","/decode-token").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session for JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .httpBasic().authenticationEntryPoint(unauthorizedEntryPoint());  // Custom unauthorized handler
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(unauthorizedEntryPoint())
+                );
 
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();  // Use Argon2 for password encryption
+        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
 
     @Bean
@@ -47,4 +48,3 @@ public class SecurityConfig {
         };
     }
 }
-

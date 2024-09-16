@@ -1,6 +1,5 @@
 package dev.backendintegratedproject.services;
 
-import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.managements.entities.StatusEntity;
 import dev.backendintegratedproject.managements.entities.TaskEntity;
 import dev.backendintegratedproject.managements.repositories.StatusRepository;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -35,20 +35,21 @@ public class TaskService {
     }
 
 
-    @Transactional
+    @Transactional("projectManagementTransactionManager")
     public TaskEntity addTask(TaskEntity task) {
-
         task.setCreatedOn(new Date());
         task.setUpdatedOn(new Date());
         return taskRepository.save(task);
     }
 
-    @Transactional
+    @Transactional("projectManagementTransactionManager")
     public void deleteTask(Integer id) {
-        taskValidator.validateTaskExists(id);
+        TaskEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task not found"));
+        taskRepository.delete(task);
     }
 
-    @Transactional
+    @Transactional("projectManagementTransactionManager")
     public TaskEntity editTask(Integer id, TaskEntity task) {
         TaskEntity existingTask = taskRepository.findById(id).orElse(null);
         if (existingTask != null) {
@@ -92,22 +93,6 @@ public class TaskService {
         }else {
             return taskRepository.findAll(Sort.by(sortOrderList));
         }
-    }
-
-
-    public TaskDTO deleteById(Integer id) {
-        TaskEntity task = taskRepository.findById(id).orElse(null);
-        if (task == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
-        }
-        taskRepository.deleteById(id);
-        TaskDTO taskDTO = new TaskDTO();
-        taskDTO.setId(task.getId());
-        taskDTO.setTitle(task.getTitle());
-        taskDTO.setDescription(task.getDescription());
-        taskDTO.setStatus(task.getStatus().getName());
-        // Set other fields as necessary
-        return taskDTO;
     }
 }
 

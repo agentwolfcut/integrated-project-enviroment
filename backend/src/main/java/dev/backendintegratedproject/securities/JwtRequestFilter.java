@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -33,7 +33,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Skip JWT validation for public endpoints like /login
         String uri = request.getRequestURI();
         if (uri.equals("/v2/login") || uri.equals("/v2/api-docs")) {
             chain.doFilter(request, response);
@@ -45,30 +44,46 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        // Extract token if it starts with "Bearer "
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);  // Remove "Bearer " prefix
+            jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException e) {
                 logger.error("JWT Token has expired", e);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");  // Send 401
-                return;
-            } catch (Exception e) {
-                logger.error("JWT Token is invalid", e);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");  // Send 401
+                request.setAttribute("jwt_error", "JWT Token has expired");
+            } catch (SignatureException e) {
+                logger.error("JWT Token has been tampered with", e);
+                request.setAttribute("jwt_error", "JWT Token has been tampered with");
+            } catch (Exception e){
+                logger.error("JWT Token is invalid" , e);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token Invalid");
                 return;
             }
+
+            // this mtf catch BUG for 403
+//            } catch (IllegalArgumentException e) {
+//                logger.error("JWT Token is invalid", e);
+//                request.setAttribute("jwt_error", "JWT Token is invalid");
+//
+//            // dont need to catch this
+//            } catch (UnsupportedJwtException e) {
+//                logger.error("JWT Token is not supported", e);
+//                request.setAttribute("jwt_error", "JWT Token is not supported");
+//            } catch (MalformedJwtException e) {
+//                logger.error("JWT Token is not well-formed", e);
+//                request.setAttribute("jwt_error", "JWT Token is not well-formed");
+//            }
+
         } else {
-            logger.warn("JWT Token is missing or does not start with 'Bearer '");
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT Token is missing or invalid");
+            logger.warn("JWT Token is missing or invalid");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token is missing or invalid");
+//            request.setAttribute("jwt_error", "JWT Token is missing or invalid");
             return;
         }
 
         // Validate and set security context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", new ArrayList<>());
-
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -79,7 +94,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
         chain.doFilter(request, response);
     }
 }

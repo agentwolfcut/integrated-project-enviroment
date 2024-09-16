@@ -72,31 +72,37 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTask(@PathVariable Integer id) {
-        try {
-            taskService.deleteTask(id);
-            return new ResponseEntity<>("The task has been deleted", HttpStatus.OK);
-        } catch (HttpClientErrorException.NotFound e) {
-            return new ResponseEntity<>("An error has occurred, the task does not exist", HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<TaskDTO> removeTask(@PathVariable Integer id) {
+        TaskDTO taskDTO = taskService.deleteById(id);
+        return ResponseEntity.ok(taskDTO);
     }
 
+//    @PutMapping("/{id}")
+//    public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
+//        taskValidator.validateTaskExists(id);
+//        taskValidator.validateTask(task);
+//        TaskEntity editedTask = taskService.editTask(id, task);
+//        if (editedTask != null) {
+//
+//            StatusEntity statusEntity = statusService.getStatusById(editedTask.getStatus().getId());
+//
+//            PutTaskDTO responseDTO = modelMapper.map(editedTask, PutTaskDTO.class);
+//            responseDTO.setStatus(statusEntity.getName());
+//
+//            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> editTask(@Valid @PathVariable Integer id, @RequestBody TaskEntity task) {
-        taskValidator.validateTaskExists(id);
-        taskValidator.validateTask(task);
-        TaskEntity editedTask = taskService.editTask(id, task);
-        if (editedTask != null) {
-
-            StatusEntity statusEntity = statusService.getStatusById(editedTask.getStatus().getId());
-
-            PutTaskDTO responseDTO = modelMapper.map(editedTask, PutTaskDTO.class);
-            responseDTO.setStatus(statusEntity.getName());
-
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> editTask(@PathVariable Integer id, @Valid @RequestBody PutTaskDTO putTaskDTO) {
+        TaskEntity taskEntity = modelMapper.map(putTaskDTO, TaskEntity.class);
+        TaskEntity editedTask = taskService.editTask(id, taskEntity);
+        if (editedTask == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
         }
+        return ResponseEntity.ok(editedTask);
     }
 }
 

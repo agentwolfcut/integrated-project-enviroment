@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.services;
 
+import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.managements.entities.StatusEntity;
 import dev.backendintegratedproject.managements.entities.TaskEntity;
 import dev.backendintegratedproject.managements.repositories.StatusRepository;
@@ -91,6 +92,22 @@ public class TaskService {
         }else {
             return taskRepository.findAll(Sort.by(sortOrderList));
         }
+    }
+
+
+    public TaskDTO deleteById(Integer id) {
+        TaskEntity task = taskRepository.findById(id).orElse(null);
+        if (task == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Task id %d does not exist.", id));
+        }
+        taskRepository.deleteById(id);
+        TaskDTO taskDTO = new TaskDTO();
+        taskDTO.setId(task.getId());
+        taskDTO.setTitle(task.getTitle());
+        taskDTO.setDescription(task.getDescription());
+        taskDTO.setStatus(task.getStatus().getName());
+        // Set other fields as necessary
+        return taskDTO;
     }
 }
 

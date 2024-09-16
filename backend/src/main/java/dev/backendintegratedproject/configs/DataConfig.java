@@ -60,6 +60,7 @@ public class DataConfig {
     }
 
     @Bean(name = "projectManagementTransactionManager")
+    @Primary
     public PlatformTransactionManager projectManagementTransactionManager(
             final @Qualifier("projectManagementEntityManager") LocalContainerEntityManagerFactoryBean projectManagementEntityManager) {
         return new JpaTransactionManager(

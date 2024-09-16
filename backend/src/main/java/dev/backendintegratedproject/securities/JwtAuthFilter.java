@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Skip JWT validation for public endpoints like /login
         String uri = request.getRequestURI();
-        if (uri.equals("/login") || uri.equals("/v2/api-docs")) {
+        if (uri.equals("/v2/login") || uri.equals("/v2/api-docs")) {
             chain.doFilter(request, response);
             return;
         }

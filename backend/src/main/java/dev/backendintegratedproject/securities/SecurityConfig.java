@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers( "/v2/**", "/decode-token").permitAll()  // Allow unauthenticated access to login and decode-token
+                        .requestMatchers( "/login","/v2/**", "/decode-token").permitAll()  // Allow unauthenticated access to login and decode-token
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
                 .sessionManagement(session -> session

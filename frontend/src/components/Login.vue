@@ -14,7 +14,7 @@ const current_user = ref(null);
 const inputUsrpw = async () => {
   try {
     // wait for agent api
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL2}/login`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

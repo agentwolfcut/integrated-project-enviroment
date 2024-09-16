@@ -14,7 +14,7 @@ const current_user = ref(null);
 const inputUsrpw = async () => {
   try {
     // wait for agent api
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL2}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ const decode = () => {
         current_user.value = decoded.name; // Store the decoded token        
       } catch (err) {
         console.log('token is null: ', err);
-      }
+      }      
     };
 
 const errorNotify = (text) => {

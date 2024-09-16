@@ -34,28 +34,28 @@ export async function fetchData(
 
 export function get(url, token = null, headers = {}) {
   if (token) {
-    headers["Authorization"] = `${token}`;
-  }
+    headers["Authorization"] = `Bearer ${token}`;
+  }  
   return fetchData(url, "GET", null, headers);
 }
 
 export function post(url, body, token, headers = {}) {
   if (token) {
-    headers["Authorization"] = `${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
   return fetchData(url, "POST", body, headers);
 }
 
 export function put(url, body, token = null, headers = {}) {
   if (token) {
-    headers["Authorization"] = `${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
   return fetchData(url, "PUT", body, headers);
 }
 
 export function del(url, token = null, headers = {}) {
   if (token) {
-    headers["Authorization"] = `${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
   return fetchData(url, "DELETE", null, headers);
 }

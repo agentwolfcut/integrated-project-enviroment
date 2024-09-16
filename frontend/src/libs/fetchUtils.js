@@ -5,7 +5,7 @@ async function getItems(url, token = null) {
       'Content-Type': 'application/json',
     };
     if (token) {
-      headers['Authorization'] = `${token}`;
+      headers['Authorization'] = `Bearer ${token}`;
     }
     const response = await fetch(url, {
       method: 'GET',
@@ -38,7 +38,7 @@ async function deleteItemById(url, id ,token = null) {
       'Content-Type': 'application/json',
     };
     if (token) {
-      headers['Authorization'] = `${token}`;
+      headers['Authorization'] = `Bearer ${token}`;
     }
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE",
@@ -56,7 +56,7 @@ async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
       'Content-Type': 'application/json',
     };
     if (token) {
-      headers['Authorization'] = `${token}`;
+      headers['Authorization'] = `Bearer ${token}`;
     }
     const res = await fetch(`${url}/${id}/${desId}`, {
       method: "DELETE",

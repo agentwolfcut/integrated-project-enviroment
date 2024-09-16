@@ -39,9 +39,6 @@ const isFormModified = computed(() => {
     );
 });
 
-const canSave = computed(() => {
-    return previousStatus.value.name.trim().length > 0 && isFormModified.value;
-});
 
 const saveStatus = () => {
     // Trim the description and set to null if it contains only whitespace

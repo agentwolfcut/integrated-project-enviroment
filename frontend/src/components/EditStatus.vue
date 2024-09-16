@@ -1,7 +1,6 @@
 <script setup>
 import router from '@/router';
-import { useRoute } from 'vue-router'
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     status: {
@@ -14,8 +13,7 @@ const props = defineProps({
     }
 })
 const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
-const route = useRoute()
-// const statusId = ref(route.params.id)
+
 const initialStatus = JSON.parse(JSON.stringify(props.status))
 console.log(initialStatus);
 
@@ -58,6 +56,10 @@ const saveStatus = () => {
     emits('saveEdit', previousStatus.value);
 };
 
+const defaultStatuses = ['No Status','Done'];
+const isDefaultStatus = computed(() => {
+      return defaultStatuses.includes(previousStatus.value.name);
+    });
 </script>
 
 <template>
@@ -70,7 +72,7 @@ const saveStatus = () => {
                     Edit Status
                 </p>
 
-                <div v-if="previousStatus.id === 1 || previousStatus.name==='Done'" class="flex justify-center font-semibold text-xl text-red-600">
+                <div v-if="isDefaultStatus" class="flex justify-center font-semibold text-xl text-red-600">
                     You can't edit default status
                 </div>
 

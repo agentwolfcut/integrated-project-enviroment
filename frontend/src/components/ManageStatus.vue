@@ -225,14 +225,18 @@ const updateStatus = async (editStatus) => {
     }
     const resJson = await put(
       `${import.meta.env.VITE_BASE_URL}/statuses/${editingStatus.value.id}`,
-      editingStatus.value,
-      token
+      editingStatus.value
     );
     console.log(resJson);
+    if (resJson.status === 404) {
+      errorNotify();
+      router.go('/status');
+    } else {
+      completeNotify(editingStatus.value.name, "updated");
+    }
     statusMan.value.updateStatus(resJson);
     statusList.value = statusMan.value.getStatuses();
     router.back();
-    completeNotify(editingStatus.value.name, "updated");
     editingStatus.value = {
       id: undefined,
       name: "",

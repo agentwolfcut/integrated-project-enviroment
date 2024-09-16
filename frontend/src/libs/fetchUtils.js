@@ -1,12 +1,10 @@
 // async task must wait , inside are promise
-async function getItems(url, token = null) {
+async function getItems(url) {
   try {
     const headers = {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,
@@ -32,10 +30,11 @@ async function getItemById(url, id) {
   }
 }
 
-async function deleteItemById(url, id ,token = null) {
+async function deleteItemById(url, id ) {
   try {
     const headers = {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -54,6 +53,7 @@ async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
   try {
     const headers = {
       'Content-Type': 'application/json',
+      'authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -74,6 +74,7 @@ async function addItem(url, newItem) {
       method: "POST", // add
       headers: {
         "content-type": "application/json", // add contents
+        "authorization": `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({
         ...newItem, // sent add data . destructuring object
@@ -94,6 +95,7 @@ async function editItem(url, id, editItem) {
       method: "PUT",
       headers: {
         "content-type": "application/json",
+        "authorization": `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({
         ...editItem,

@@ -12,7 +12,7 @@ import java.util.TimeZone;
 @Getter
 @Setter
 @Entity
-@Table(name = "Tasks_v2")
+@Table(name = "tasks_v2")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

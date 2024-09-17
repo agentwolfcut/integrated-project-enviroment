@@ -18,7 +18,7 @@ import java.util.Map;
 public class JwtTokenUtil {
 
     private SecretKey secretKey;
-    private final long expiration = 18000L; // 30 minutes in seconds
+    private final long expiration = 1800L; // 30 minutes in seconds
 
     @PostConstruct
     public void init() {
@@ -34,10 +34,10 @@ public class JwtTokenUtil {
         claims.put("role", user.getRole());
 
         return Jwts.builder()
-//                .setHeaderParam("typ", "JWT") // Explicitly set the token type as JWT
+                .setHeaderParam("typ", "JWT") // Explicitly set the token type as JWT
                 .setClaims(claims)
                 .setSubject(user.getEmail()) // Subject is the username or email
-                .setIssuer("https://intproj23.sit.kmutt.ac.th/kk3/") // Set the correct issuer
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/kk3") // Set the correct issuer
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(secretKey) // Sign with HS256

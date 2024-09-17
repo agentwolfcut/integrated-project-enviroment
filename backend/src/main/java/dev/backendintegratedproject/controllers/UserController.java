@@ -43,19 +43,23 @@ public class UserController {
         if (loginRequest.getUserName() == null || loginRequest.getUserName().isEmpty()) {
             errors.add("Username cannot be empty");
         } else if (loginRequest.getUserName().length() > 50) {
-             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Username must be at most 50 characters long.");
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Username must be at most 50 characters long.");
         }
 
         // Validate password
         if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
             errors.add("Password cannot be empty");
         } else if (loginRequest.getPassword().length() > 14) {
-             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Password must be at most 14 characters long.");
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( "Password must be at most 14 characters long.");
+        }
+
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty() && loginRequest.getUserName() == null || loginRequest.getUserName().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Username and password cannot be empty"));
         }
 
         // If there are validation errors, return them all
         if (!errors.isEmpty()) {
-             ResponseEntity.badRequest().body(Map.of("message", String.join(", ", errors)));
+            ResponseEntity.badRequest().body(Map.of("message", String.join(", ", errors)));
         }
 
         // If validation passes, proceed with authentication
@@ -65,7 +69,8 @@ public class UserController {
             // Generate JWT token
             String token = jwtTokenUtil.generateToken(user);
             return ResponseEntity.ok(Map.of("access_token", token));
-        } else {
+        }
+        else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "The username or password is incorrect."));
         }
     }

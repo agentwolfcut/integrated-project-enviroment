@@ -5,74 +5,66 @@ import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
-import java.util.TimeZone;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "Tasks_v2")
-@Builder
+@Table(name = "task")
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taskID")
-    private Integer id;
-
+    private Long taskID;
 
     @Column(name = "taskTitle", length = 100, nullable = false)
     @NotNull(message = "Title cannot be null")
     @NotBlank(message = "Title cannot be blank")
     @Size(max = 100, message = "Title must be less than 100 characters")
-    private String title;
-
+    private String taskTitle;
 
     @Column(name = "taskDescription", length = 500)
     @Size(max = 500, message = "Description must be less than 500 characters")
-    private String description;
-
+    private String taskDescription;
 
     @Column(name = "taskAssignees", length = 30)
     @Size(max = 30, message = "Assignees must be less than 30 characters")
-    private String assignees;
+    private String taskAssignees;
 
-
-    @ManyToOne
-    @JoinColumn(name = "statusID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "statusID", nullable = false)
     private StatusEntity status;
 
-    @Column(name = "createdOn", nullable = false)
-    private Date createdOn;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "boardId", nullable = false)
+    private BoardEntity board;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "createdOn", nullable = false, updatable = false)
+    private Date createdOn = new Date();
+
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updatedOn", nullable = false)
-    private Date updatedOn;
+    private Date updatedOn = new Date();
 
+    @PreUpdate
+    public void preUpdate() {
+        updatedOn = new Date();
+    }
 
     public void setDescription(String description) {
-        this.description = description == null?null:description.trim().length()==0?null:description.trim();
+        this.taskDescription = description == null ? null : description.trim().isEmpty() ? null : description.trim();
     }
 
     public void setAssignees(String assignees) {
-        this.assignees = assignees == null?null:assignees.trim().length()==0?null:assignees.trim();
-    }
-    public void setTitle(String title){
-        this.title = title == null || title.trim().isEmpty()?null:title.trim();
+        this.taskAssignees = assignees == null ? null : assignees.trim().isEmpty() ? null : assignees.trim();
     }
 
-
-
-
-
-    private String dateformat(Date date_s) throws ParseException {
-        if (date_s ==null) date_s = new Date();
-        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
-        dt.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dt1.format(dt.parse(dt.format(date_s)));
+    public void setTitle(String title) {
+        this.taskTitle = title == null || title.trim().isEmpty() ? null : title.trim();
     }
 }

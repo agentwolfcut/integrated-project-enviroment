@@ -12,8 +12,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Status")
-public class StatusEntity {
+@Table(name = "status")
+public class StatusV3Entity extends StatusEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,6 @@ public class StatusEntity {
     @JoinColumn(name = "boardId", nullable = false)
     private BoardEntity board;
 
-    // Relationship to tasks
     @OneToMany(mappedBy = "status", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TaskEntity> tasks;
 
@@ -51,5 +50,15 @@ public class StatusEntity {
     public void setStatusDescription(String statusDescription) {
         this.description = statusDescription != null && !statusDescription.trim().isEmpty() ? statusDescription.trim() : null;
     }
+    @Override
+    @JsonIgnore
+    public List<TaskEntity> getTasks() {
+        return tasks;  // กำหนดให้ TaskV3Entity คืนค่าแทน TaskEntity
+    }
+    @Override
+    public void setTasks(List<TaskEntity> tasks) {
+        this.tasks = tasks;
+    }
+
 
 }

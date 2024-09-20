@@ -82,6 +82,18 @@ const currentUser = inject('currentUser')
             <div
         class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
       >
+        <router-link to="/board" class="block">
+          <div
+            class="rounded-lg font-medium text-lg text-center group-hover:scale-105 transform transition duration-300"
+          >
+            Board View
+          </div>
+        </router-link>
+      </div>
+
+            <div
+        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
+      >
 <span class="loading loading-ball loading-xs"></span>
 <span class="loading loading-ball loading-sm"></span>
 <span class="loading loading-ball loading-md"></span>

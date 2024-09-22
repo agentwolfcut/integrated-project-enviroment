@@ -18,6 +18,7 @@ import { createToaster } from "../../node_modules/@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
 import { post, put } from "@/libs/Utils";
 
+
 const toaster = createToaster({
   /* options */
 });
@@ -40,6 +41,12 @@ const editingStatus = ref({ id: undefined, name: "", description: "" });
 
 // sem2
 const token = localStorage.getItem('token');
+
+import {AuthUserStore} from '../stores/store.js'
+const tokenStore = AuthUserStore();
+console.log(tokenStore.currentUser);
+
+
 // GET
 onMounted(async () => {
   const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token );

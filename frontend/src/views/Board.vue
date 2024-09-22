@@ -5,8 +5,14 @@ import { useRoute } from 'vue-router'
 import { ref, onMounted, provide } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode'
 import buttonSlot from '@/components/Button.vue'
+
 const route = useRoute()
 const currentUser = ref(null)
+const error = ref(false);
+const complete = ref(false);
+const classNotify = ref("");
+const textNotify = ref("");
+
 onMounted(async () => {
   if (route.state && route.state.currentUser) {
     currentUser.value = route.state.currentUser
@@ -20,7 +26,26 @@ onMounted(async () => {
   }
 })
 provide('currentUser', currentUser)
+
+const errorNotify = () => {
+  error.value = true;
+  classNotify.value = "bg-red-500";
+  textNotify.value = `An error has occurred, the status does not exist.`;
+  setTimeout(() => {
+    error.value = false;
+  }, 1000);
+};
+
+const completeNotify = (status, action) => {
+  complete.value = true;
+  classNotify.value = "bg-green-600";
+  textNotify.value = `The status ${status} has been successfully ${action}.`;
+  setTimeout(() => {
+    complete.value = false;
+  }, 1500);
+};
 </script>
+
 <template>
   <div class="flex">
     <SideBar :user="currentUser" />
@@ -76,36 +101,31 @@ provide('currentUser', currentUser)
 
                   <!-- body content -->
                   <tbody class="container">
-                    <tr
-                      v-for="(status, index) in statusList"
-                      :key="index"
-                      :class="{ 'bg-slate-100': index % 2 === 0 }"
-                      class="itbkk-item h-16 box ease-in transition-colors"
-                    >
+                    <tr class="itbkk-item h-16 box ease-in transition-colors">
                       <td class="min-w-60">
                         <div class="flex items-center pl-5">
                           <div class="flex flex-row justify-start">
                             <p
                               class="text-base font-medium leading-none text-gray-700 mr-4"
                             >
-                              {{ index + 1 }}
+                              
                             </p>
                           </div>
 
                           <div
                             class="itbkk-status-name truncate text-base font-medium leading-none text-gray-700 mr-4"
                           >
-                            {{ status.name }}
+                            
                           </div>
                         </div>
                       </td>
 
                       <td class="">
                         <div
-                          v-if="status.description"
+                          v-if=1
                           class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
                         >
-                          {{ status.description }}
+                          x
                         </div>
                         <div
                           v-else
@@ -119,27 +139,6 @@ provide('currentUser', currentUser)
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
-                          <router-link
-                            class="itbkk-button-edit"
-                            :to="{
-                              name: 'EditStatus',
-                              params: { id: status.id },
-                            }"
-                          >
-                            <button class="pr-2" @click="openToEdit(status)">
-                              <Edit />
-                            </button>
-                          </router-link>
-
-                          <button
-                            class="pr-1 itbkk-button-delete"
-                            @click="
-                              ;(statusDelete = status),
-                                checkTasksBeforeDelete(status)
-                            "
-                          >
-                            <Trash />
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -162,124 +161,6 @@ provide('currentUser', currentUser)
     </div>
   </div>
 
-  <router-view
-    :status="editingStatus"
-    @saveStatus="addStatus"
-    @saveEdit="updateStatus"
-    @cancelEdit="clearEdit"
-    @cancelAdd="clearEdit"
-    @failEdit="handelFail"
-  />
-
-  <div v-if="deleteDefault">
-    <div
-      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
-    >
-      <div
-        class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-3 relative w-1/3"
-      >
-        <div class="m-1 flex justify-end">
-          <button @click="deleteDefault = false" class="mb-2">
-            <LineMdCloseSmall
-              class="bg-black text-white rounded-full w-5 h-5 hover:bg-gray-700"
-            />
-          </button>
-        </div>
-        <div
-          class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex"
-        >
-          <p>
-            <span class="text-red-500">
-              {{ statusDelete.name }}
-            </span>
-            status is the default status and cannot be modified
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div v-if="confirmDelete">
-    <div
-      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
-    >
-      <div
-        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
-      >
-        <div class="mb-4 text-base font-medium overflow-y-auto">
-          <p>Do you want to delete the status "{{ statusDelete.name }}"?</p>
-        </div>
-
-        <div class="flex justify-end mt-4">
-          <button
-            @click="confirmDelete = false"
-            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          <button
-            @click="deleteStatus"
-            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div v-if="confirmTransfer">
-    <div
-      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
-    >
-      <div
-        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
-      >
-        <div class="mb-4 text-base font-medium overflow-y-auto">
-          <p>
-            There are
-            <span class="text-red-600 italic">{{ taskCount }}</span> tasks in
-            <span class="text-red-600 italic">{{ statusDelete.name }}</span>
-            status. To delete this status, please transfer tasks to an other
-            status.
-          </p>
-        </div>
-        <div>
-          <select
-            v-model="destinationStatusId"
-            class="w-full p-2 border rounded"
-          >
-            <option value="" selected disabled>
-              Select destination status
-            </option>
-            <option
-              :disabled="statusDelete.name === status.name"
-              v-for="status in statusList"
-              :key="status.id"
-              :value="status.id"
-            >
-              {{ status.name }}
-            </option>
-          </select>
-        </div>
-        <div class="flex justify-end mt-4">
-          <button
-            @click="confirmTransfer = false"
-            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          <button
-            @click="transferAndDeleteStatus(destinationStatusId)"
-            :disabled="hasTasksToTransfer && !destinationStatusId"
-            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
-          >
-            Transfer and Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <style scoped>

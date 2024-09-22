@@ -3,6 +3,7 @@ import { defineProps, inject, ref } from 'vue'
 
 const currentUser = inject('currentUser')
 
+
 </script>
 
 <template>

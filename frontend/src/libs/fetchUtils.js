@@ -5,7 +5,6 @@ async function getItems(url) {
       'Content-Type': 'application/json',
       'Authorization' : 'Bearer ' + localStorage.getItem('token')
     };
-    console.log(headers);
     const response = await fetch(url, {
       method: 'GET',
       headers: headers,

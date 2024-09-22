@@ -8,7 +8,9 @@ import router from './router'
 // moment.tz.setDefault('Asia/Jakarta');
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createPinia())
+
+app.use(pinia)
 app.use(router)
 app.mount('#app')

@@ -2,14 +2,18 @@
 import router from "@/router";
 import { computed, ref } from "vue";
 import VueJwtDecode from 'vue-jwt-decode';
+import {AuthUserStore} from '../stores/store.js'
 
 const usrpw = ref({ userName: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-
+let token = ''
+const tokenStore = AuthUserStore();
 const current_user = ref(null);
+
+localStorage.clear();
 
 const inputUsrpw = async () => {
   try {
@@ -24,8 +28,8 @@ const inputUsrpw = async () => {
 
     if (res.ok) {
       const data = await res.json();
-      const token = data.access_token;
-      // save token to local storage
+      tokenStore.setToken(data.access_token)      
+      token = data.access_token;
       localStorage.setItem("token", token);
       decode();
       router.push("/task");
@@ -51,7 +55,8 @@ const decode = () => {
       let token = localStorage.getItem('token');
       try {
         let decoded = VueJwtDecode.decode(token);
-        current_user.value = decoded.name; // Store the decoded token        
+        current_user.value = decoded.name; // Store the decoded token 
+        tokenStore.setUser(current_user.value)
       } catch (err) {
         console.log('token is null: ', err);
       }

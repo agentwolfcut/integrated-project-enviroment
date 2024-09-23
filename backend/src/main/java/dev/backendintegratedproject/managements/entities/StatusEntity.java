@@ -27,10 +27,10 @@ public class StatusEntity {
     @OneToMany(mappedBy = "status")
     private List<TaskEntity> tasks;
 
+    @ManyToOne
+    @JoinColumn(name = "boardId", nullable = false)
     @JsonIgnore
-    public String getStatusName() {
-        return name;
-    }
+    private BoardEntity board;
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim().length()==0?null:description.trim();

@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.managements.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +13,7 @@ import java.util.TimeZone;
 @Getter
 @Setter
 @Entity
-@Table(name = "Tasks_v2")
+@Table(name = "Task")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -49,6 +50,11 @@ public class TaskEntity {
 
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
+
+    @ManyToOne
+    @JoinColumn(name = "boardId", nullable = false)
+    @JsonIgnore
+    private BoardEntity board;
 
 
     public void setDescription(String description) {

@@ -46,4 +46,6 @@ public class UserEntity {
     @Lob
     @Column(name = "role", nullable = false)
     private String role;
+
+
 }

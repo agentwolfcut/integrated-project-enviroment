@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 @RestController
-@RequestMapping("/v2/tasks")
+@RequestMapping("/v3/tasks")
 //@CrossOrigin(origins = "http://ip23kk3.sit.kmutt.ac.th")
 @CrossOrigin(origins = {"http://localhost:5173",
 			            "http://ip23kk3.sit.kmutt.ac.th",

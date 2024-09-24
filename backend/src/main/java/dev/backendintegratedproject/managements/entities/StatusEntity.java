@@ -23,9 +23,6 @@ public class StatusEntity {
     @Column(name = "statusDescription", length = 200)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "boardId", nullable = false)
-    private BoardEntity boardId;
 
     @OneToMany(mappedBy = "statusId")
     private List<TaskEntity> tasks;

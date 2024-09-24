@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 @RestController
-@RequestMapping("/v2/statuses")
+@RequestMapping("/v3/statuses")
 @CrossOrigin(origins = {"http://localhost:5173",
         "http://ip23kk3.sit.kmutt.ac.th",
         "http://intproj23.sit.kmutt.ac.th"})

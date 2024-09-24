@@ -55,10 +55,6 @@ public class TaskEntity {
     @JoinColumn(referencedColumnName = "statusId" ,name ="statusId")
     private StatusEntity statusId ;
 
-    @ManyToOne
-    @JoinColumn(name = "boardId", referencedColumnName = "boardId", nullable = false)
-    private BoardEntity boardId;
-
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim().length()==0?null:description.trim();

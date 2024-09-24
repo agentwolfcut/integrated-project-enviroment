@@ -14,110 +14,21 @@ import java.util.Optional;
 public class BoardService {
 
     @Autowired
-    private final BoardRepository boardRepository;
-
-    // TEST
-    public Optional<BoardEntity> getBoardById(String boardId) {
-        return boardRepository.findById(boardId);
-    }
+    private BoardRepository boardRepository;
+    //Get all boards
 
 
-    public Object getAllBoards() {
+    //Get all boards
+    public Iterable<BoardEntity> getAllBoards() {
         return boardRepository.findAll();
     }
 
-    public Object addBoard(BoardEntity board) {
-        return boardRepository.save(board);
+    //Delete a board
+    public void deleteBoard(String id) { // changed to String
+        boardRepository.deleteById(id);
     }
 
-    public Object editBoard(String boardId, BoardEntity board) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            BoardEntity boardEntity = boardOptional.get();
-            boardEntity.setBoardName(board.getBoardName());
-            return boardRepository.save(boardEntity);
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object deleteBoard(String boardId) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            boardRepository.deleteById(boardId);
-            return "Board deleted";
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object getAllTasksInBoard(String boardId) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            return boardOptional.get().getTasks();
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object addTaskToBoard(String boardId, TaskEntity task) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            BoardEntity boardEntity = boardOptional.get();
-            boardEntity.getTasks().add(task);
-            return boardRepository.save(boardEntity);
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object getTaskById(String boardId, Integer taskId) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            BoardEntity boardEntity = boardOptional.get();
-            for (TaskEntity task : boardEntity.getTasks()) {
-                if (task.getTaskId().equals(taskId)) {
-                    return task;
-                }
-            }
-            return "Task not found";
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object editTask(String boardId, Integer taskId, TaskEntity task) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            BoardEntity boardEntity = boardOptional.get();
-            for (TaskEntity taskEntity : boardEntity.getTasks()) {
-                if (taskEntity.getTaskId().equals(taskId)) {
-                    taskEntity.setTitle(task.getTitle());
-                    taskEntity.setDescription(task.getDescription());
-                    taskEntity.setAssignees(task.getAssignees());
-                    taskEntity.setStatus(task.getStatus());
-                    return boardRepository.save(boardEntity);
-                }
-            }
-            return "Task not found";
-        } else {
-            return "Board not found";
-        }
-    }
-
-    public Object deleteTask(String boardId, Integer taskId) {
-        Optional<BoardEntity> boardOptional = boardRepository.findById(boardId);
-        if (boardOptional.isPresent()) {
-            BoardEntity boardEntity = boardOptional.get();
-            for (TaskEntity task : boardEntity.getTasks()) {
-                if (task.getTaskId().equals(taskId)) {
-                    boardEntity.getTasks().remove(task);
-                    return boardRepository.save(boardEntity);
-                }
-            }
-            return "Task not found";
-        } else {
-            return "Board not found";
-        }
+    public Optional<BoardEntity> getBoardById(String id) { // changed to String
+        return boardRepository.findById(id);
     }
 }

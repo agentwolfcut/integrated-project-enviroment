@@ -52,9 +52,12 @@ public class TaskEntity {
     private Date updatedOn;
 
     @ManyToOne
-    @JoinColumn(name = "boardId", nullable = false)
-    @JsonIgnore
-    private BoardEntity board;
+    @JoinColumn(referencedColumnName = "statusId" ,name ="statusId")
+    private StatusEntity statusId ;
+
+    @ManyToOne
+    @JoinColumn(name = "boardId", referencedColumnName = "boardId", nullable = false)
+    private BoardEntity boardId;
 
 
     public void setDescription(String description) {
@@ -80,5 +83,9 @@ public class TaskEntity {
         SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dt1.format(dt.parse(dt.format(date_s)));
+    }
+
+    public Object getTaskId() {
+        return id;
     }
 }

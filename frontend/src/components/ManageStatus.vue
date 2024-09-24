@@ -42,10 +42,6 @@ const editingStatus = ref({ id: undefined, name: "", description: "" });
 // sem2
 const token = localStorage.getItem('token');
 
-import {AuthUserStore} from '../stores/store.js'
-const tokenStore = AuthUserStore();
-console.log(tokenStore.currentUser);
-
 
 // GET
 onMounted(async () => {

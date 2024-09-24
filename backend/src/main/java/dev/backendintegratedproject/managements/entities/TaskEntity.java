@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.managements.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +13,7 @@ import java.util.TimeZone;
 @Getter
 @Setter
 @Entity
-@Table(name = "Tasks_v2")
+@Table(name = "Task")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,6 +51,14 @@ public class TaskEntity {
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
 
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "statusId" ,name ="statusId")
+    private StatusEntity statusId ;
+
+    @ManyToOne
+    @JoinColumn(name = "boardId", referencedColumnName = "boardId", nullable = false)
+    private BoardEntity boardId;
+
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim().length()==0?null:description.trim();
@@ -74,5 +83,9 @@ public class TaskEntity {
         SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         dt1.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dt1.format(dt.parse(dt.format(date_s)));
+    }
+
+    public Object getTaskId() {
+        return id;
     }
 }

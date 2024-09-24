@@ -23,14 +23,12 @@ public class StatusEntity {
     @Column(name = "statusDescription", length = 200)
     private String description;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "status")
-    private List<TaskEntity> tasks;
+    @ManyToOne
+    @JoinColumn(name = "boardId", nullable = false)
+    private BoardEntity boardId;
 
-    @JsonIgnore
-    public String getStatusName() {
-        return name;
-    }
+    @OneToMany(mappedBy = "statusId")
+    private List<TaskEntity> tasks;
 
     public void setDescription(String description) {
         this.description = description == null?null:description.trim().length()==0?null:description.trim();

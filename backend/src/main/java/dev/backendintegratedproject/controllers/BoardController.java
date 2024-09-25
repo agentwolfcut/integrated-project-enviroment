@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -22,8 +24,27 @@ public class BoardController {
     // Get all boards
     @GetMapping
     public ResponseEntity<Object> getAllBoards() {
-        return ResponseEntity.ok(boardService.getAllBoards());
+        List<BoardEntity> boardEntities = (List<BoardEntity>) boardService.getAllBoards();
+
+        // Map the list of BoardEntity to a list of BoardDTO
+        List<BoardDTO> boardDTOs = boardEntities.stream().map(board -> {
+            // Map the owner fields to BoardDTO.UserMainEntity
+            BoardDTO.UserMainEntity ownerDTO = new BoardDTO.UserMainEntity(
+                    board.getOwner().getOid(),
+                    board.getOwner().getName()
+            );
+
+            // Map BoardEntity to BoardDTO
+            return new BoardDTO(
+                    board.getId(),
+                    board.getName(),
+                    ownerDTO
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(boardDTOs);
     }
+
 
     // Get board by ID
     // Get board by ID

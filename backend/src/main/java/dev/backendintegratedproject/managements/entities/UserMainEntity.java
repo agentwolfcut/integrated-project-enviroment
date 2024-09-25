@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.managements.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class UserMainEntity {
     @Column(name = "username", nullable = false)
     private String username;
 
+
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -33,7 +35,7 @@ public class UserMainEntity {
     @Column(name = "updated_on", updatable = false, insertable = false)
     private Date updatedOn;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "owner")
     private List<BoardEntity> boards;
 

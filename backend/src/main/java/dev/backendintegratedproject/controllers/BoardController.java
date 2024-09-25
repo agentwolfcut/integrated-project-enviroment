@@ -1,9 +1,15 @@
 package dev.backendintegratedproject.controllers;
 
 import dev.backendintegratedproject.dtos.BoardDTO;
+<<<<<<< Updated upstream
 import dev.backendintegratedproject.dtos.TaskDTO;
 import dev.backendintegratedproject.managements.entities.TaskV3Entity;
+=======
+import dev.backendintegratedproject.managements.entities.BoardEntity;
+import dev.backendintegratedproject.managements.entities.UserMainEntity;
+>>>>>>> Stashed changes
 import dev.backendintegratedproject.services.BoardService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -93,7 +99,44 @@ public class BoardController {
                     .body(Map.of("error", "Failed to retrieve tasks: " + e.getMessage()));
         }
     }
+    //post a board
+    @PostMapping
+    public ResponseEntity<BoardDTO> createBoard(@Valid @RequestBody BoardDTO boardDTO) {
+        // Convert DTO to Entity
+        BoardEntity boardEntity = new BoardEntity();
+        boardEntity.setName(boardDTO.getName());
 
+        // Check if owner is present
+        if (boardDTO.getOwner() != null) {
+            // Find the owner by their oid
+            Optional<UserMainEntity> owner = boardService.getUserById(boardDTO.getOwner().getOid());
+            if (owner.isEmpty()) {
+                return ResponseEntity.badRequest().body(null); // Return 400 if the owner is not found
+            }
+            boardEntity.setOwner(owner.get());
+        } else {
+            // Handle case if owner is not provided
+            boardEntity.setOwner(null); // Or set a default owner if necessary
+        }
+
+        // Save the board
+        BoardEntity savedBoard = boardService.saveBoard(boardEntity);
+
+        // Convert back to DTO for the response
+        BoardDTO savedBoardDTO = new BoardDTO(
+                savedBoard.getId(),
+                savedBoard.getName(),
+                savedBoard.getOwner() != null
+                        ? new BoardDTO.UserMainEntity(savedBoard.getOwner().getOid(), savedBoard.getOwner().getName())
+                        : null
+        );
+
+        return ResponseEntity.status(201).body(savedBoardDTO); // Return 201 Created
+    }
+
+
+
+<<<<<<< Updated upstream
     // Get a specific task by task ID within a board
     @GetMapping("/{boardId}/tasks/{taskId}")
     public ResponseEntity<?> getTaskById(@PathVariable String boardId,
@@ -111,6 +154,10 @@ public class BoardController {
                     .body(Map.of("error", "Failed to retrieve task: " + e.getMessage()));
         }
     }
+=======
+
+
+>>>>>>> Stashed changes
 
     // Delete a specific task from a board
     @DeleteMapping("/{boardId}/tasks/{taskId}")

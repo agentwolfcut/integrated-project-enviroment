@@ -2,8 +2,12 @@ package dev.backendintegratedproject.services;
 
 import dev.backendintegratedproject.dtos.BoardDTO;
 import dev.backendintegratedproject.managements.entities.BoardEntity;
+<<<<<<< Updated upstream
 import dev.backendintegratedproject.managements.entities.StatusEntity;
 import dev.backendintegratedproject.managements.entities.TaskV3Entity;
+=======
+import dev.backendintegratedproject.managements.entities.UserMainEntity;
+>>>>>>> Stashed changes
 import dev.backendintegratedproject.managements.repositories.BoardRepository;
 import dev.backendintegratedproject.managements.repositories.StatusRepository;
 import dev.backendintegratedproject.managements.repositories.TaskV3Repository;
@@ -199,5 +203,14 @@ public class BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         taskRepository.delete(task);
+    }
+
+    public BoardEntity saveBoard(BoardEntity board) {
+        return boardRepository.save(board);
+    }
+
+
+    public Optional<UserMainEntity> getUserById(String oid) {
+        return boardRepository.findById(oid).map(BoardEntity::getOwner);
     }
 }

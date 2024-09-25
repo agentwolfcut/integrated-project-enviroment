@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -31,8 +32,18 @@ public class BoardEntity {
     @Column(name = "updatedOn", nullable = false)
     private Date updatedOn;
 
+<<<<<<< Updated upstream
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StatusV3Entity> statuses;
+=======
+    @PrePersist
+    public void generateId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+
+>>>>>>> Stashed changes
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TaskV3Entity> tasks;

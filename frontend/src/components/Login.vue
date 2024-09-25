@@ -32,9 +32,8 @@ const inputUsrpw = async () => {
       token = data.access_token;
       localStorage.setItem("token", token);
       decode();
-      router.push("/task");
+      router.push("/board");
       // router.push("/task");
-      router.push({ name: 'Task', state: { currentUser: current_user.value } });
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("Username or Password is incorrect.");

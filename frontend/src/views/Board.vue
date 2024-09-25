@@ -1,10 +1,13 @@
 <script setup>
+
 import SideBar from '@/components/SideBar.vue'
 import HeaderIT from '@/components/Header.vue'
 import { useRoute } from 'vue-router'
 import { ref, onMounted, provide } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode'
 import buttonSlot from '@/components/Button.vue'
+
+const haveboard = ref(true)
 
 const route = useRoute()
 const currentUser = ref(null)
@@ -21,7 +24,7 @@ onMounted(async () => {
     if (token) {
       const decoded = VueJwtDecode.decode(token)
       currentUser.value = decoded.name
-      console.log(currentUser.value)
+      
     }
   }
 })
@@ -56,7 +59,6 @@ const completeNotify = (status, action) => {
           <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-200">
             <div>
               <!-- button add -->
-
               <div class="flex justify-end mb-9">
                 <input
                   type="text"
@@ -64,16 +66,16 @@ const completeNotify = (status, action) => {
                   class="input input-bordered w-full max-w-xs"
                 />
                 <router-link to="/board/add">
-                  <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
-                      <template v-slot:title> Create personal board </template>
+                  <div class="rounded-lg ml-4 sm:ml-8 w-60">
+                    <buttonSlot size="sm" type="dark" class="itbkk-button-create">
+                      <template v-slot:title > Create personal board </template>
                     </buttonSlot>
                   </div>
                 </router-link>
               </div>
 
               <div class="mt-7 overflow-x-auto rounded-2xl">
-                <table class="w-full whitespace-nowrap">
+                <table v-if="haveboard"  class="w-full whitespace-nowrap">
                   <!-- head -->
                   <thead
                     class="text-slate-50 text"
@@ -98,9 +100,9 @@ const completeNotify = (status, action) => {
                       </th>
                     </tr>
                   </thead>
-
                   <!-- body content -->
                   <tbody class="container">
+
                     <tr class="itbkk-item h-16 box ease-in transition-colors">
                       <td class="min-w-60">
                         <div class="flex items-center pl-5">
@@ -108,7 +110,7 @@ const completeNotify = (status, action) => {
                             <p
                               class="text-base font-medium leading-none text-gray-700 mr-4"
                             >
-                              
+                              dfjkglfsld;augiwoehg
                             </p>
                           </div>
 
@@ -122,28 +124,25 @@ const completeNotify = (status, action) => {
 
                       <td class="">
                         <div
-                          v-if=1
                           class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
                         >
-                          x
+                          xfghjkl;ertyuioiuhygtfd
                         </div>
-                        <div
-                          v-else
-                          class="itbkk-status-description text-base font-normal italic leading-none text-gray-400 mr-2"
-                        >
-                          No description is provided
-                        </div>
+ 
                       </td>
 
-                      <td class="p-3">
+                      <td class="">
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
-                        >
+                        >ertyuiopoiuytrdcvbghnjk
                         </div>
                       </td>
                     </tr>
+
                   </tbody>
                 </table>
+
+                <div v-else class="flex justify-center mt-64 text-3xl font-bold">No board provided</div>
               </div>
             </div>
           </div>
@@ -160,15 +159,15 @@ const completeNotify = (status, action) => {
       ></div>
     </div>
   </div>
-
+  <router-view/>
 </template>
 
 <style scoped>
-.itbkk-button-add {
+.itbkk-button-create {
   background-color: #260b8a;
 }
 
-.itbkk-button-add:hover {
+.itbkk-button-create:hover {
   background-color: #c7b8ea;
   /* light purple color */
 }

@@ -56,7 +56,7 @@ const currentUser = inject('currentUser')
   </transition> -->
 
     <nav class="flex flex-1 flex-col items-center gap-y-4 pt-10">
-      <div
+      <!-- <div
         class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
       >
         <router-link to="/task" class="block">
@@ -78,7 +78,7 @@ const currentUser = inject('currentUser')
             Status View
           </div>
         </router-link>
-      </div>
+      </div> -->
 
             <div
         class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"

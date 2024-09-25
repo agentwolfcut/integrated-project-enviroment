@@ -1,5 +1,7 @@
 package dev.backendintegratedproject.controllers;
 
+import dev.backendintegratedproject.managements.entities.UserMainEntity;
+import dev.backendintegratedproject.managements.repositories.UserMainRepository;
 import dev.backendintegratedproject.securities.JwtTokenUtil;
 import dev.backendintegratedproject.userManage.LoginRequest;
 import dev.backendintegratedproject.userManage.UserEntity;
@@ -29,6 +31,8 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private UserMainRepository userMainRepository;
 
     @GetMapping()
     public List<UserEntity> getAllUsers() {
@@ -57,15 +61,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Username and password cannot be empty"));
         }
 
-        // If there are validation errors, return them all
+
         if (!errors.isEmpty()) {
             ResponseEntity.badRequest().body(Map.of("message", String.join(", ", errors)));
         }
 
-        // If validation passes, proceed with authentication
         UserEntity user = userRepository.findByUserName(loginRequest.getUserName());
 
         if (user != null && passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            UserMainEntity userMainEntity = (UserMainEntity) userMainRepository.findByOid(user.getOid()).orElse(null);
+            if (userMainEntity == null) {
+                userMainEntity = new UserMainEntity();
+                userMainEntity.setOid(user.getOid());
+                userMainEntity.setName(user.getName());
+                userMainEntity.setUserName(user.getUserName());
+                userMainEntity.setEmail(user.getEmail());
+                userMainRepository.save(userMainEntity);
+            }
+
             // Generate JWT token
             String token = jwtTokenUtil.generateToken(user);
             return ResponseEntity.ok(Map.of("access_token", token));

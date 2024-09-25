@@ -6,9 +6,13 @@ import dev.backendintegratedproject.services.BoardService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,16 +29,13 @@ public class BoardController {
     @GetMapping
     public ResponseEntity<Object> getAllBoards() {
         List<BoardEntity> boardEntities = (List<BoardEntity>) boardService.getAllBoards();
-
-        // Map the list of BoardEntity to a list of BoardDTO
         List<BoardDTO> boardDTOs = boardEntities.stream().map(board -> {
-            // Map the owner fields to BoardDTO.UserMainEntity
+
             BoardDTO.UserMainEntity ownerDTO = new BoardDTO.UserMainEntity(
                     board.getOwner().getOid(),
                     board.getOwner().getName()
             );
 
-            // Map BoardEntity to BoardDTO
             return new BoardDTO(
                     board.getId(),
                     board.getName(),
@@ -47,13 +48,26 @@ public class BoardController {
 
 
     // Get board by ID
-    // Get board by ID
+
+
+    // Get board by ID, but restrict access to the owner only
     @GetMapping("/{id}")
     public ResponseEntity<BoardDTO> getBoard(@PathVariable String id) {
+        // Get the current authenticated user's oid
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserOid = (String) authentication.getPrincipal();  // Assuming oid is stored in the principal
+
+        // Find the board by id
         Optional<BoardEntity> boardEntity = boardService.getBoardById(id);
         if (boardEntity.isPresent()) {
-            // Mapping from BoardEntity to BoardDTO
             BoardEntity board = boardEntity.get();
+
+            // Check if the current user is the owner of the board
+            if (!board.getOwner().getOid().equals(currentUserOid)) {
+                return ResponseEntity.status(403).build();  // Return 403 Forbidden if not the owner
+            }
+
+            // If the user is the owner, return the board details
             BoardDTO boardDTO = new BoardDTO(
                     board.getId(),
                     board.getName(),
@@ -61,8 +75,11 @@ public class BoardController {
             );
             return ResponseEntity.ok(boardDTO);
         }
+
+        // If the board is not found, return 404
         return ResponseEntity.notFound().build();
     }
+
 
 
     // Delete a board
@@ -76,8 +93,5 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
-    // Utility method to map BoardEntity to BoardDTO
-
-
-
+    // Create a board
 }

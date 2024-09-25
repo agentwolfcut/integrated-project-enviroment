@@ -39,4 +39,7 @@ public class UserMainEntity {
     @OneToMany(mappedBy = "owner")
     private List<BoardEntity> boards;
 
+    public void setUserName(String userName) {
+        this.username = userName == null ? null : userName.trim();
+    }
 }

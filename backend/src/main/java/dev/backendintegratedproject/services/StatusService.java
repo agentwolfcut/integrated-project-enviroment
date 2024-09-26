@@ -1,99 +1,178 @@
 package dev.backendintegratedproject.services;
-import dev.backendintegratedproject.managements.entities.StatusEntity;
-import dev.backendintegratedproject.managements.entities.TaskEntity;
-import dev.backendintegratedproject.managements.repositories.StatusRepository;
-import dev.backendintegratedproject.managements.repositories.TaskRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import dev.backendintegratedproject.dtos.status.CreateStatusDTO;
+import dev.backendintegratedproject.primarydatasource.entities.Status;
+import dev.backendintegratedproject.primarydatasource.repositories.StatusRepository;
+import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
+
 @Service
 public class StatusService {
     @Autowired
     private StatusRepository statusRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private TaskService taskService;
 
-    public List<StatusEntity> getAllStatus() {
-        return statusRepository.findAll();
+
+
+    public List<Status> getAllStatuses(String boardID) {
+        return statusRepository.findAllByBoardID(boardID);
     }
 
-    public StatusEntity getStatusById(Integer id) {
-        StatusEntity status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + id + " does not exist"));
+    @Transactional(readOnly = true)
+    public Status getStatusById(Integer id, String boardId) {
+        Status status = statusRepository.findByIdAndBoardID(id,boardId);
+        if(status == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
+        }
         return status;
     }
 
-    public StatusEntity addStatus(StatusEntity status) {
-        validateStatus(status);
-
-        if (status.getDescription() != null && status.getDescription().isEmpty()) {
-            status.setDescription(null);
+    @Transactional
+    public Status createStatus(CreateStatusDTO status, String boardID) {
+        // Check if name is empty
+        if (status.getName() == null || status.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required.");
         }
-
-        return statusRepository.save(status);
-    }
-
-    public StatusEntity editStatus(Integer id, StatusEntity status) {
-        validateStatus(status);
-
-        StatusEntity editStatus = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        editStatus.setName(status.getName());
-        editStatus.setDescription(status.getDescription());
-
-        return statusRepository.save(editStatus);
-    }
-
-    public void deleteStatus(Integer id) {
-        StatusEntity status = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + id + " does not exist"));
-
-        if (StatusInUse(status)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete Status with ID " + id + " as it is currently in use.");
+        if (statusRepository.existsByNameAndBoardID(status.getName(), boardID)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name (" + status.getName() + ") already exists.");
         }
-
-        statusRepository.delete(status);
+        try {
+            Status newStatus = new Status();
+            newStatus.setName(status.getName());
+            newStatus.setDescription(status.getDescription());
+            newStatus.setBoardID(boardID);
+            return statusRepository.save(newStatus);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save status.", e);
+        }
     }
 
     @Transactional
-    public void deleteStatusAndTransferTasks(int id, int newStatusId) {
-        StatusEntity currentStatus = statusRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + id + " does not exist"));
-
-        StatusEntity newStatus = statusRepository.findById(newStatusId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status with ID " + newStatusId + " does not exist"));
-
-        List<TaskEntity> tasksWithCurrentStatus = taskRepository.findAllByStatus(currentStatus);
-        tasksWithCurrentStatus.forEach(task -> task.setStatus(newStatus));
-        taskRepository.saveAll(tasksWithCurrentStatus);
-
-        statusRepository.delete(currentStatus);
+    public void deleteStatus(Integer id, String boardId) {
+        Status status = statusRepository.findByIdAndBoardID(id, boardId);
+        if(status == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status to delete not found");
+        }
+        if (!taskService.getAllTaskWithStatus(status).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete status " + status.getName() + " because it is in use !!!");
+        }
+        try {
+            statusRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete status.", e);
+        }
     }
 
-    public boolean StatusInUse(StatusEntity status) {
-        return taskRepository.existsByStatus(status);
+    @Transactional
+    public void deleteAndReplaceStatus(Integer deleteId, Integer replaceId, String boardId) {
+        // Check if status exists
+        if (deleteId.equals(replaceId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "destination status for task transfer must be different from current status");
+        }
+        Status deleteStatus = statusRepository.findByIdAndBoardID(deleteId, boardId);
+        Status replaceStatus = statusRepository.findByIdAndBoardID(replaceId, boardId);
+        if(replaceStatus == null || deleteStatus == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found please check both status ID");
+        }
+
+
+        // fetch all tasks with deleteStatus
+
+
+
+
+        try {
+            // Replace all deleteStatus in tasks with replaceStatus
+            taskRepository.transferStatusTasks(deleteStatus.getId(), replaceStatus.getId());
+            // after replacing all deleteStatus in tasks, delete deleteStatus
+            statusRepository.deleteById(deleteId);
+        } catch (Exception e) {
+            throw e;
+        }
+
+
+
     }
 
-    private void validateStatus(StatusEntity status) {
-        if (status.getName() == null || status.getName().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name must not be null or empty");
+    @Transactional
+    public Status updateStatus(Integer id, Status updateStatus, String boardId) {
+        // Check if status exists
+        Status existingStatus = statusRepository.findByIdAndBoardID(id, boardId);
+        if(existingStatus == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status to update not found");
         }
+        // set existing status value
 
-        if (statusRepository.existsByName(status.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name must be unique");
+        // check if name is empty
+        if (updateStatus.getName() == null || updateStatus.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required.");
         }
-
-        if (status.getName().length() > 50 || (status.getDescription() != null && status.getDescription().length() > 200)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name size must be between 0 and 50, description size must be between 0 and 200");
+//        if (statusRepository.existsByName(updateStatus.getName()) && !updateStatus.getId().equals(existingStatus.getId())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name (" + updateStatus.getName() + ") already exists.");
+//        }
+        if(statusRepository.findAllByName(updateStatus.getName()).stream().anyMatch(status -> !status.getId().equals(updateStatus.getId()))){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name (" + updateStatus.getName() + ") already exists.");
         }
+        // set updated values
+        existingStatus.setName(updateStatus.getName());
+        existingStatus.setDescription(updateStatus.getDescription());
 
+        try {
+            // save updated status
+            return statusRepository.save(existingStatus);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update status.", e);
+        }
+    }
+
+    public Integer checkIsNotInUsed(Integer id, String boardId) {
+        Status status = statusRepository.findByIdAndBoardID(id, boardId);
+        if(status == null){
+            new ResponseStatusException(HttpStatus.NOT_FOUND, "status " + id + " does not exist !!!");
+        }
+        return taskService.getAllTaskWithStatus(status).size();
+    }
+
+    public CreateStatusDTO trimStatus(CreateStatusDTO status) {
+        if (status.getName() == null || status.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name is required");
+        }
+        String trimmedName = status.getName().trim();
+        String trimmedDescription = status.getDescription() != null ? status.getDescription().trim() : null;
+        status.setName(trimmedName);
+        status.setDescription(trimmedDescription);
+        return status;
+    }
+
+    public Status trimStatusUpdate(Status status) {
+        if (status.getName() == null || status.getName().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name is required");
+        }
+        String trimmedName = status.getName().trim();
+        String trimmedDescription = status.getDescription() != null ? status.getDescription().trim() : null;
+        status.setName(trimmedName);
+        status.setDescription(trimmedDescription);
+        return status;
+    }
+
+    public Map<Status, Integer> getAllStatUsage(String boardID) {
+        Map usageMap = new HashMap();
+        List<Status> statuses = getAllStatuses(boardID);
+        statuses.forEach(status -> {
+            usageMap.put(status.getId(), checkIsNotInUsed(status.getId(), boardID));
+        });
+        return usageMap;
     }
 }
-
-
-

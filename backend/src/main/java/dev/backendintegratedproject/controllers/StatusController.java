@@ -1,74 +1,70 @@
 package dev.backendintegratedproject.controllers;
 
-import dev.backendintegratedproject.dtos.StatusDTO;
-import dev.backendintegratedproject.managements.entities.StatusEntity;
-import dev.backendintegratedproject.services.StatusService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import dev.backendintegratedproject.dtos.status.CreateStatusDTO;
+import dev.backendintegratedproject.primarydatasource.entities.Status;
+import dev.backendintegratedproject.services.StatusService;
+import dev.backendintegratedproject.util.ListMapper;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/v3/statuses")
-@CrossOrigin(origins = {"http://localhost:5173",
-        "http://ip23kk3.sit.kmutt.ac.th",
-        "http://intproj23.sit.kmutt.ac.th"})
+@RequestMapping("/v3/boards")
+@CrossOrigin(origins = {"http://ip23kk3.sit.kmutt.ac.th:80", "http://localhost:5173" ,"http://intproj23.sit.kmutt.ac.th"})
 public class StatusController {
     @Autowired
-    private StatusService statusService;
+    StatusService statusService;
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
+    @Autowired
+    ListMapper listMapper;
 
-    @GetMapping
-    public ResponseEntity<Object> getAllStatus() {
-        List<StatusEntity> statuses = statusService.getAllStatus();
-        List<StatusDTO> statusDTOList = statuses.stream()
-                .map(status -> modelMapper.map(status, StatusDTO.class))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(statusDTOList, HttpStatus.OK);
+    @GetMapping("/{boardID}/statuses")
+    public List<Status> getAllStatuses(@PathVariable String boardID) {
+        return statusService.getAllStatuses(boardID);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getStatusById(@PathVariable("id") Integer id) {
-        StatusEntity status = statusService.getStatusById(id);
-        if (status == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Status id %d does not exist.", id));
-        StatusDTO statusDTO = modelMapper.map(status, StatusDTO.class);
-        return new ResponseEntity<>(statusDTO, HttpStatus.OK);
+    @GetMapping("/{boardID}/statuses/{id}")
+    public Status getStatusById(@PathVariable Integer id, @PathVariable String boardID) {
+        return statusService.getStatusById(id, boardID);
     }
 
-    @PostMapping
-    public ResponseEntity<Object> addStatus(@Valid @RequestBody StatusDTO statusDTO) {
-        StatusEntity status = modelMapper.map(statusDTO, StatusEntity.class);
-        StatusEntity addedStatus = statusService.addStatus(status);
-        StatusDTO addedStatusDTO = modelMapper.map(addedStatus, StatusDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedStatusDTO);
-
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> editStatus(@Valid @PathVariable Integer id, @RequestBody StatusEntity status) {
-        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status and Done Cannot be Edited");}
-        StatusEntity editedStatus = statusService.editStatus(id,status);
-        return ResponseEntity.ok(editedStatus);
+    @PostMapping("/{boardID}/statuses")
+    public ResponseEntity<Status> createStatus(@PathVariable String boardID, @Valid @RequestBody CreateStatusDTO status) {
+        CreateStatusDTO statusTrim = statusService.trimStatus(status);
+        Status createdStatus = statusService.createStatus(statusTrim, boardID);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
     }
 
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteStatus(@PathVariable("id") Integer id) {
-        if ("No Status".equals(statusService.getStatusById(id).getName()) || "Done".equals(statusService.getStatusById(id).getName())){ throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Status and Done Cannot be deleted");}
-        statusService.deleteStatus(id);
-        return ResponseEntity.ok().body(new HashMap<>());
+    @DeleteMapping("/{boardID}/statuses/{id}")
+    public void deleteStatus(@PathVariable Integer id, @PathVariable String boardID) {
+        statusService.deleteStatus(id, boardID);
     }
 
-    @DeleteMapping("/{id}/{newId}")
-    public ResponseEntity<Object> deleteStatusAndTransferTasks(@PathVariable int id, @PathVariable int newId) {
-        statusService.deleteStatusAndTransferTasks(id, newId);
-        return ResponseEntity.ok("{}");
+    @DeleteMapping("/{boardID}/statuses/{id}/{replaceId}")
+    public void deleteStatus(@PathVariable Integer id, @PathVariable Integer replaceId, @PathVariable String boardID) {
+        statusService.deleteAndReplaceStatus(id, replaceId, boardID);
+    }
+
+    @PutMapping("/{boardID}/statuses/{id}")
+    public Status updateStatus(@PathVariable Integer id,@Valid @RequestBody Status status, @PathVariable String boardID) {
+        Status statusTrim = statusService.trimStatusUpdate(status);
+        return statusService.updateStatus(id, statusTrim, boardID);
+    }
+
+    @GetMapping("/{boardID}/statuses/usage/{id}")
+    public Integer checkUsage(@PathVariable Integer id, @PathVariable String boardID){
+        return statusService.checkIsNotInUsed(id, boardID);
+    }
+
+    @GetMapping("/{boardID}/statuses/usage")
+    public ResponseEntity<Map<Status, Integer>> checkAllUsage(@PathVariable String boardID){
+        return ResponseEntity.ok(statusService.getAllStatUsage(boardID));
     }
 }

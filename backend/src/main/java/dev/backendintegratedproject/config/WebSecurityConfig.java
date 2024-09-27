@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import dev.backendintegratedproject.filters.JwtAuthenFilter;
+import dev.backendintegratedproject.filters.JwtAuthenticFilter;
 import dev.backendintegratedproject.services.UserService;
 
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
@@ -21,7 +21,7 @@ public class WebSecurityConfig {
     @Autowired
     private UserService userService;
     @Autowired
-    private JwtAuthenFilter jwtAuthenFilter;
+    private JwtAuthenticFilter jwtAuthenticFilter;
 
 
 
@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/v3/boards/{boardID}/tasks/{id}").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
-        httpSecurity.addFilterBefore(jwtAuthenFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(jwtAuthenticFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

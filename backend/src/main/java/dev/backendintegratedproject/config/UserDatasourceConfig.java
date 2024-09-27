@@ -19,7 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class UserDatasourceConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "app.userdatasource")
+    @ConfigurationProperties(prefix = "project.userdatasource")
     public DataSourceProperties secondaryDataSourceProperties(){
         return new DataSourceProperties();
     }

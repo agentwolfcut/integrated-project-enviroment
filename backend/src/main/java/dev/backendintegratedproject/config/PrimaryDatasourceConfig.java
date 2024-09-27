@@ -22,7 +22,7 @@ public class PrimaryDatasourceConfig {
 
     @Bean
     @Primary
-    @ConfigurationProperties(prefix = "app.datasource")
+    @ConfigurationProperties(prefix = "project.datasource")
     public DataSourceProperties primaryDataSourceProperties(){
         return new DataSourceProperties();
     }

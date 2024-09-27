@@ -1,9 +1,7 @@
 package dev.backendintegratedproject.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
@@ -12,10 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -23,18 +19,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 import dev.backendintegratedproject.dtos.users.UserDetailsDTO;
 import dev.backendintegratedproject.exceptions.ExceptionForm;
-import dev.backendintegratedproject.primarydatasource.entities.Board;
-import dev.backendintegratedproject.primarydatasource.repositories.BoardPermissionRepository;
-import dev.backendintegratedproject.primarydatasource.repositories.BoardRepository;
 import dev.backendintegratedproject.services.UserService;
 import dev.backendintegratedproject.util.JwtUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
-public class JwtAuthenFilter extends OncePerRequestFilter {
+public class JwtAuthenticFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 

@@ -4,7 +4,7 @@ import { computed, ref } from "vue";
 import VueJwtDecode from 'vue-jwt-decode';
 import {AuthUserStore} from '../stores/store.js'
 
-const usrpw = ref({ userName: "", password: "" });
+const usrpw = ref({ username: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
@@ -36,7 +36,7 @@ const inputUsrpw = async () => {
       // router.push("/task");
     } else {
       if (res.status === 400 || res.status === 401) {
-        errorNotify("Username or Password is incorrect.");
+        errorNotify("username or Password is incorrect.");
         console.log(res.status + res.statusText);
         
       } else {
@@ -65,7 +65,7 @@ const errorNotify = (text) => {
   error.value = true;
   classNotify.value = "bg-red-500";
   textNotify.value = text;
-  // textNotify.value = `Username or Password is incorrect.`;
+  // textNotify.value = `username or Password is incorrect.`;
   setTimeout(() => {
     error.value = false;
   }, 2000);
@@ -73,9 +73,9 @@ const errorNotify = (text) => {
 
 const canLogin = computed(() => {
   return (
-    usrpw.value.userName.length > 0 &&
+    usrpw.value.username.length > 0 &&
     usrpw.value.password.length > 0 &&
-    usrpw.value.userName.length <= 50 &&
+    usrpw.value.username.length <= 50 &&
     usrpw.value.password.length <= 14
   );
 });
@@ -110,7 +110,7 @@ const canLogin = computed(() => {
                 <label class="text-white text-sm mb-2 block">User name</label>
                 <div class="relative flex items-center">
                   <input
-                    v-model="usrpw.userName"
+                    v-model="usrpw.username"
                     name="username"
                     type="text"
                     required

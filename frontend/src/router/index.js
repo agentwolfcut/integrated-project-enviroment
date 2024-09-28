@@ -7,7 +7,7 @@ import EditTask from "@/components/EditTask.vue";
 import ManageStatus from "@/components/ManageStatus.vue";
 import AddStatus from "@/components/AddStatus.vue";
 import EditStatus from "@/components/EditStatus.vue";
-import Login from "@/components/Login.vue";
+import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
 

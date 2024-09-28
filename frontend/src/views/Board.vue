@@ -6,8 +6,15 @@ import { useRoute } from 'vue-router'
 import { ref, onMounted, provide } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode'
 import buttonSlot from '@/components/Button.vue'
+import {
+  getItems,
+} from "../libs/fetchUtils";
+import {useToast} from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+const toast = useToast();
+import { BoardManagement } from "@/libs/BoardManagement";
 
-const haveboard = ref(true)
+const haveboard = ref(false)
 
 const route = useRoute()
 const currentUser = ref(null)
@@ -15,8 +22,16 @@ const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
+const token = localStorage.getItem('token');
+
+const boardMan = ref(new BoardManagement());
 
 onMounted(async () => {
+  const boardRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards` , token )
+  boardMan.value.addBoards(boardRes)
+
+  console.log(`get board :  ${boardMan.value.getBoards}`);
+  
   if (route.state && route.state.currentUser) {
     currentUser.value = route.state.currentUser
   } else {
@@ -24,10 +39,10 @@ onMounted(async () => {
     if (token) {
       const decoded = VueJwtDecode.decode(token)
       currentUser.value = decoded.name
-      
     }
   }
 })
+
 provide('currentUser', currentUser)
 
 const errorNotify = () => {

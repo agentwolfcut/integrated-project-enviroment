@@ -1,8 +1,15 @@
 <script setup>
-import { defineProps, inject, ref } from 'vue'
+import { defineProps, inject, ref , onMounted} from 'vue'
+import VueJwtDecode from 'vue-jwt-decode';
 
-const currentUser = inject('currentUser')
 
+let currentUser = ref('')
+const token = localStorage.getItem('token')
+
+if (token) {
+    const decoded = VueJwtDecode.decode(token);
+    currentUser.value = decoded.name;
+}
 
 </script>
 

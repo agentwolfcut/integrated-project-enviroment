@@ -13,9 +13,12 @@ import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
 import { useRoute } from "vue-router";
-import VueJwtDecode from "vue-jwt-decode";
-import { get, del } from "@/libs/Utils";
+import { get } from "@/libs/Utils";
+import { BoardStore } from "@/stores/store.js";
+import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
+import { useToast } from "vue-toast-notification";
 
+const boardStore = BoardStore();
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const statuses = ref({});
@@ -28,7 +31,6 @@ const classNotify = ref("");
 const textNotify = ref("");
 const showDeleteModal = ref(false);
 const taskToDelete = ref(undefined);
-// for modal
 const selectTask = ref({
   id: undefined,
   title: "",
@@ -39,39 +41,37 @@ const selectTask = ref({
   updatedOn: "",
 });
 // sem2
-const route = useRoute();
-const currentUser = ref(null);
 const token = localStorage.getItem("token");
+const props = defineProps({
+  boardID: {
+    type: String,
+    required: true,
+  },
+});
 
 // GET items
 onMounted(async () => {
+  console.log("Received boardID :", props.boardID);
+  console.log("this is firstPage");
   const taskRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/tasks`,
+    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks`,
     token
   );
-  //tasks.value = taskRes // reverse and slice to show the most
+  console.log(taskRes);
+
   taskMan.value.addtasks(taskRes);
   sortedTasks.value = taskMan.value.gettasks();
+  console.log(sortedTasks.value);
+
   // status
   const statusRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/statuses`,
+    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`,
     token
   );
   statuses.value = statusRes;
   statusFilter.value = statuses.value.map((status) => status.name);
-  doFilter();
-  if (route.state && route.state.currentUser) {
-    currentUser.value = route.state.currentUser;
-  } else {
-    // Fallback if state is not available
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = VueJwtDecode.decode(token);
-      currentUser.value = decoded.name;
-    }
-  }
+  // doFilter();
 });
-provide("currentUser", currentUser);
 
 const errorNotify = () => {
   error.value = true;
@@ -114,30 +114,29 @@ const cancel = (flag) => {
     status: 1,
   };
 };
+const toast = useToast()
 
 // ADD
 const saveTask = async () => {
   selectTask.value.title = selectTask.value.title.trim();
-  if (selectTask.value.description !== null) {
-    selectTask.value.description = selectTask.value.description.trim();
-  }
-  if (selectTask.value.assignees !== null) {
-    selectTask.value.assignees = selectTask.value.assignees.trim();
-  }
   try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}/tasks`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(selectTask.value),
-    });
-    if (!res.ok) {
-      throw new Error(
-        `Failed to add task. Server responded with status ${res.status}`
-      );
-    }
+    // const res = await fetch(
+    //   `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID/tasks}`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify(selectTask.value),
+    //   }
+    // );
+    // if (!res.ok) {
+    //   throw new Error(
+    //     `Failed to add task. Server responded with status ${res.status}`
+    //   );
+    // }
+    const res = await boardStore.addTask(selectTask.value , props.boardID)
     const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
     // sortedTasks.value.push(addedTask);
@@ -151,8 +150,8 @@ const saveTask = async () => {
       assignees: "",
       status: 1,
     };
-  } catch (error) {
-    errorNotify();
+  } catch (error){
+    toast.error(error)
   }
 };
 
@@ -266,24 +265,6 @@ const toggleFilter = () => {
 
 // Assuming statuses is an array of status objects provided as a prop or fetched from an API
 const statusFilter = ref([]);
-// Fetch statuses and initialize statusFilter
-
-// Apply the filter whenever statusFilter changes
-const doFilter = async () => {
-  await nextTick(); // Ensure the next DOM update cycle is completed
-  if (statusFilter.value.length > 0) {
-    const statusString = statusFilter.value.join(",");
-    // Logs the comma-separated string of selected statuses
-    const res = await getItems(
-      `${import.meta.env.VITE_BASE_URL}/tasks?filterStatuses=${statusString}`,
-      token
-    );
-    sortedTasks.value = res;
-  } else {
-    console.log("No statuses selected");
-    sortedTasks.value = [];
-  }
-};
 
 const sortTasksByCreationTime = () => {
   sortedTasks.value = sortedTasks.value.slice().sort((a, b) => a.id - b.id); // Assuming `id` reflects creation time
@@ -320,7 +301,7 @@ const toggleSortOrder = () => {
 
 <template>
   <div class="flex">
-    <SideBar :user="currentUser" />
+    <SideBar />
     <!-- <div class="flex content flex-col items-center h-screen"> -->
     <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
@@ -329,7 +310,7 @@ const toggleSortOrder = () => {
           <div class="bg-gray-200 py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
               <div class="flex justify-end mb-9">
-                <router-link to="/task/add">
+                <router-link :to="`/board/${props.boardID}/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> Add Task </template>
@@ -423,7 +404,7 @@ const toggleSortOrder = () => {
                       <td
                         class="itbkk-status p-3 text-base font-medium text-slate-800 truncate"
                       >
-                        {{ task.status }}
+                        {{ task.status.name }}
                       </td>
                       <td
                         class="itbkk-button-action p-3 text-base font-medium text-slate-800"
@@ -444,7 +425,7 @@ const toggleSortOrder = () => {
 
                         <button
                           @click="
-                            (showDeleteModal = true), (taskToDelete = task);
+                            (showDeleteModal = true), (taskToDelete = task)
                           "
                           class="itbkk-button-delete pr-1"
                         >
@@ -478,7 +459,6 @@ const toggleSortOrder = () => {
                     id="filter-checkbox"
                     type="checkbox"
                     :value="status.name"
-                    @change="doFilter"
                     class="itbkk-status-choice w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   />
                   <label

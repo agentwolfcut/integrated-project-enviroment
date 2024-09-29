@@ -4,6 +4,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
 import { getItems } from '../libs/fetchUtils';
 import router from '@/router';
+import { BoardStore } from "@/stores/store.js";
 
 const props = defineProps({
     task: {
@@ -16,6 +17,10 @@ const props = defineProps({
             status: 1
             },
         require: true
+    },
+    boardID: {
+        type: String,
+        required: true
     }
 })
 const emit = defineEmits(['saveUpdateTask' , 'cancelOpe']); // Define the custom event
@@ -23,11 +28,11 @@ const previousTask = computed(() => props.task)
 const statusOptions = ref('')
 const route = useRoute();
 const taskId = ref(route.params.taskId)
-
 const token = localStorage.getItem('token');
+console.log("Received boardID:", props.boardID);
 
 onMounted(async () => {
-    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
+    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses` , token)
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {
@@ -71,6 +76,18 @@ const saveTask = () => {
     }
     emit('saveUpdateTask', previousTask.value);
 };
+
+const boardStore = BoardStore()
+// const saveTask = async () => {
+
+//   try {
+//     // เรียกใช้ addTask พร้อมข้อมูล task และ boardID ที่เกี่ยวข้อง
+//     await boardStore.addTask(previousTask.value, props.boardID);
+//   } catch (error) {
+//     console.error('Failed to save task:', error);
+//   }
+// };
+
 
 </script>
 

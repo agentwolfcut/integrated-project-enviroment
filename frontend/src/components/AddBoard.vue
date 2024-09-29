@@ -1,11 +1,13 @@
 <script setup>
-import { onMounted, ref, provide } from "vue";
-import { useRoute } from "vue-router";
+import { ref, provide } from "vue";
 import router from "@/router";
 import VueJwtDecode from "vue-jwt-decode";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
+import { BoardStore } from "@/stores/store.js";
 
+const boardStore = BoardStore();
+const newBoardName = ref('')
 const toast = useToast();
 const currentUser = ref("");
 const token = localStorage.getItem("token");
@@ -13,10 +15,16 @@ const decoded = VueJwtDecode.decode(token);
 currentUser.value = decoded.name;
 
 provide("currentUser", currentUser);
+newBoardName.value =  `${currentUser.value} personal Board`
+console.log(newBoardName.value);
 
 const addBoard = () => {
-    toast.success('yeh')
-}
+  boardStore.addBoard(newBoardName.value);
+  router.push('/board')
+};
+
+
+// can't add
 </script>
 
 <template>
@@ -39,18 +47,17 @@ const addBoard = () => {
             type="text"
             maxlength="50"
             placeholder="Enter board name"
-            :value="currentUser + ' personal board'"
+            v-model="newBoardName"
           />
 
-          <!-- <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousStatus.name.length}}/50</p> -->
           <p class="text-end text-sm font-semibold text-blue-600"></p>
-          <!-- <p v-if="previousStatus.name.length === 50" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for status name </p> -->
         </div>
 
         <!-- bottom -->
         <div class="m-3">
           <div class="buttons flex gap-2">
-            <button @click="addBoard"
+            <button
+              @click="addBoard"
               class="itbkk-button-ok disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
             >
               save

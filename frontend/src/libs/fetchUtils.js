@@ -62,7 +62,7 @@ async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
   }
 }
 
-async function addItem(url, newItem) {
+async function addItem(url, newItem , token) {
   try {
     const res = await fetch(url, {
       method: "POST", // add

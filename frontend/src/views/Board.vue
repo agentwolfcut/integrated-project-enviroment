@@ -1,50 +1,33 @@
 <script setup>
-
-import SideBar from '@/components/SideBar.vue'
-import HeaderIT from '@/components/Header.vue'
-import { useRoute } from 'vue-router'
-import { ref, onMounted, provide } from 'vue'
-import VueJwtDecode from 'vue-jwt-decode'
-import buttonSlot from '@/components/Button.vue'
-import {
-  getItems,
-} from "../libs/fetchUtils";
-import {useToast} from 'vue-toast-notification';
-import 'vue-toast-notification/dist/theme-sugar.css';
-const toast = useToast();
+import SideBar from "@/components/SideBar.vue";
+import HeaderIT from "@/components/Header.vue";
+import { useRoute } from "vue-router";
+import { ref, onMounted, provide, computed } from "vue";
+import VueJwtDecode from "vue-jwt-decode";
+import buttonSlot from "@/components/Button.vue";
+import { getItems } from "../libs/fetchUtils";
+import { useToast } from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-sugar.css";
 import { BoardManagement } from "@/libs/BoardManagement";
+import { BoardStore } from "@/stores/store.js";
+const boardStore = BoardStore();
 
-const haveboard = ref(false)
-
-const route = useRoute()
-const currentUser = ref(null)
+const toast = useToast();
+const route = useRoute();
+const currentUser = ref(null);
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-const token = localStorage.getItem('token');
 
 const boardMan = ref(new BoardManagement());
+const boardList = ref(boardMan.value.getBoards());
 
-onMounted(async () => {
-  const boardRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards` , token )
-  boardMan.value.addBoards(boardRes)
+onMounted(() => {
+  boardStore.getBoard();
+});
 
-  console.log(`get board :  ${boardMan.value.getBoards}`);
-  
-  if (route.state && route.state.currentUser) {
-    currentUser.value = route.state.currentUser
-  } else {
-    const token = localStorage.getItem('token')
-    if (token) {
-      const decoded = VueJwtDecode.decode(token)
-      currentUser.value = decoded.name
-    }
-  }
-})
-
-provide('currentUser', currentUser)
-
+const boards = computed(() => boardStore.getBoards);
 const errorNotify = () => {
   error.value = true;
   classNotify.value = "bg-red-500";
@@ -80,17 +63,25 @@ const completeNotify = (status, action) => {
                   placeholder="Filter by status"
                   class="input input-bordered w-full max-w-xs"
                 />
-                <router-link to="/board/add">
-                  <div class="rounded-lg ml-4 sm:ml-8 w-60">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-create">
-                      <template v-slot:title > Create personal board </template>
-                    </buttonSlot>
-                  </div>
-                </router-link>
+                <div>
+                  <router-link to="/board/add">
+                    <div class="rounded-lg ml-4 sm:ml-8 w-60">
+                      <buttonSlot
+                        size="sm"
+                        type="dark"
+                        class="itbkk-button-create"
+                      >
+                        <template v-slot:title>
+                          Create personal board
+                        </template>
+                      </buttonSlot>
+                    </div>
+                  </router-link>
+                </div>
               </div>
 
               <div class="mt-7 overflow-x-auto rounded-2xl">
-                <table v-if="haveboard"  class="w-full whitespace-nowrap">
+                <table v-if="boards.length" class="w-full whitespace-nowrap">
                   <!-- head -->
                   <thead
                     class="text-slate-50 text"
@@ -98,7 +89,7 @@ const completeNotify = (status, action) => {
                   >
                     <tr class="focus:outline-none h-16 text-base">
                       <th
-                        class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
+                        class="w-3/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
                       >
                         No
                       </th>
@@ -117,47 +108,44 @@ const completeNotify = (status, action) => {
                   </thead>
                   <!-- body content -->
                   <tbody class="container">
+                    <tr
+                      class="itbkk-item h-16 box ease-in transition-colors"
+                      v-for="(board, index) in boards"
+                      :key="index"
+                    >
+                      <td
+                        class="w-3/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left"
+                      >
+                        {{ index + 1 }}
+                      </td>
 
-                    <tr class="itbkk-item h-16 box ease-in transition-colors">
-                      <td class="min-w-60">
-                        <div class="flex items-center pl-5">
-                          <div class="flex flex-row justify-start">
-                            <p
-                              class="text-base font-medium leading-none text-gray-700 mr-4"
-                            >
-                              dfjkglfsld;augiwoehg
-                            </p>
-                          </div>
-
+                      <td class="w-3/12 p-3 pl-5">
+                        <router-link :to="`/board/${board.boardID}`">
                           <div
-                            class="itbkk-status-name truncate text-base font-medium leading-none text-gray-700 mr-4"
+                            class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
                           >
-                            
+                            {{ board.boardName }}
                           </div>
-                        </div>
+                        </router-link>
                       </td>
 
-                      <td class="">
-                        <div
-                          class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
-                        >
-                          xfghjkl;ertyuioiuhygtfd
-                        </div>
- 
-                      </td>
-
-                      <td class="">
+                      <td class="w-2/12 p-3">
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
-                        >ertyuiopoiuytrdcvbghnjk
+                        >
+                          Action
                         </div>
                       </td>
                     </tr>
-
                   </tbody>
                 </table>
 
-                <div v-else class="flex justify-center mt-64 text-3xl font-bold">No board provided</div>
+                <div
+                  v-else
+                  class="flex justify-center mt-64 text-3xl font-bold"
+                >
+                  No board provided
+                </div>
               </div>
             </div>
           </div>
@@ -174,7 +162,7 @@ const completeNotify = (status, action) => {
       ></div>
     </div>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
 <style scoped>

@@ -18,15 +18,6 @@ const routes = [
   // first page & wait t. give endpoint
   { path: "/", redirect: "/login" },
   { path: "/login", name: "Login", component: Login },
-  // {
-  //   path: "/task",
-  //   name: "Task",
-  //   component: FirstPage,
-  //   children: [
-  //     { path: "add", component: AddTask, name: "AddTask" },
-  //     { path: ":taskId/edit", component: EditTask, name: "EditTask" },
-  //   ],
-  // },
   {
     path: "/status",
     component: ManageStatus,
@@ -51,20 +42,29 @@ const routes = [
     component: NotFound,
     redirect: "/login",
   },
+
   // v3
-  { path: "/board/:boardID", name: "Task", component: Task , props: true,
+  {
+    path: "/board/:boardID",
+    name: "Task",
+    component: Task,
+    props: true,
     children: [
-      { path: "add", component: AddTask, name: "AddTask" , props:true },
+      { path: "task/add", component: AddTask, name: "AddTask", props: true },
       { path: ":taskId/edit", component: EditTask, name: "EditTask" },
     ],
+  },
+
+  { path: "/board/:boardID/status", component: ManageStatus , name: "Status" , props: true , 
+    children: [
+      { path: "add", component: AddStatus, name: "AddStatus",}
+    ]
   },
   {
     path: "/board",
     name: "Board",
     component: Board,
-    children: [
-      { path: "add", component: AddBoard, name: "AddBoard" },
-    ],
+    children: [{ path: "add", component: AddBoard, name: "AddBoard" }],
   },
 ];
 

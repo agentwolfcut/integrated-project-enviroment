@@ -41,11 +41,17 @@ const editingStatus = ref({ id: undefined, name: "", description: "" });
 
 // sem2
 const token = localStorage.getItem('token');
-
+const props = defineProps({
+  boardID: {
+    type: String,
+    required: true,
+  },
+});
 
 // GET
 onMounted(async () => {
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token );
+  console.log("Received boardID :", props.boardID);
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses` , token );
   statusMan.value.addStatuses(statusRes);
   if (route.state && route.state.currentUser) {
     currentUser.value = route.state.currentUser;
@@ -260,7 +266,14 @@ const handelFail = () => {
             <div>
               <!-- button add -->
               <div class="flex justify-end mb-9">
-                <router-link to="/status/add">
+                <router-link :to="`/board/${props.boardID}`">
+                  <div class="rounded-lg ml-4 sm:ml-8">
+                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                      <template v-slot:title> TASK </template>
+                    </buttonSlot>
+                  </div>
+                </router-link>
+                <router-link :to="`/board/${props.boardID}/status/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> Add Status </template>

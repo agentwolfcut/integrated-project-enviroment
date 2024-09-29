@@ -28,23 +28,6 @@ onMounted(() => {
 });
 
 const boards = computed(() => boardStore.getBoards);
-const errorNotify = () => {
-  error.value = true;
-  classNotify.value = "bg-red-500";
-  textNotify.value = `An error has occurred, the status does not exist.`;
-  setTimeout(() => {
-    error.value = false;
-  }, 1000);
-};
-
-const completeNotify = (status, action) => {
-  complete.value = true;
-  classNotify.value = "bg-green-600";
-  textNotify.value = `The status ${status} has been successfully ${action}.`;
-  setTimeout(() => {
-    complete.value = false;
-  }, 1500);
-};
 </script>
 
 <template>
@@ -64,7 +47,7 @@ const completeNotify = (status, action) => {
                   class="input input-bordered w-full max-w-xs"
                 />
                 <div>
-                  <router-link to="/board/add">
+                  <router-link to="/board/add" v-if="boards.length === 0">
                     <div class="rounded-lg ml-4 sm:ml-8 w-60">
                       <buttonSlot
                         size="sm"

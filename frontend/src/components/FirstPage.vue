@@ -310,7 +310,14 @@ const toggleSortOrder = () => {
           <div class="bg-gray-200 py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
               <div class="flex justify-end mb-9">
-                <router-link :to="`/board/${props.boardID}/add`">
+                <router-link :to="`/board/${props.boardID}/status`">
+                  <div class="rounded-lg ml-4 sm:ml-8">
+                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                      <template v-slot:title> STATUS </template>
+                    </buttonSlot>
+                  </div>
+                </router-link>
+                <router-link :to="`/board/${props.boardID}/task/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> Add Task </template>

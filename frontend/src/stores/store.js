@@ -24,7 +24,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     clearToken() {
       this.token = null;
       this.currentUser = null;
-    },
+    }
   },
 });
 

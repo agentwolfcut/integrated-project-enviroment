@@ -1,22 +1,25 @@
 <script setup>
 import router from "@/router";
 import { computed, ref } from "vue";
-import VueJwtDecode from 'vue-jwt-decode';
-import {AuthUserStore} from '../stores/store.js'
+import VueJwtDecode from "vue-jwt-decode";
+import { AuthUserStore } from "../stores/store.js";
+import { BoardStore } from "../stores/store.js";
 
 const usrpw = ref({ username: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-let token = ''
-const tokenStore = AuthUserStore();
+let token = "";
+const authUserStore = AuthUserStore();
+const boardStore = BoardStore();
 const current_user = ref(null);
-
 localStorage.clear();
 
 const inputUsrpw = async () => {
   try {
+    authUserStore.clearToken();
+    boardStore.board = [];
     // wait for agent api
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
       method: "POST",
@@ -28,17 +31,15 @@ const inputUsrpw = async () => {
 
     if (res.ok) {
       const data = await res.json();
-      tokenStore.setToken(data.access_token)      
+      authUserStore.setToken(data.access_token);
       token = data.access_token;
       localStorage.setItem("token", token);
       decode();
-      router.push("/board");
-      // router.push("/task");
+        router.push("/board");
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("username or Password is incorrect.");
         console.log(res.status + res.statusText);
-        
       } else {
         errorNotify("There is a problem. Please try again later.");
         console.log(res.status + res.statusText);
@@ -48,18 +49,19 @@ const inputUsrpw = async () => {
     errorNotify("There is a problem. Please try again later.");
     console.log(error);
   }
-}
+};
+
 const decode = () => {
-      // Take token from window local storage
-      let token = localStorage.getItem('token');
-      try {
-        let decoded = VueJwtDecode.decode(token);
-        current_user.value = decoded.name; // Store the decoded token 
-        tokenStore.setUser(current_user.value)
-      } catch (err) {
-        console.log('token is null: ', err);
-      }
-    };
+  // Take token from window local storage
+  let token = localStorage.getItem("token");
+  try {
+    let decoded = VueJwtDecode.decode(token);
+    current_user.value = decoded.name; // Store the decoded token
+    authUserStore.setUser(current_user.value);
+  } catch (err) {
+    console.log("token is null: ", err);
+  }
+};
 
 const errorNotify = (text) => {
   error.value = true;
@@ -79,8 +81,6 @@ const canLogin = computed(() => {
     usrpw.value.password.length <= 14
   );
 });
-
-
 </script>
 
 <template>
@@ -213,41 +213,49 @@ const canLogin = computed(() => {
     top: -300px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
   }
 }
+
 @keyframes animatetop {
   from {
     top: -300px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
   }
 }
+
 @-webkit-keyframes zoomIn {
   0% {
     opacity: 0;
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
   }
+
   50% {
     opacity: 1;
   }
 }
+
 @keyframes zoomIn {
   0% {
     opacity: 0;
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
   }
+
   50% {
     opacity: 1;
   }
 }
+
 /*End Animations*/
 /*
 -- Start BackGround Animation 
@@ -369,6 +377,7 @@ const canLogin = computed(() => {
     border-radius: 50%;
   }
 }
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -379,41 +388,49 @@ const canLogin = computed(() => {
     top: -300px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
   }
 }
+
 @keyframes animatetop {
   from {
     top: -300px;
     opacity: 0;
   }
+
   to {
     top: 0;
     opacity: 1;
   }
 }
+
 @-webkit-keyframes zoomIn {
   0% {
     opacity: 0;
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
   }
+
   50% {
     opacity: 1;
   }
 }
+
 @keyframes zoomIn {
   0% {
     opacity: 0;
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
   }
+
   50% {
     opacity: 1;
   }
 }
+
 /*End Animations*/
 /*
 -- Start BackGround Animation 

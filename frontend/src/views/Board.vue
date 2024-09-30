@@ -3,14 +3,12 @@ import SideBar from "@/components/SideBar.vue";
 import HeaderIT from "@/components/Header.vue";
 import { useRoute } from "vue-router";
 import { ref, onMounted, provide, computed } from "vue";
-import VueJwtDecode from "vue-jwt-decode";
 import buttonSlot from "@/components/Button.vue";
-import { getItems } from "../libs/fetchUtils";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { BoardManagement } from "@/libs/BoardManagement";
 import { BoardStore } from "@/stores/store.js";
-
+import router from "@/router";
 const boardStore = BoardStore();
 
 const toast = useToast();
@@ -28,6 +26,7 @@ onMounted(() => {
 });
 
 const boards = computed(() => boardStore.getBoards);
+
 </script>
 
 <template>

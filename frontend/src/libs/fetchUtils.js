@@ -62,13 +62,13 @@ async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
   }
 }
 
-async function addItem(url, newItem , token) {
+async function addItem(url, newItem) {
   try {
     const res = await fetch(url, {
       method: "POST", // add
       headers: {
         "content-type": "application/json", // add contents
-        'Authorization' : 'Bearer ' + token
+        'Authorization' : 'Bearer ' + localStorage.getItem('token')
       },      
       body: JSON.stringify({
         ...newItem, // sent add data . destructuring object

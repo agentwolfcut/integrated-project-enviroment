@@ -37,8 +37,6 @@ const selectTask = ref({
   description: "",
   assignees: "",
   status: 1,
-  createdOn: "",
-  updatedOn: "",
 });
 // sem2
 const token = localStorage.getItem("token");
@@ -94,7 +92,7 @@ const completeNotify = (task, action) => {
 const openDetails = async (id) => {
   try {
     const item = await get(
-      `${import.meta.env.VITE_BASE_URL}/tasks/${id}`,
+      `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks/${id}`,
       token
     );
     selectTask.value = item;
@@ -116,7 +114,7 @@ const cancel = (flag) => {
 };
 const toast = useToast()
 
-// ADD
+// ADD wait for API
 const saveTask = async () => {
   selectTask.value.title = selectTask.value.title.trim();
   try {
@@ -158,7 +156,7 @@ const saveTask = async () => {
 // DELETE
 const deleteTask = async (removeId) => {
   const removeTask = await deleteItemById(
-    `${import.meta.env.VITE_BASE_URL}/tasks`,
+    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks`,
     removeId,
     token
   );
@@ -194,7 +192,7 @@ const editTask = async (editedTask) => {
     }
     // const transformedTask = transformTaskFormat(selectTask.value);
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/tasks/${selectTask.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/board/${props.boardID}/tasks/${selectTask.value.id}`,
       {
         method: "PUT",
         headers: {
@@ -214,7 +212,6 @@ const editTask = async (editedTask) => {
       );
     }
     const resJson = await res.json();
-    // console.log(sortMode.value);
     if (sortMode.value === "default") {
       // console.log(`sort mode edit = ${sortMode.value}`);
     } else if (sortMode.value === "alp") {
@@ -247,9 +244,7 @@ const cancelHandle = () => {
     title: "",
     description: "",
     assignees: "",
-    status: 1,
-    createdOn: "",
-    updatedOn: "",
+    status: 1
   };
 };
 

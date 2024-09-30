@@ -60,7 +60,7 @@ export const BoardStore = defineStore('BoardStore', {
 
     async addBoard(name) {
       try {
-        const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, { "boardName": name }, token);
+        const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, { "boardName": name });
         if (data.status < 200 || data.status >= 300) {
           toast.error('Failed to add Board');
         } else {

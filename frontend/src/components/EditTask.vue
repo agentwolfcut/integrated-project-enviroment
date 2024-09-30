@@ -20,6 +20,10 @@ const props = defineProps({
     statusOptions: {
         type: Array,
         default: () => []
+    },
+    boardID: {
+        type: String,
+        required: true
     }
 });
 
@@ -28,7 +32,7 @@ const statusOptions = ref('')
 const token = localStorage.getItem('token');
 
 onMounted(async () => {
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/statuses` , token)
+  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses` , token)
   statusOptions.value = statusRes;
 })
 

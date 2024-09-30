@@ -10,11 +10,11 @@ import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { BoardManagement } from "@/libs/BoardManagement";
 import { BoardStore } from "@/stores/store.js";
+
 const boardStore = BoardStore();
 
 const toast = useToast();
 const route = useRoute();
-const currentUser = ref(null);
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
@@ -32,7 +32,7 @@ const boards = computed(() => boardStore.getBoards);
 
 <template>
   <div class="flex">
-    <SideBar :user="currentUser" />
+    <SideBar/>
     <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
@@ -105,7 +105,7 @@ const boards = computed(() => boardStore.getBoards);
                       <td class="w-3/12 p-3 pl-5">
                         <router-link :to="`/board/${board.boardID}`">
                           <div
-                            class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
+                            class="itbkk-status-description text-base truncate font-medium leading-none text-gray-900 mr-2"
                           >
                             {{ board.boardName }}
                           </div>
@@ -165,6 +165,11 @@ table {
 
 .box {
   transition: opacity 0.6s ease;
+}
+
+.box:hover{
+  opacity: 0.4;
+  background-color:rgb(203, 203, 203);
 }
 
 .container:hover > :not(:hover) {

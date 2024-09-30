@@ -12,11 +12,11 @@ import Edit from "@/assets/icons/CiEditPencil01.vue";
 import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
-import { useRoute } from "vue-router";
 import { get } from "@/libs/Utils";
 import { BoardStore } from "@/stores/store.js";
 import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
 import { useToast } from "vue-toast-notification";
+import { useRoute, useRouter } from "vue-router";
 
 const boardStore = BoardStore();
 const taskMan = ref(new TaskManagement());
@@ -49,18 +49,13 @@ const props = defineProps({
 
 // GET items
 onMounted(async () => {
-  console.log("Received boardID :", props.boardID);
-  console.log("this is firstPage");
   const taskRes = await getItems(
     `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks`,
     token
   );
-  console.log(taskRes);
-
   taskMan.value.addtasks(taskRes);
   sortedTasks.value = taskMan.value.gettasks();
   console.log(sortedTasks.value);
-
   // status
   const statusRes = await getItems(
     `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`,
@@ -112,7 +107,7 @@ const cancel = (flag) => {
     status: 1,
   };
 };
-const toast = useToast()
+const toast = useToast();
 
 // ADD wait for API
 const saveTask = async () => {
@@ -134,7 +129,7 @@ const saveTask = async () => {
     //     `Failed to add task. Server responded with status ${res.status}`
     //   );
     // }
-    const res = await boardStore.addTask(selectTask.value , props.boardID)
+    const res = await boardStore.addTask(selectTask.value, props.boardID);
     const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
     // sortedTasks.value.push(addedTask);
@@ -148,8 +143,8 @@ const saveTask = async () => {
       assignees: "",
       status: 1,
     };
-  } catch (error){
-    toast.error(error)
+  } catch (error) {
+    toast.error(error);
   }
 };
 
@@ -192,7 +187,9 @@ const editTask = async (editedTask) => {
     }
     // const transformedTask = transformTaskFormat(selectTask.value);
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/board/${props.boardID}/tasks/${selectTask.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/board/${props.boardID}/tasks/${
+        selectTask.value.id
+      }`,
       {
         method: "PUT",
         headers: {
@@ -244,7 +241,7 @@ const cancelHandle = () => {
     title: "",
     description: "",
     assignees: "",
-    status: 1
+    status: 1,
   };
 };
 

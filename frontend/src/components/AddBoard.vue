@@ -56,13 +56,13 @@ const addBoard = () => {
         <!-- bottom -->
         <div class="m-3">
           <div class="buttons flex gap-2">
-            <button
+            <button :disabled="!newBoardName"
               @click="addBoard"
               class="itbkk-button-ok disabled border border-slate-800 hover:bg-green-500 hover:text-white transition-all ease-out p-3 font-medium text-base text-green-800 bg-green-300 rounded-md px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
             >
               save
             </button>
-            <button
+            <button 
               @click="router.back"
               class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3"
             >

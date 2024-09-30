@@ -10,7 +10,11 @@ import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
+import { BoardStore } from "@/stores/store.js";
+import { useRoute, useRouter } from "vue-router";
+import { useToast } from "vue-toast-notification";
 
+const toast = useToast();
 // set history of stor path when visit
 const history = createWebHistory(import.meta.env.BASE_URL);
 // give roue paths
@@ -43,6 +47,8 @@ const routes = [
     redirect: "/login",
   },
 
+
+
   // v3
   {
     path: "/board/:boardID",
@@ -51,14 +57,34 @@ const routes = [
     props: true,
     children: [
       { path: "task/add", component: AddTask, name: "AddTask", props: true },
-      { path: ":taskId/edit", component: EditTask, name: "EditTask" , props:true },
+      {
+        path: ":taskId/edit",
+        component: EditTask,
+        name: "EditTask",
+        props: true,
+      },
     ],
+    beforeEnter: async (to, from, next) => {
+      // Check if the boardID exists
+      // You can replace this with your own logic to check if the boardID exists
+      const boardID = to.params.boardID;
+      const boardStore = BoardStore();
+      const board = await boardStore.getBoardById(boardID)
+      if (!board) {
+        toast.error(`Board  with ID ${boardID} does not exist`);
+        next({ path: '/board' });
+      } else {
+        next();
+      }
+    },
   },
 
-  { path: "/board/:boardID/status", component: ManageStatus , name: "Status" , props: true , 
-    children: [
-      { path: "add", component: AddStatus, name: "AddStatus",}
-    ]
+  {
+    path: "/board/:boardID/status",
+    component: ManageStatus,
+    name: "Status",
+    props: true,
+    children: [{ path: "add", component: AddStatus, name: "AddStatus" }],
   },
   {
     path: "/board",
@@ -82,4 +108,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
 export default router;

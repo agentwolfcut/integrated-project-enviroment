@@ -1,24 +1,30 @@
 <script setup>
-import { defineProps, inject, ref , onMounted} from 'vue'
+import { defineProps, inject, ref, onMounted } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode';
-
+import buttonSlot from "./Button.vue";
+import router from "@/router";
 
 let currentUser = ref('')
 const token = localStorage.getItem('token')
 
 if (token) {
-    const decoded = VueJwtDecode.decode(token);
-    currentUser.value = decoded.name;
+  const decoded = VueJwtDecode.decode(token);
+  currentUser.value = decoded.name;
+}
+
+const signout = () => {
+  localStorage.removeItem('token'); 
+  currentUser.value = ''; 
+  router.push('/login'); 
 }
 
 </script>
 
 <template>
-  <aside
-    class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center  bg-slate-900">
-  <div id='profileview' class="flex items-center w-full py-8 px-5" >
-    <div class="relative">
-      <!-- <img
+  <aside class=" bg-gradient-to-t from-cyan-900 w-64 px-6 flex h-screen flex-col items-center  bg-slate-900">
+    <div id='profileview' class="flex items-center w-full py-8 px-5">
+      <div class="relative">
+        <!-- <img
         class="w-12 h-12 rounded-full border-2 border-green-400"
         :src="randomPair.image"
         alt="User Avatar"
@@ -26,15 +32,17 @@ if (token) {
       <span
         class="loading loading-infinity top-10 left-2 absolute w-8 h-8 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"
       ></span> -->
-    </div>
-    <div class="ml-5">
-      <p class="itbkk-fullname text-white font-semibold"> {{ currentUser }} </p>
+      </div>
+      <div class="ml-5">
+        <p class="itbkk-fullname text-white font-semibold"> {{ currentUser }} </p>
 
-      <p class="text-gray-400 text-sm ">  Welcome <p class="loading loading-ring loading-xs h-3"></p></p>
+        <p class="text-gray-400 text-sm "> Welcome
+        <p class="loading loading-ring loading-xs h-3"></p>
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- <transition name="fade-in">
+    <!-- <transition name="fade-in">
     <div @click="showProfileInfo = false"  v-if="showProfileInfo" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class=" p-8 rounded-lg" >
         <img
@@ -87,29 +95,31 @@ if (token) {
         </router-link>
       </div> -->
 
-            <div
-        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
-      >
+      <div class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out">
         <router-link to="/board" class="block">
           <div
-            class="rounded-lg font-medium text-lg text-center group-hover:scale-105 transform transition duration-300"
-          >
+            class="rounded-lg font-medium text-lg text-center group-hover:scale-105 transform transition duration-300">
             Board View
           </div>
         </router-link>
       </div>
 
-            <div
-        class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out"
-      >
-<span class="loading loading-ball loading-xs"></span>
-<span class="loading loading-ball loading-sm"></span>
-<span class="loading loading-ball loading-md"></span>
-<span class="loading loading-ball loading-lg"></span>
+      <div class="group relative rounded-xl p-3 text-white transition duration-300 ease-in-out">
+        <span class="loading loading-ball loading-xs"></span>
+        <span class="loading loading-ball loading-sm"></span>
+        <span class="loading loading-ball loading-md"></span>
+        <span class="loading loading-ball loading-lg"></span>
       </div>
     </nav>
+
+    <div class="pb-10">
+      <buttonSlot size="sm" type="light" class="itbkk-sign-out bg-cyan-500" @click="signout">
+        <template v-slot:title> SIGN OUT </template>
+      </buttonSlot>
+    </div>
 
   </aside>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>

@@ -51,37 +51,44 @@ public class TaskService {
 
     @Transactional
     public Task createTask(CreateTaskDTO task, String boardID, UserDetailsDTO userDetailsDTO) {
-        Status status = statusRepository.findByIdAndBoardID(task.getStatusId(), boardID);
-        if (status == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
-        }
-        if (!boardPermissionRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The status does not exist");
-        }
-        // Check if title, status is empty
+        // Validate title
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
         }
-        if (!statusRepository.existsById(task.getStatusId())) {
-            task.setStatusId(1);
+
+        // Validate and find status
+        Status status = statusRepository.findByIdAndBoardID(task.getStatusId(), boardID);
+        if (status == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found.");
         }
+
+        // Check board access permission
+        if (!boardPermissionRepository.checkBoardAccess(userDetailsDTO.getOid(), boardID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this board.");
+        }
+
+        // Optional: Handle invalid statusId by throwing exception instead of assigning default
+        if (!statusRepository.existsById(task.getStatusId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid statusId provided.");
+        }
+
+        // Map the task and set necessary fields
         Task newTask = modelMapper.map(task, Task.class);
         newTask.setBoardID(boardID);
-        newTask.setStatus(statusRepository.findById(task.getStatusId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + task.getStatusId() + " does not exist.")));
-
+        newTask.setStatus(status);  // Use the status found earlier
 
         try {
-            // Save task
+            // Save task to repository
             return taskRepository.save(newTask);
         } catch (DataIntegrityViolationException e) {
-            // Handle specific constraint violation (e.g., unique constraint)
+            // Handle specific constraint violations
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to save task. Ensure data integrity.");
         } catch (Exception e) {
             // Handle any other unexpected errors
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + e.getMessage());
         }
     }
+
 
     @Transactional
     public Task deleteTask(Integer id, String boardID) {

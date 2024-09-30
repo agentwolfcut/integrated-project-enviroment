@@ -1,5 +1,8 @@
 package dev.backendintegratedproject.controllers;
 
+import dev.backendintegratedproject.dtos.task.SimpleTaskDTO;
+import dev.backendintegratedproject.primarydatasource.entities.Task;
+import dev.backendintegratedproject.services.UserBoardService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import dev.backendintegratedproject.dtos.status.CreateStatusDTO;
 import dev.backendintegratedproject.primarydatasource.entities.Status;
 import dev.backendintegratedproject.services.StatusService;
 import dev.backendintegratedproject.util.ListMapper;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -24,11 +28,29 @@ public class StatusController {
     ModelMapper modelMapper;
     @Autowired
     ListMapper listMapper;
+    @Autowired
+    UserBoardService userBoardService;
+
 
     @GetMapping("/{boardID}/statuses")
-    public List<Status> getAllStatuses(@PathVariable String boardID) {
-        return statusService.getAllStatuses(boardID);
+    public ResponseEntity<List<Status>> getAllStatuses(@PathVariable String boardID) {
+        // Check if board exists
+        if (!userBoardService.existsById(boardID)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board with ID " + boardID + " not found.");
+        }
+
+        // Fetch statuses
+        List<Status> statuses = statusService.getAllStatuses(boardID);
+
+        // Check if statuses exist
+        if (statuses.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No statuses found for the given board ID.");
+        }
+
+        // Return the list of statuses
+        return ResponseEntity.ok(statuses);
     }
+
 
     @GetMapping("/{boardID}/statuses/{id}")
     public Status getStatusById(@PathVariable Integer id, @PathVariable String boardID) {

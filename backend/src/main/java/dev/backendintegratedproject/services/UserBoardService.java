@@ -75,4 +75,7 @@ public class UserBoardService {
     }
 
 
+    public boolean existsById(String boardID) {
+        return boardRepository.existsById(boardID);
+    }
 }

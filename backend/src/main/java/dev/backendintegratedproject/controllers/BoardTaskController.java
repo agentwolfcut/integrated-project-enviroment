@@ -22,6 +22,7 @@ import dev.backendintegratedproject.services.TaskService;
 import dev.backendintegratedproject.services.UserBoardService;
 import dev.backendintegratedproject.util.JwtUtils;
 import dev.backendintegratedproject.util.ListMapper;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -76,8 +77,15 @@ public class BoardTaskController {
     // Task API
     @GetMapping("/{boardID}/tasks")
     public ResponseEntity<List<SimpleTaskDTO>> getTasks(@PathVariable String boardID, @RequestParam(required = false, value = "filterStatuses") List<String> filterStatuses) {
-        return ResponseEntity.ok(listMapper.mapList(taskService.getTasksByStatuses(boardID, filterStatuses), SimpleTaskDTO.class, modelMapper));
+        List<Task> tasks = taskService.getTasksByStatuses(boardID, filterStatuses);
+
+        if (tasks.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tasks found for the given board ID.");
+        }
+
+        return ResponseEntity.ok(listMapper.mapList(tasks, SimpleTaskDTO.class, modelMapper));
     }
+
 
     @GetMapping("{boardID}/tasks/{taskID}")
     public ResponseEntity<DetailedTaskDTO> getTaskById(@PathVariable Integer taskID, @PathVariable String boardID) {

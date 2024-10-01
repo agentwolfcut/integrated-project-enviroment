@@ -8,6 +8,8 @@ import router from "@/router";
 const toast = useToast();
 const token = localStorage.getItem("token");
 
+// interface ขึ้นกับ res ของpostman
+
 export const pinia = createPinia();
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({

@@ -10,7 +10,7 @@ services:
     networks:
       - backend_net
     environment:
-      MYSQL_DATABASE: taskBoard
+      MYSQL_DATABASE: itbkk-kk3
       MYSQL_USER: gpm
       MYSQL_PASSWORD: gpm@password
       MYSQL_ROOT_PASSWORD: gpm
@@ -31,7 +31,7 @@ services:
     environment:
       - DB_HOST=database
       - DB_PORT=3306
-      - DB_NAME=taskBoard
+      - DB_NAME=itbkk-kk3
       - DB_USER=gpm
       - DB_PASS=gpm@password
 

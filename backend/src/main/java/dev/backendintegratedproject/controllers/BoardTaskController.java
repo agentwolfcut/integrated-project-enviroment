@@ -52,7 +52,7 @@ public class BoardTaskController {
     @PostMapping("")
     public ResponseEntity<Board> createBoard(@Valid @RequestBody CreateBoardDTO board, Authentication authentication) {
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-        Board createdBoard = userBoardService.createBoardForUser(userDetails.getOid(), board.getBoardName());
+        Board createdBoard = userBoardService.createBoardForUser(userDetails.getOid(), board.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
     }
     @GetMapping("/{boardID}")

@@ -16,9 +16,9 @@ import lombok.Setter;
 public class Board {
     @Id
     @Column(name = "boardID", length = 10)
-    private String boardID;
+    private String id;
     @Column(name = "boardName", nullable = false, length = 45)
-    private String boardName;
+    private String name;
     @Column(name = "ownerID", nullable = false, length = 36)
     private String ownerID;
 
@@ -29,8 +29,8 @@ public class Board {
 
     @PrePersist
     public void generateBoardID() {
-        if (this.boardID == null || this.boardID.isEmpty()) {
-            this.boardID = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
         }
     }
 }

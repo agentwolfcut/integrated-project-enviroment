@@ -43,7 +43,7 @@ public class UserBoardService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User " + userID + " does not exist !!!"));
 
         Board newBoard = new Board();
-        newBoard.setBoardName(boardName);
+        newBoard.setName(boardName);
         newBoard.setOwnerID(user.getUserID());
 
         Board createdBoard = boardRepository.save(newBoard);
@@ -55,7 +55,7 @@ public class UserBoardService {
     public Board updateBoard(String boardID, Board board) {
         Board boardToUpdate = boardRepository.findById(boardID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board " + boardID + " does not exist !!!"));
-        boardToUpdate.setBoardName(board.getBoardName());
+        boardToUpdate.setName(board.getName());
         boardRepository.save(boardToUpdate);
         return boardToUpdate;
     }

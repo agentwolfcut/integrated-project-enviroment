@@ -88,19 +88,34 @@ public class BoardTaskController {
     }
 
 
-
-
     @GetMapping("{boardID}/tasks/{taskID}")
     public ResponseEntity<DetailedTaskDTO> getTaskById(@PathVariable Integer taskID, @PathVariable String boardID) {
         return ResponseEntity.ok(modelMapper.map(taskService.getTaskById(taskID, boardID), DetailedTaskDTO.class));
     }
 
+//    @PostMapping("{boardID}/tasks")
+//    public ResponseEntity<CreateTaskDTO> createTask(@PathVariable String boardID, @Valid @RequestBody CreateTaskDTO task, Authentication authentication) {
+//        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
+//        CreateTaskDTO taskTrim = taskService.trimTask(task);
+//        Task createdTask = taskService.createTask(taskTrim, boardID, userDetailsDTO);
+//        CreateTaskDTO taskDTO = modelMapper.map(createdTask, CreateTaskDTO.class);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(taskDTO);
+//    }
     @PostMapping("{boardID}/tasks")
-    public ResponseEntity<CreateTaskDTO> createTask(@PathVariable String boardID, @Valid @RequestBody CreateTaskDTO task, Authentication authentication) {
+    public ResponseEntity<DetailedTaskDTO> createTask(@PathVariable String boardID, @Valid @RequestBody CreateTaskDTO task, Authentication authentication) {
+        // รับข้อมูลผู้ใช้ที่กำลังทำการ authenticated
         UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
+
+        // Trim task details ถ้าจำเป็น
         CreateTaskDTO taskTrim = taskService.trimTask(task);
+
+        // สร้าง task ใหม่โดยใช้ข้อมูลจาก CreateTaskDTO
         Task createdTask = taskService.createTask(taskTrim, boardID, userDetailsDTO);
-        CreateTaskDTO taskDTO = modelMapper.map(createdTask, CreateTaskDTO.class);
+
+        // Map task ที่เพิ่งสร้างขึ้นไปยัง DetailedTaskDTO เพื่อใช้เป็น response
+        DetailedTaskDTO taskDTO = modelMapper.map(createdTask, DetailedTaskDTO.class);
+
+        // ส่ง DetailedTaskDTO กลับไปพร้อม status 201 CREATED
         return ResponseEntity.status(HttpStatus.CREATED).body(taskDTO);
     }
 

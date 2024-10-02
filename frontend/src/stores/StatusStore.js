@@ -20,7 +20,7 @@ export const useStatusStore = defineStore('status' , {
         async fetchStatus(boardID) {
             try {
                 const statuses = await getItems (
-                    `${import.meta.env.VITE_BASE_URL}/boards/${boardID}/tasks`
+                    `${import.meta.env.VITE_BASE_URL}/boards/${boardID}/statuses`
                 )
                 this.statuses = statuses
             } catch (error) {

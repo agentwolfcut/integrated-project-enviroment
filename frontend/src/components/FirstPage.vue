@@ -85,6 +85,8 @@ onMounted(async () => {
     await statusStore.fetchStatus(boardIdRoute);
     const statuses = statusStore.statuses;
     statusFilter.value = statuses.map((status) => status.name);
+    console.log(statusFilter.value);
+    
   } catch (error) {
     console.error(error);
   }
@@ -428,19 +430,19 @@ const toggleSortOrder = () => {
                       <td
                         class="itbkk-status p-3 text-base font-medium text-slate-800 truncate"
                       >
-                        {{ task.statusId }}
+                        {{ task.status.name }}
                       </td>
                       <td
                         class="itbkk-button-action p-3 text-base font-medium text-slate-800"
                       >
-                        <!-- <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
+                        <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
                           <button
                             @click="editMode(task)"
                             class="pr-2 itbkk-button-edit"
                           >
                             <Edit />
                           </button>
-                        </router-link> -->
+                        </router-link>
 
                         <button
                           @click="

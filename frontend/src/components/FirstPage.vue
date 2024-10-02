@@ -160,7 +160,7 @@ const saveTask = async () => {
     // sortedTasks.value.push(addedTask);
     taskMan.value.addtask(addedTask);
     sortedTasks.value = taskMan.value.gettasks();
-    router.back();
+    router.back()
     toast.success(`${addedTask.title} added`);
     selectTask.value = {
       title: "",
@@ -174,6 +174,7 @@ const saveTask = async () => {
 };
 
 const deleteTask = async (removeId) => {
+  // taskStore.fetchTask(boardIdRoute);
   const removeTask = await deleteItemById(
     `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`,
     removeId,

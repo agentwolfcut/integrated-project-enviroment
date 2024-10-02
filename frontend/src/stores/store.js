@@ -34,21 +34,25 @@ export const BoardStore = defineStore("BoardStore", {
   state: () => ({
     board: [], // Array ของบอร์ดทั้งหมด
     currentBoard: {}, // บอร์ดปัจจุบันที่กำลังจัดการ
-    boardID: null, // ตัวแปรสำหรับเก็บ boardID
+    id: null, // ตัวแปรสำหรับเก็บ id
     tasks: [],
+    currentBoardId: null,
   }),
   getters: {
     getBoards: (state) => state.board,
     getCurrentBoard: (state) => state.currentBoard,
-    getBoardId: (state) => (id) => {
-      return state.board.find((board) => board.boardID === id);
+    getid: (state) => (id) => {
+      return state.board.find((board) => board.id === id);
     },
     getTasks: (state) => state.tasks, // Getter สำหรับดึง tasks ของบอร์ด
     getBoardById: (state) => (id) => {
-      return state.board.find((board) => board.boardID === id);
+      return state.board.find((board) => board.id === id);
     },
   },
   actions: {
+    setCurrentBoardID(id) {
+      this.currentBoardId = id;
+    } ,
     async getBoard() {
       try {
         const data = await getItems(
@@ -65,10 +69,10 @@ export const BoardStore = defineStore("BoardStore", {
         toast.error("An error occurred while fetching boards.");
       }
     },
-    async fetchBoardById(boardID) {
+    async fetchBoardById(id) {
       try {
         const data = await getItems(
-          `${import.meta.env.VITE_BASE_URL}/boards/${boardID}`,
+          `${import.meta.env.VITE_BASE_URL}/boards/${id}`,
           token
         );
         if (data) {
@@ -97,9 +101,9 @@ export const BoardStore = defineStore("BoardStore", {
         } else {
           toast.success("Board added successfully");
 
-          // เก็บ boardID จากการตอบกลับ
+          // เก็บ id จากการตอบกลับ
           this.currentBoard = data; // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
-          this.boardID = data.boardID; // เก็บค่า boardID แยกไว้
+          this.id = data.id; // เก็บค่า id แยกไว้
           this.board.push(data); // เพิ่มบอร์ดใน array
         }
       } catch (error) {
@@ -107,10 +111,10 @@ export const BoardStore = defineStore("BoardStore", {
         toast.error("An error occurred while adding the board");
       }
     },
-    async addTask(taskData, boardID) {
+    async addTask(taskData, id) {
       try {
         const data = await addItem(
-          `${import.meta.env.VITE_BASE_URL}/boards/${boardID}/tasks`,
+          `${import.meta.env.VITE_BASE_URL}/boards/${id}/tasks`,
           taskData,
           token
         );

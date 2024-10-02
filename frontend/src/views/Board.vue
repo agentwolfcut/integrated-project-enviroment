@@ -1,31 +1,24 @@
 <script setup>
 import SideBar from "@/components/SideBar.vue";
 import HeaderIT from "@/components/Header.vue";
-import { useRoute } from "vue-router";
-import { ref, onMounted, provide, computed } from "vue";
+import { onMounted, computed } from "vue";
 import buttonSlot from "@/components/Button.vue";
-import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-import { BoardManagement } from "@/libs/BoardManagement";
 import { BoardStore } from "@/stores/store.js";
-import router from "@/router";
+
 const boardStore = BoardStore();
 
-const toast = useToast();
-const route = useRoute();
-const error = ref(false);
-const complete = ref(false);
-const classNotify = ref("");
-const textNotify = ref("");
-
-const boardMan = ref(new BoardManagement());
-const boardList = ref(boardMan.value.getBoards());
+// Add this line to set the current board ID in the store
+const setCurrentBoardId = (id) => {
+  boardStore.setCurrentBoardID(id);
+};
 
 onMounted(() => {
   boardStore.getBoard();
 });
 
 const boards = computed(() => boardStore.getBoards);
+
 
 </script>
 
@@ -102,11 +95,11 @@ const boards = computed(() => boardStore.getBoards);
                       </td>
 
                       <td class="w-3/12 p-3 pl-5">
-                        <router-link :to="`/board/${board.boardID}`">
+                        <router-link :to="`/board/${board.id}`" @click="setCurrentBoardId(board.id)">
                           <div
                             class="itbkk-status-description text-base truncate font-medium leading-none text-gray-900 mr-2"
                           >
-                            {{ board.boardName }}
+                            {{ board.name }}
                           </div>
                         </router-link>
                       </td>
@@ -133,15 +126,6 @@ const boards = computed(() => boardStore.getBoards);
           </div>
         </div>
       </div>
-
-      <div
-        v-show="error || complete"
-        :class="[
-          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
-          classNotify,
-        ]"
-        v-text="textNotify"
-      ></div>
     </div>
   </div>
   <router-view />

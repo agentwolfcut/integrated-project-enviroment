@@ -11,7 +11,6 @@ import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
 import { BoardStore } from "@/stores/store.js";
-import { useRoute, useRouter } from "vue-router";
 import { useToast } from "vue-toast-notification";
 
 const toast = useToast();
@@ -47,8 +46,6 @@ const routes = [
     redirect: "/login",
   },
 
-
-
   // v3
   {
     path: "/board/:boardID",
@@ -56,7 +53,7 @@ const routes = [
     component: Task,
     props: true,
     children: [
-      { path: "task/add", component: AddTask, name: "AddTask", props: true },
+      { path: "task/add", component: AddTask, name: "AddTask" , props : true },
       {
         path: ":taskId/edit",
         component: EditTask,

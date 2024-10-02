@@ -17,10 +17,6 @@ const props = defineProps({
             status: 1
             },
         require: true
-    },
-    boardID: {
-        type: String,
-        required: true
     }
 })
 const emit = defineEmits(['saveUpdateTask' , 'cancelOpe']); // Define the custom event
@@ -29,10 +25,14 @@ const statusOptions = ref('')
 const route = useRoute();
 const taskId = ref(route.params.taskId)
 const token = localStorage.getItem('token');
-console.log("Received boardID:", props.boardID);
+
+const boardStore = BoardStore()
+const boardId = boardStore.currentBoardId
+
+console.log(boardId);
 
 onMounted(async () => {
-    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses` , token)
+    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${boardId}/statuses` , token)
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {
@@ -77,7 +77,6 @@ const saveTask = () => {
     emit('saveUpdateTask', previousTask.value);
 };
 
-const boardStore = BoardStore()
 // const saveTask = async () => {
 
 //   try {

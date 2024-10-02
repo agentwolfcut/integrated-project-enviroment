@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref, nextTick, provide } from "vue";
-import { getItems, deleteItemById } from "../libs/fetchUtils";
+import { onMounted, ref } from "vue";
+import { deleteItemById , getItems} from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "./TaskDetail.vue";
 import HeaderIT from "./Header.vue";
@@ -14,11 +14,15 @@ import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
 import { get } from "@/libs/Utils";
 import { BoardStore } from "@/stores/store.js";
-import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
+// import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
 import { useToast } from "vue-toast-notification";
 import { useRoute, useRouter } from "vue-router";
+import { useTaskStore } from '@/stores/TaskStore.js'
 
+const taskStore = useTaskStore()
+const route = useRoute()
 const boardStore = BoardStore();
+
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const statuses = ref({});
@@ -41,6 +45,7 @@ const selectTask = ref({
 // sem2
 const token = localStorage.getItem("token");
 const props = defineProps({
+  // props จาก route
   boardID: {
     type: String,
     required: true,
@@ -48,23 +53,32 @@ const props = defineProps({
 });
 
 // GET items
+// onMounted(async () => {  
+//   const taskRes = await getItems(
+//     `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks`,
+//     token
+//   );
+//   taskMan.value.addtasks(taskRes);
+//   sortedTasks.value = taskMan.value.gettasks();
+//   console.log(sortedTasks.value);
+//   // status
+//   const statusRes = await getItems(
+//     `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/statuses`,
+//     token
+//   );
+//   statuses.value = statusRes;
+//   statusFilter.value = statuses.value.map((status) => status.name);
+//   // doFilter();
+// });
+
 onMounted(async () => {
-  const taskRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks`,
-    token
-  );
-  taskMan.value.addtasks(taskRes);
-  sortedTasks.value = taskMan.value.gettasks();
-  console.log(sortedTasks.value);
-  // status
-  const statusRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`,
-    token
-  );
-  statuses.value = statusRes;
-  statusFilter.value = statuses.value.map((status) => status.name);
-  // doFilter();
-});
+  try {
+      await taskStore.fetchTask(route.params.boardID)
+  } catch (error) {
+    console.error(error);
+  }
+})
+
 
 const errorNotify = () => {
   error.value = true;
@@ -87,7 +101,7 @@ const completeNotify = (task, action) => {
 const openDetails = async (id) => {
   try {
     const item = await get(
-      `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks/${id}`,
+      `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks/${id}`,
       token
     );
     selectTask.value = item;
@@ -113,23 +127,23 @@ const toast = useToast();
 const saveTask = async () => {
   selectTask.value.title = selectTask.value.title.trim();
   try {
-    // const res = await fetch(
-    //   `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID/tasks}`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(selectTask.value),
-    //   }
-    // );
-    // if (!res.ok) {
-    //   throw new Error(
-    //     `Failed to add task. Server responded with status ${res.status}`
-    //   );
-    // }
-    const res = await boardStore.addTask(selectTask.value, props.boardID);
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/boards/${props.id/tasks}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(selectTask.value),
+      }
+    );
+    if (!res.ok) {
+      throw new Error(
+        `Failed to add task. Server responded with status ${res.status}`
+      );
+    }
+    // const res = await boardStore.addTask(selectTask.value, props.id);
     const addedTask = await res.json();
     addedTask.status = addedTask.status.name;
     // sortedTasks.value.push(addedTask);
@@ -144,14 +158,14 @@ const saveTask = async () => {
       status: 1,
     };
   } catch (error) {
-    toast.error(error);
+    toast.error(`this is FirstPage : ${error}`);
   }
 };
 
 // DELETE
 const deleteTask = async (removeId) => {
   const removeTask = await deleteItemById(
-    `${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/tasks`,
+    `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks`,
     removeId,
     token
   );
@@ -187,7 +201,7 @@ const editTask = async (editedTask) => {
     }
     // const transformedTask = transformTaskFormat(selectTask.value);
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/board/${props.boardID}/tasks/${
+      `${import.meta.env.VITE_BASE_URL}/board/${props.id}/tasks/${
         selectTask.value.id
       }`,
       {
@@ -302,14 +316,14 @@ const toggleSortOrder = () => {
           <div class="bg-gray-200 py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
               <div class="flex justify-end mb-9">
-                <router-link :to="`/board/${props.boardID}/status`">
+                <router-link :to="`/board/${props.id}/status`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> STATUS </template>
                     </buttonSlot>
                   </div>
                 </router-link>
-                <router-link :to="`/board/${props.boardID}/task/add`">
+                <router-link :to="`/board/${props.id}/task/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> Add Task </template>

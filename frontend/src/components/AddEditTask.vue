@@ -27,12 +27,12 @@ const taskId = ref(route.params.taskId)
 const token = localStorage.getItem('token');
 
 const boardStore = BoardStore()
-const boardId = boardStore.currentBoardId
+// const boardId = boardStore.currentBoardId
+const boardIdRoute = route.params.boardID;
 
-console.log(boardId);
 
 onMounted(async () => {
-    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${boardId}/statuses` , token)
+    const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses` , token)
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {

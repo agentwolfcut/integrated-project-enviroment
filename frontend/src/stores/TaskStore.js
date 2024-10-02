@@ -26,5 +26,26 @@ export const useTaskStore = defineStore("tasks", {
         toast.error('An error occurred while fetching tasks')
       }
     },
+    async getTaskById(taskId , boardId) {
+      const task = this.tasks.find((task) => task.id === taskId)
+      if (!task) {
+        const res = await getItems(
+          `${import.meta.env.VITE_BASE_URL}/boards/${boardId}/tasks/${taskId}`
+        );
+        task = res.data
+        task.status = task.status.name
+        this.tasks.push(task)
+      }
+      return  task;
+    },
+    async updateTask(task, boardId) {
+      try {
+        await updateItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardId}/tasks/${task.id}`, task);
+        useToast().success('Task updated successfully!');
+      } catch (error) {
+        useToast().error('Failed to update task.');
+        console.error(error);
+      }
+    }
   },
 });

@@ -1,10 +1,11 @@
 <script setup>
 import router from '@/router';
-import { ref, onMounted , computed } from 'vue'
-import {  getItems } from '../libs/fetchUtils';
+import { ref, onMounted, computed } from 'vue'
+import { getItems } from '../libs/fetchUtils';
+import Login from '@/views/Login.vue';
 
 
-const emit = defineEmits(['saveEdit','cancelOpe','failEdit']); // Define the custom event
+const emit = defineEmits(['saveEdit', 'cancelOpe', 'failEdit']); // Define the custom event
 const props = defineProps({
     task: {
         type: Object,
@@ -12,42 +13,71 @@ const props = defineProps({
             id: undefined,
             name: '',
             description: null,
-            status: '' ,
+            status: '',
             createdOn: "",
             updatedOn: "",
         })
     },
-    statusOptions: {
-        type: Array,
-        default: () => []
-    },
     boardID: {
         type: String,
         required: true
-    }
+    },
+    taskId: {
+        type: String,
+        required: false,
+    },
 });
 
-const previousTask = ref({...props.task})
-const statusOptions = ref('')
+const previousTask = ref({ ...props.task })
+const statusOptions = ref([])
 const token = localStorage.getItem('token');
 
 onMounted(async () => {
-  const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses` , token)
-  statusOptions.value = statusRes;
+    try {
+        const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`, token)
+        statusOptions.value = statusRes;
+    } catch (error) {
+        console.error('Error fetching status options:', error);
+    }
 })
 
-// const previousTask = ref({ ...props.task });
-
 // Computed property to find the status id from status name
+// const statusId = computed(() => {
+//     const selectedStatus = props.statusOptions.find(
+//         (status) => status.name === previousTask.value.status
+//     );
+//     return selectedStatus ? selectedStatus.id : null;
+// });
+
+// const saveTask = () => {
+//     try {
+//         const taskToSave = {
+//             ...previousTask.value,
+//             status: statusId.value // Send status id to the backend
+//         };
+//         emit('saveEdit', taskToSave);
+//     } catch (error) {
+//         console.error('Error saving task:', error);
+//         // Handle error as needed
+//     }
+// }
+
 const statusId = computed(() => {
-    const selectedStatus = props.statusOptions.find(
-        (status) => status.name === previousTask.value.status
+    if (!previousTask.value.status.name) {
+        return null;
+    }
+    const selectedStatus = statusOptions.value.find(
+        (status) => status.name === previousTask.value.status.name
     );
     return selectedStatus ? selectedStatus.id : null;
 });
 
 const saveTask = () => {
     try {
+        if (!statusId.value) {
+            console.error('Status ID is null or undefined');
+            return;
+        }
         const taskToSave = {
             ...previousTask.value,
             status: statusId.value // Send status id to the backend
@@ -62,9 +92,9 @@ const saveTask = () => {
 if (previousTask.value.title === null || previousTask.value.title === undefined || previousTask.value.title == '') {
     // router.back()
     emit('failEdit');
-    setTimeout(()=>{
+    setTimeout(() => {
         router.back();
-    } , 800)
+    }, 800)
     // toaster.error(`An error has occurred, the status does not exist.`);
 }
 const formatLocalDate = (dateString) => {
@@ -84,12 +114,12 @@ const formatLocalDate = (dateString) => {
 }
 
 const textColorClass = computed(() => {
-    if (previousTask.value.description !== null) {  
-        return previousTask.value.title.length > 99 ? 'text-red-600' : 'text-blue-600';  
+    if (previousTask.value.description !== null) {
+        return previousTask.value.title.length > 99 ? 'text-red-600' : 'text-blue-600';
     }
 });
 
-const descriptionClass = computed(()=>{
+const descriptionClass = computed(() => {
     return previousTask.value.description.length > 499 ? 'text-red-600' : 'text-blue-600';
 })
 
@@ -101,22 +131,21 @@ const limitInputLength = () => {
     if (previousTask.value.title.length > 100) {
         previousTask.value.title = previousTask.value.title.slice(0, 100);
     }
-    if (previousTask.value.description !== null && previousTask.value.description.length > 500) {
-        previousTask.value.description = previousTask.value.description.slice(0, 500);
-    }
-    if(previousTask.value.assignees !== null && previousTask.value.assignees.length > 30){
-        previousTask.value.assignees = previousTask.value.assignees.slice(0, 30);
-    }
+    // if (previousTask.value.description !== null && previousTask.value.description.length > 500) {
+    //     previousTask.value.description = previousTask.value.description.slice(0, 500);
+    // }
+    // if (previousTask.value.assignees !== null && previousTask.value.assignees.length > 30) {
+    //     previousTask.value.assignees = previousTask.value.assignees.slice(0, 30);
+    // }
 };
 
 // Track the initial state of the status to detect changes
 const initialTask = JSON.parse(JSON.stringify(props.task))
-console.log(initialTask);
 const isSaveDisabled = computed(() => {
-  return (
-    JSON.stringify(previousTask.value) === JSON.stringify(initialTask) ||
-    previousTask.value.title.length < 1 
-  )
+    return (
+        JSON.stringify(previousTask.value) === JSON.stringify(initialTask) ||
+        previousTask.value.title.length < 1
+    )
 })
 
 </script>
@@ -137,10 +166,10 @@ const isSaveDisabled = computed(() => {
                     <label for="title" class="font-medium text-base">Title</label>
                     <input v-model="previousTask.title" required
                         class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
-                        type="text"
-                        @input="limitInputLength">
+                        type="text" @input="limitInputLength">
                     </input>
-                    <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
+                    <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{
+                        previousTask.title.length }}/100</p>
 
                 </div>
 
@@ -149,8 +178,10 @@ const isSaveDisabled = computed(() => {
                     <div class="itbkk-description  w-8/12">
                         <p class="font-medium text-base mb-2">description</p>
                         <input v-model="previousTask.description" class="text-base  rounded-md py-1 h-16 w-10/12 "
-                            style='padding: 15px;' type="text" @input="limitInputLength"/>
-                            <p v-if="previousTask.description" :class="descriptionClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
+                            style='padding: 15px;' type="text" @input="limitInputLength" />
+                        <p v-if="previousTask.description" :class="descriptionClass"
+                            class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length
+                            }}/500</p>
 
                     </div>
                     <div class="flex flex-col w-5/12">
@@ -159,20 +190,19 @@ const isSaveDisabled = computed(() => {
                                 <p class="font-medium text-base">assignees</p>
                                 <input v-model="previousTask.assignees" class=" w-full text-base rounded-md border p-1"
                                     :class="{ 'italic text-slate-500': previousTask.assignees === '' }"
-                                    @input="limitInputLength"/>
-                                    <p v-if="previousTask.assignees" :class="assigneesClass" class="text-end text-blue-600 text-sm font-semibold ">{{ previousTask.assignees.length}}/30</p>
+                                    @input="limitInputLength" />
+                                <p v-if="previousTask.assignees" :class="assigneesClass"
+                                    class="text-end text-blue-600 text-sm font-semibold ">{{
+                                        previousTask.assignees.length }}/30</p>
 
                             </div>
                             <div>
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
-                                    <select id="status" v-model="previousTask.status"
+                                    <select id="status" v-model="previousTask.status.name"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
-                                        <option v-for="status in statusOptions" 
-                                            :key="status.id" 
-                                            :value="status.name"
-                                        >
+                                        <option v-for="status in statusOptions" :key="status.id" :value="status.name">
                                             {{ status.name }}
                                         </option>
                                     </select>
@@ -212,7 +242,7 @@ const isSaveDisabled = computed(() => {
                             ">
                             save
                         </button>
-                        <button @click="$router.go(-1) , $emit('cancelOpe')"
+                        <button @click="$router.go(-1), $emit('cancelOpe')"
                             class="itbkk-button-cancel border border-slate-800 hover:bg-slate-400 hover:text-white transition-all ease-out p-3 font-medium text-base text-slate-800 bg-slate-300 rounded-md px-3">
                             cancel
                         </button>

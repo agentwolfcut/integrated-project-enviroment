@@ -90,7 +90,7 @@ export const BoardStore = defineStore("BoardStore", {
     async addBoard(name) {
       try {
         const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, {
-          boardName: name,
+          name: name,
         });
         if (data.status < 200 || data.status >= 300) {
           if (data.status === 401) {
@@ -100,7 +100,6 @@ export const BoardStore = defineStore("BoardStore", {
           }
         } else {
           toast.success("Board added successfully");
-
           // เก็บ id จากการตอบกลับ
           this.currentBoard = data; // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
           this.id = data.id; // เก็บค่า id แยกไว้

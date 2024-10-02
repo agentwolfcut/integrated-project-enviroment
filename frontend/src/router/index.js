@@ -61,11 +61,13 @@ const routes = [
         props: true,
       },
     ],
-    beforeEnter: async (to, from, next) => {
+    beforeEach: async (to, from, next) => {
       // Check if the boardID exists
       // You can replace this with your own logic to check if the boardID exists
       const boardID = to.params.boardID;
       const boardStore = BoardStore();
+      console.log(`beforeEnter ${boardID}`);
+      
       const board = await boardStore.getBoardById(boardID)
       if (!board) {
         toast.error(`Board  with ID ${boardID} does not exist`);

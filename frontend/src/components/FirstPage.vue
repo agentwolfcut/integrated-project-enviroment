@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { deleteItemById , getItems} from "../libs/fetchUtils";
+import { deleteItemById, getItems } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "./TaskDetail.vue";
 import HeaderIT from "./Header.vue";
@@ -17,12 +17,14 @@ import { BoardStore } from "@/stores/store.js";
 // import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
 import { useToast } from "vue-toast-notification";
 import { useRoute, useRouter } from "vue-router";
-import { useTaskStore } from '@/stores/TaskStore.js'
+import { useTaskStore } from "@/stores/TaskStore.js";
+import { useStatusStore } from "@/stores/StatusStore";
+import "vue-toast-notification/dist/theme-sugar.css";
 
-const taskStore = useTaskStore()
-const route = useRoute()
-const boardStore = BoardStore();
-
+const toast = useToast();
+const taskStore = useTaskStore();
+const statusStore = useStatusStore();
+const route = useRoute();
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
 const statuses = ref({});
@@ -36,11 +38,11 @@ const textNotify = ref("");
 const showDeleteModal = ref(false);
 const taskToDelete = ref(undefined);
 const selectTask = ref({
-  id: undefined,
+  id: '',
   title: "",
   description: "",
   assignees: "",
-  status: 1,
+  statusId: "",
 });
 // sem2
 const token = localStorage.getItem("token");
@@ -53,7 +55,7 @@ const props = defineProps({
 });
 
 // GET items
-// onMounted(async () => {  
+// onMounted(async () => {
 //   const taskRes = await getItems(
 //     `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks`,
 //     token
@@ -71,14 +73,22 @@ const props = defineProps({
 //   // doFilter();
 // });
 
+const boardIdRoute = route.params.boardID;
+
 onMounted(async () => {
   try {
-      await taskStore.fetchTask(route.params.boardID)
+    await taskStore.fetchTask(boardIdRoute);
+    const tasks = taskStore.tasks;
+    taskMan.value.addtasks(tasks);
+    sortedTasks.value = taskMan.value.gettasks();
+    // status
+    await statusStore.fetchStatus(boardIdRoute);
+    const statuses = statusStore.statuses;
+    statusFilter.value = statuses.map((status) => status.name);
   } catch (error) {
     console.error(error);
   }
-})
-
+});
 
 const errorNotify = () => {
   error.value = true;
@@ -101,7 +111,7 @@ const completeNotify = (task, action) => {
 const openDetails = async (id) => {
   try {
     const item = await get(
-      `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks/${id}`,
+      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks/${id}`,
       token
     );
     selectTask.value = item;
@@ -118,17 +128,16 @@ const cancel = (flag) => {
     title: "",
     description: "",
     assignees: "",
-    status: 1,
+    statusId: "",
   };
 };
-const toast = useToast();
 
 // ADD wait for API
 const saveTask = async () => {
   selectTask.value.title = selectTask.value.title.trim();
   try {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/boards/${props.id/tasks}`,
+      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`,
       {
         method: "POST",
         headers: {
@@ -145,27 +154,28 @@ const saveTask = async () => {
     }
     // const res = await boardStore.addTask(selectTask.value, props.id);
     const addedTask = await res.json();
-    addedTask.status = addedTask.status.name;
+    // {"title":"zxzxzx","description":null,"assignees":null,"statusId":328}
+    const status = statusStore.getStatusById(addedTask.statusId);
+    addedTask.statusId = status;
     // sortedTasks.value.push(addedTask);
     taskMan.value.addtask(addedTask);
     sortedTasks.value = taskMan.value.gettasks();
     router.back();
-    completeNotify(addedTask.title, "added");
+    toast.success(`${addedTask.title} added`);
     selectTask.value = {
       title: "",
       description: "",
       assignees: "",
-      status: 1,
+      statusId: "",
     };
   } catch (error) {
     toast.error(`this is FirstPage : ${error}`);
   }
 };
 
-// DELETE
 const deleteTask = async (removeId) => {
   const removeTask = await deleteItemById(
-    `${import.meta.env.VITE_BASE_URL}/boards/${props.id}/tasks`,
+    `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`,
     removeId,
     token
   );
@@ -194,7 +204,7 @@ const editTask = async (editedTask) => {
       selectTask.value.assignees = selectTask.value.assignees.trim();
     }
     const selectedStatus = statuses.value.find(
-      (status) => status.id == selectTask.value.status
+      (status) => status.id == selectTask.value.statusId
     );
     if (selectedStatus) {
       selectTask.value.status = selectedStatus;
@@ -239,7 +249,7 @@ const editTask = async (editedTask) => {
       title: "",
       description: "",
       assignees: "",
-      status: 1,
+      statusId: "",
     };
   } catch (error) {
     // Navigate back
@@ -255,7 +265,7 @@ const cancelHandle = () => {
     title: "",
     description: "",
     assignees: "",
-    status: 1,
+    statusId: "",
   };
 };
 
@@ -323,7 +333,7 @@ const toggleSortOrder = () => {
                     </buttonSlot>
                   </div>
                 </router-link>
-                <router-link :to="`/board/${props.id}/task/add`">
+                <router-link :to="`/board/${route.params.boardID}/task/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
                     <buttonSlot size="sm" type="dark" class="itbkk-button-add">
                       <template v-slot:title> Add Task </template>
@@ -417,24 +427,19 @@ const toggleSortOrder = () => {
                       <td
                         class="itbkk-status p-3 text-base font-medium text-slate-800 truncate"
                       >
-                        {{ task.status.name }}
+                        {{ task.statusId }}
                       </td>
                       <td
                         class="itbkk-button-action p-3 text-base font-medium text-slate-800"
                       >
-                        <router-link
-                          :to="{
-                            name: 'EditTask',
-                            params: { taskId: task.id },
-                          }"
-                        >
+                        <!-- <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
                           <button
                             @click="editMode(task)"
                             class="pr-2 itbkk-button-edit"
                           >
                             <Edit />
                           </button>
-                        </router-link>
+                        </router-link> -->
 
                         <button
                           @click="

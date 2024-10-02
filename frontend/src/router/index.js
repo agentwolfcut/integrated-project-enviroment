@@ -53,7 +53,7 @@ const routes = [
     component: Task,
     props: true,
     children: [
-      { path: "task/add", component: AddTask, name: "AddTask" , props : true },
+      { path: "task/add", component: AddTask, name: "AddTask" , props :true },
       {
         path: ":taskId/edit",
         component: EditTask,

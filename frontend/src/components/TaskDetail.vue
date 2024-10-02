@@ -81,7 +81,7 @@ const formatLocalDate = (dateString) => {
               <div class="itbkk-status">
                 <p class="font-medium text-base">status</p>
                 <div class="text-base rounded-md w-6/6 border p-1">
-                  {{ taskSelect.status.name }}
+                  {{ taskSelect.status }}
                 </div>
               </div>
             </div>

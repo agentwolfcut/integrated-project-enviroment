@@ -14,7 +14,7 @@ const props = defineProps({
             title: '',
             description: '',
             assignees: '',
-            status: 1
+            statusId: ''
             },
         require: true
     }
@@ -36,7 +36,7 @@ onMounted(async () => {
     statusOptions.value = { ...statusRes }
     const defaultStatus = statusOptions.value[0]
     if (defaultStatus) {
-        previousTask.value.status = defaultStatus.id;
+        previousTask.value.statusId = defaultStatus.id;
     }
 })
 
@@ -139,7 +139,7 @@ const saveTask = () => {
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">
                                         Status</label>
-                                    <select id="status" v-model="previousTask.status"
+                                    <select id="status" v-model="previousTask.statusId"
                                         class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                         <option v-for="status in statusOptions" :key="status.name" :value="status.id">
                                             {{ status.name }}

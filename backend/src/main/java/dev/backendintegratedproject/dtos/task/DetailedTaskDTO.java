@@ -12,6 +12,4 @@ public class DetailedTaskDTO {
     private String description;
     private String assignees;
     private Status status;
-    private ZonedDateTime createdOn;
-    private ZonedDateTime updatedOn;
 }

@@ -24,6 +24,7 @@ import dev.backendintegratedproject.util.JwtUtils;
 import dev.backendintegratedproject.util.ListMapper;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -80,11 +81,13 @@ public class BoardTaskController {
         List<Task> tasks = taskService.getTasksByStatuses(boardID, filterStatuses);
 
         if (tasks.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tasks found for the given board ID.");
+            return ResponseEntity.ok(Collections.emptyList()); // ส่ง array ว่าง []
         }
 
         return ResponseEntity.ok(listMapper.mapList(tasks, SimpleTaskDTO.class, modelMapper));
     }
+
+
 
 
     @GetMapping("{boardID}/tasks/{taskID}")

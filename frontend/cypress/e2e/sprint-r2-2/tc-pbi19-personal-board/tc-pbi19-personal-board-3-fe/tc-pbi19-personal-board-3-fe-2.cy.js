@@ -26,6 +26,8 @@ describe(`TC-PBI19-PERSIONAL-BOARD-3-FE-1\n
     })
 
     it('[Step 5] should have add task button and click to open task add modal',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
+
         cy.get('.itbkk-button-add').should('exist').click() ;
 
         cy.get('.itbkk-modal-task').should('exist').as('modal')
@@ -35,12 +37,16 @@ describe(`TC-PBI19-PERSIONAL-BOARD-3-FE-1\n
     })
 
     it('Should have task title "user2 first task"',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
+
         cy.get('.itbkk-title').contains('user2 first task').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-assignees','Unassigned')
         cy.get('@item').contains('.itbkk-status',"Doing")
     })
 
     it('Should have "No Description Provided","Unassigned" and "Doing".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
+
         cy.get('.itbkk-title').contains('user2 first task').click()
     
         cy.wait(200)

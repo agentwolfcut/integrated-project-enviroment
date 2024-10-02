@@ -147,7 +147,6 @@ const addStatus = async () => {
 // DELETE
 const checkTasksBeforeDelete = async (status) => {
   console.log(status);
-  
   if (status.id === 'No Status' || status.name === "Done") {
     deleteDefault.value = true;
     setTimeout(() => {
@@ -157,7 +156,7 @@ const checkTasksBeforeDelete = async (status) => {
     const res = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`, token);
     tasks.value = { ...res };
     console.log(tasks.value);
-    
+
     // console.log(tasks.value);F
     const clean = JSON.parse(JSON.stringify(tasks.value));
     // console.log(clean);
@@ -169,7 +168,7 @@ const checkTasksBeforeDelete = async (status) => {
     );
     const count = filteredTask.length;
     console.log(count);
-    
+
     if (count > 0) {
       confirmTransfer.value = true;
     } else {
@@ -282,7 +281,7 @@ const handelFail = () => {
               <div class="flex justify-end mb-9">
                 <router-link :to="`/board/${boardIdRoute}`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                    <buttonSlot size="sm" type="dark" class="itbkk-manage-task">
                       <template v-slot:title> TASK </template>
                     </buttonSlot>
                   </div>
@@ -345,14 +344,17 @@ const handelFail = () => {
 
                       <td class="p-3">
                         <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                          <router-link class="itbkk-button-edit" :to="{
+                          <button class="itbkk-button-edit">
+                            <router-link class="itbkk-button-edit" :to="{
                             name: 'EditStatus',
                             params: { id: status.id },
                           }">
-                            <button class="pr-2" @click="openToEdit(status)">
+                            <button class="itbkk-button-edit pr-2" @click="openToEdit(status)">
                               <Edit />
                             </button>
                           </router-link>
+                          </button>
+                          
 
                           <button class="pr-1 itbkk-button-delete" @click="
                             (statusDelete = status),

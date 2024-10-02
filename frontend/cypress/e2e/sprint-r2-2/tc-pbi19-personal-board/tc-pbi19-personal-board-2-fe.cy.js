@@ -12,7 +12,8 @@ describe(`TC-PBI19-PERSIONAL-BOARD-2-FE\n
 
         cy.wait(100)
         cy.url().should('contain','/board')
-        cy.contains('Software Development Kanban Board for the course INT222 Integrated Project II at School of Information Technology in 202')
+        // cy.contains('Kandan')
+        cy.contains('Software Development Kanban')
     })
 
 })

@@ -304,7 +304,7 @@ const toggleSortOrder = () => {
               <div class="flex justify-end mb-9">
                 <router-link :to="`/board/${boardIdRoute}/status`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                    <buttonSlot size="sm" type="dark" class="itbkk-manage-status">
                       <template v-slot:title> STATUS </template>
                     </buttonSlot>
                   </div>
@@ -378,8 +378,8 @@ const toggleSortOrder = () => {
                         {{ task.status.name }}
                       </td>
                       <td class="itbkk-button-action p-3 text-base font-medium text-slate-800">
-                        <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }">
-                          <button @click="editMode(task)" class="pr-2 itbkk-button-edit">
+                        <router-link :to="{ name: 'EditTask', params: { taskId: task.id } }" >
+                          <button @click="editMode(task)" class="itbkk-button-edit pr-2 ">
                             <Edit />
                           </button>
                         </router-link>

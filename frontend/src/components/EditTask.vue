@@ -153,7 +153,7 @@ const isSaveDisabled = computed(() => {
 <template>
     <div class="absolute left-0 right-0 top-1/4 m-auto flex flex-wrap justify-center items-center ">
         <div
-            class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
+            class="itbkk-modal-task px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
 
             <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl">
 

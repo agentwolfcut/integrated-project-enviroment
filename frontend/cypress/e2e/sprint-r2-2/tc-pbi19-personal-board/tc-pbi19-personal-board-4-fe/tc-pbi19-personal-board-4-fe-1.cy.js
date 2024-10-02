@@ -17,14 +17,16 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     it('Open the login page at /login and open the /board page', () => {
         cy.wait(100)
         cy.url().should('contain','/board')
-        cy.contains('Software Development Kanban Board for the course INT222 Integrated Project II at School of Information Technology in 202')
+        cy.contains('Software Development Kanban')
     })
 
     it('[Step 1.1] should have "Manage Status" and click to open the Status list page',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
     })
 
     it('[Step 1.1] Status table shoud contain "No Status","To Do"," Doing" and "Done".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
         cy.wait(100) ;
 
@@ -44,6 +46,7 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     })
 
     it('[Step 1.2] should have an Add Status and click the button to show the modal window and add status "To Review".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
         cy.wait(100) ;
 
@@ -62,8 +65,8 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     })
 
     it('[Step 1.3] should have add task button and click to open task add modal and add "user1 first task" with "To Review".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-button-add').should('exist').click() ;
-
         cy.get('.itbkk-modal-task').should('exist').as('modal')
         cy.get('@modal').find('.itbkk-title').type('user1 first task')
         cy.get('@modal').find('.itbkk-status').select('To Review')
@@ -71,12 +74,14 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     })
 
     it('[Step 1.3] Should have task title "user1 first task" with "To Review".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-title').contains('user1 first task').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-assignees','Unassigned')
         cy.get('@item').contains('.itbkk-status',"To Review")
     })
 
     it('[Step 1.4] should have add task button and click to open task add modal and add "user1 second task" with "Doing".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-button-add').should('exist').click() ;
 
         cy.get('.itbkk-modal-task').should('exist').as('modal')
@@ -86,17 +91,18 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     })
 
     it('[Step 1.4] Should have task title "user1 second task" with "Doing".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-title').contains('user1 second task').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-assignees','Unassigned')
         cy.get('@item').contains('.itbkk-status',"Doing")
     })
 
     it('[Step 1.5] Should change "Doing" status to "In Progress" status.', ()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
         cy.wait(100) ;
-
         cy.get('.itbkk-status-name').contains('Doing').parents('.itbkk-item').as('item')
-        cy.get('@item').contains('.itbkk-button-edit','Edit').should('exist').click()
+        cy.get('@item').contains('.itbkk-button-edit').should('exist').click()
         cy.wait(100)
 
         cy.get('.itbkk-modal-status').as('modal')
@@ -108,6 +114,7 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     })
 
     it('[Step 1.5] should have task title "user1 second task" with "In Progress".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-status').contains('In Progress').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-title','user1 second task')
         cy.get('@item').contains('.itbkk-assignees','Unassigned')

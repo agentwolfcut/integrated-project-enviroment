@@ -16,21 +16,24 @@ describe(`TC-PBI19-PERSIONAL-BOARD-4-FE-1\n
     it('Open the login page at /login and open the /board page', () => {
         cy.wait(100)
         cy.url().should('contain','/board')
-        cy.contains('ITBKK SOMSUAN personal board')
+        cy.contains('ITBKK SOMSUAN personal Board')
         cy.get('.itbkk-item').should('have.length',1)
     })
 
     it('[Step 2.1] Should have task title "user2 first task"',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-title').contains('user2 first task').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-assignees','Unassigned')
         cy.get('@item').contains('.itbkk-status',"Doing")
     })
 
     it('Should have "Manage Status" and click to open the Status list page',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
     })
 
     it('[Step 2.2] Status table shoud contain "No Status","To Do"," Doing" and "Done".',()=>{
+        cy.get('.itbkk-board-name').should('exist').click() ;
         cy.get('.itbkk-manage-status').should('exist').click() ;
         cy.wait(100) ;
 

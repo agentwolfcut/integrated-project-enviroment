@@ -104,6 +104,7 @@ export const BoardStore = defineStore("BoardStore", {
           this.currentBoard = data; // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
           this.id = data.id; // เก็บค่า id แยกไว้
           this.board.push(data); // เพิ่มบอร์ดใน array
+          // router.push(`board/${this.id}`)
         }
       } catch (error) {
         console.error("Error adding board:", error);

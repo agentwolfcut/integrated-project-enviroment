@@ -5,6 +5,7 @@ import { onMounted, computed } from "vue";
 import buttonSlot from "@/components/Button.vue";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { BoardStore } from "@/stores/store.js";
+import router from "@/router";
 
 const boardStore = BoardStore();
 
@@ -13,8 +14,12 @@ const setCurrentBoardId = (id) => {
   boardStore.setCurrentBoardID(id);
 };
 
-onMounted(() => {
-  boardStore.getBoard();
+onMounted(async () => {
+  await boardStore.getBoard();
+  if (boardStore.getBoards.length > 0) {
+    const boardId = boardStore.getBoards[0].id;
+    // router.push(`/board/${boardId}`);
+  }
 });
 
 const boards = computed(() => boardStore.getBoards);

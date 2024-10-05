@@ -281,7 +281,7 @@ const handelFail = () => {
               <div class="flex justify-end mb-9">
                 <router-link :to="`/board/${boardIdRoute}`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-manage-task">
+                    <buttonSlot size="sm" type="light" class="itbkk-manage-task">
                       <template v-slot:title> TASK </template>
                     </buttonSlot>
                   </div>
@@ -471,6 +471,15 @@ const handelFail = () => {
 .itbkk-button-add:hover {
   background-color: #c7b8ea;
   /* light purple color */
+}
+
+.itbkk-manage-task {
+  background-color: #ffcc00;
+}
+
+.itbkk-manage-task:hover {
+  background-color: #f1da7c;
+
 }
 
 table {

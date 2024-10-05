@@ -18,7 +18,7 @@ import lombok.Setter;
 public class PrimaryUser {
     @Id
     @Column(name = "userID")
-    private String userID;
+    private String oid;
     @Column(name = "username")
-    private String name;
+    private String username;
 }

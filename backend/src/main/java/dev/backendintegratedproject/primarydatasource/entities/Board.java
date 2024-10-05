@@ -21,7 +21,8 @@ public class Board {
     private String name;
     @Column(name = "ownerID", nullable = false, length = 36)
     private String ownerID;
-
+    @Column(name = "isPublic", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isPublic;
 
     @ManyToOne
     @JoinColumn(name = "ownerID", insertable = false, updatable = false, referencedColumnName = "userID", nullable = false)

@@ -15,6 +15,7 @@ import dev.backendintegratedproject.primarydatasource.repositories.StatusReposit
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserBoardService {
@@ -26,7 +27,6 @@ public class UserBoardService {
     private StatusRepository statusRepository;
     @Autowired
     private TaskRepository taskRepository;
-
 
     @Transactional(readOnly = true)
     public List<Board> getBoardsByUserID(String userID) {
@@ -44,7 +44,8 @@ public class UserBoardService {
 
         Board newBoard = new Board();
         newBoard.setName(boardName);
-        newBoard.setOwnerID(user.getUserID());
+        newBoard.setOwnerID(user.getOid());
+        newBoard.setIsPublic(false);
 
         Board createdBoard = boardRepository.save(newBoard);
         createdBoard.setOwner(user);
@@ -77,5 +78,18 @@ public class UserBoardService {
 
     public boolean existsById(String boardID) {
         return boardRepository.existsById(boardID);
+    }
+
+    @Transactional
+    public void setVisibility(String boardID, VisibilityDTO visibility) {
+        Boolean newVis = null;
+        switch (visibility.getVisibility().toLowerCase()){
+            case "public": newVis = true;
+                break;
+            case "private":newVis = false;
+                break;
+            default: throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid visibility value");
+        }
+        boardRepository.setVisibility(boardID, newVis);
     }
 }

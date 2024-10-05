@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.controllers;
 
+import dev.backendintegratedproject.dtos.board.VisibilityDTO;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,11 @@ public class BoardTaskController {
     public ResponseEntity<BoardPermissionDTO> getBoardPermission(Authentication authentication, @PathVariable String boardID) {
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
         return ResponseEntity.ok(boardPermissionService.getPermission(userDetails.getOid(), boardID));
+    }
+
+    @PatchMapping("/{boardID}")
+    public void changeVisibility(@PathVariable String boardID, @RequestBody VisibilityDTO visibility){
+        userBoardService.setVisibility(boardID, visibility);
     }
     @PutMapping("/{boardID}/update")
     public ResponseEntity<Board> updateBoard(@PathVariable String boardID, @RequestBody Board board) {

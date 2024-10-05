@@ -44,7 +44,7 @@ public class TaskService {
     public Task getTaskById(Integer id, String boardID) {
         Task task = taskRepository.findByIdAndBoardID(id, boardID);
         if (task == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Task not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist.");
         }
         return task;
     }

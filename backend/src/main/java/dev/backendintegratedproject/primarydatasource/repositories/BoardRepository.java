@@ -14,11 +14,11 @@ public interface BoardRepository extends JpaRepository<Board, String> {
 
     List<Board> findAllByOwnerID(String userID);
 
-    @Query("SELECT b.visiblity FROM Board b WHERE b.id = :id")
+    @Query("SELECT b.visibility FROM Board b WHERE b.id = :id")
     Boolean getIsPublicByBoardID(@Param("id") String boardID);
 
     @Modifying
-    @Query(value = "UPDATE Board b SET b.visiblity = :vis WHERE b.id = :bID")
+    @Query("UPDATE Board b SET b.visibility = :vis WHERE b.id = :bID")
     void setVisibility(@Param("bID") String boardID, @Param("vis") Boolean newVis);
 
 }

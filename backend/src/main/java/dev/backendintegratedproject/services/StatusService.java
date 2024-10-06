@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import dev.backendintegratedproject.dtos.status.CreateStatusDTO;
 import dev.backendintegratedproject.primarydatasource.entities.Status;
@@ -23,6 +24,8 @@ public class StatusService {
     private TaskRepository taskRepository;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    BoardPermissionService boardPermissionService;
 
 
 
@@ -174,5 +177,10 @@ public class StatusService {
             usageMap.put(status.getId(), checkIsNotInUsed(status.getId(), boardID));
         });
         return usageMap;
+    }
+
+
+    public Optional<Status> getOptionalStatusById(Integer id, String boardID) {
+        return Optional.ofNullable(statusRepository.findByIdAndBoardID(id, boardID));
     }
 }

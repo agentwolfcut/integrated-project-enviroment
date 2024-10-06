@@ -35,6 +35,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/v3/boards/{boardID}/tasks").permitAll()
                         .requestMatchers(HttpMethod.GET,"/v3/boards/{boardID}/statuses").permitAll()
                         .requestMatchers(HttpMethod.GET,"/v3/boards/{boardID}/tasks/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/v3/boards/{boardID}/statuses/{id}").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
         httpSecurity.addFilterBefore(jwtAuthenticFilter, UsernamePasswordAuthenticationFilter.class);
@@ -48,6 +49,7 @@ public class WebSecurityConfig {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             String message = authException.getMessage();
+            response.getWriter().write("{\"message\":\"" + message + "\"}");
 
         });
     }

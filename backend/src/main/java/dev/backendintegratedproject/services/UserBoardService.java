@@ -15,16 +15,19 @@ import dev.backendintegratedproject.primarydatasource.repositories.StatusReposit
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserBoardService {
+
     @Autowired
     private PrimaryUserRepository primaryUserRepository;
+
     @Autowired
     private BoardRepository boardRepository;
+
     @Autowired
     private StatusRepository statusRepository;
+
     @Autowired
     private TaskRepository taskRepository;
 
@@ -34,7 +37,8 @@ public class UserBoardService {
     }
 
     public Board getBoardsDetail(String boardID) {
-        return boardRepository.findById(boardID).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found"));
+        return boardRepository.findById(boardID)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found"));
     }
 
     @Transactional
@@ -45,7 +49,7 @@ public class UserBoardService {
         Board newBoard = new Board();
         newBoard.setName(boardName);
         newBoard.setOwnerID(user.getOid());
-        newBoard.setIsPublic(false);
+        newBoard.setVisibility("PRIVATE");  // Default to PRIVATE
 
         Board createdBoard = boardRepository.save(newBoard);
         createdBoard.setOwner(user);
@@ -56,6 +60,7 @@ public class UserBoardService {
     public Board updateBoard(String boardID, Board board) {
         Board boardToUpdate = boardRepository.findById(boardID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board " + boardID + " does not exist !!!"));
+
         boardToUpdate.setName(board.getName());
         boardRepository.save(boardToUpdate);
         return boardToUpdate;
@@ -65,6 +70,7 @@ public class UserBoardService {
     public Board deleteBoard(String boardID) {
         Board board = boardRepository.findById(boardID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board " + boardID + " does not exist !!!"));
+
         taskRepository.deleteAll(taskRepository.findAllByBoardID(boardID));
         statusRepository.deleteAll(statusRepository.findAllByBoardID(boardID));
         boardRepository.delete(board);
@@ -75,21 +81,38 @@ public class UserBoardService {
         return NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
     }
 
-
     public boolean existsById(String boardID) {
         return boardRepository.existsById(boardID);
     }
 
     @Transactional
-    public void setVisibility(String boardID, VisibilityDTO visibility) {
+    public void setVisibility(String boardID, VisibilityDTO visibility, String userID) {
+        // Check board existence and if the user is the owner
+        Board board = boardRepository.findById(boardID)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found"));
+
+        if (!board.getOwnerID().equals(userID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to change this board's visibility.");
+        }
+
+        // Check and set the new visibility
         Boolean newVis = null;
-        switch (visibility.getVisibility().toLowerCase()){
+        switch (visibility.getVisibility().toLowerCase()) {
             case "public": newVis = true;
                 break;
-            case "private":newVis = false;
+            case "private": newVis = false;
                 break;
-            default: throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid visibility value");
+            default: throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid visibility value");
         }
         boardRepository.setVisibility(boardID, newVis);
     }
+    public void checkBoardAccess(Board board, String userID) {
+        if (!board.isPublic() && !board.getOwnerID().equals(userID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+        }
+    }
+
+
+
+
 }

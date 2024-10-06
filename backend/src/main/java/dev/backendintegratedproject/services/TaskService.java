@@ -17,6 +17,7 @@ import dev.backendintegratedproject.primarydatasource.repositories.StatusReposit
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -188,4 +189,10 @@ public class TaskService {
         task.setAssignees(task.getAssignees() != null ? task.getAssignees().trim() : null);
         return task;
     }
+
+    public Optional<Task> getOptionalTaskById(Integer id, String boardID) {
+        return Optional.ofNullable(taskRepository.findByIdAndBoardID(id, boardID));
+    }
+
+
 }

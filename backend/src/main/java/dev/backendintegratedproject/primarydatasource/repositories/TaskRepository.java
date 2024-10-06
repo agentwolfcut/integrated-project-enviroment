@@ -8,6 +8,7 @@ import dev.backendintegratedproject.primarydatasource.entities.Task;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     List<Task> findAllByStatus(Status status);
@@ -27,4 +28,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     void transferStatusTasks(Integer delStat, Integer newStat);
 
     Task findByIdAndBoardID(Integer id, String boardID);
+
+    List<Task> findAllByBoardIDAndStatusNameIn(String boardID, List<String> statusNames);
+
+
 }

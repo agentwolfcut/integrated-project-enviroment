@@ -19,20 +19,36 @@ public class Board {
     @Id
     @Column(name = "boardID", length = 10)
     private String id;
+
     @Column(name = "boardName", nullable = false, length = 45)
     private String name;
+
     @Column(name = "ownerID", nullable = false, length = 36)
     private String ownerID;
+
     @JsonIgnore
     @Column(name = "isPublic", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private Boolean visiblity;
+    private Boolean visibility;
+
     @JsonProperty("visibility")
-    public String getIsPublicDisplay() {
-        return (visiblity != null && visiblity) ? "PUBLIC" : "PRIVATE";
+    public String getVisibility() {
+        return this.visibility ? "PUBLIC" : "PRIVATE";
     }
-    public void setIsPublic(Boolean isPublic) {
-        this.visiblity = isPublic;
+    @JsonIgnore
+    public void setVisibility(String visibility) {
+        if ("PUBLIC".equalsIgnoreCase(visibility)) {
+            this.visibility = true;
+        } else if ("PRIVATE".equalsIgnoreCase(visibility)) {
+            this.visibility = false;
+        } else {
+            throw new IllegalArgumentException("Invalid visibility value.");
+        }
     }
+    @JsonIgnore
+    public boolean isPublic() {
+        return this.visibility;
+    }
+
     @ManyToOne
     @JoinColumn(name = "ownerID", insertable = false, updatable = false, referencedColumnName = "userID", nullable = false)
     private PrimaryUser owner;
@@ -43,11 +59,4 @@ public class Board {
             this.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
         }
     }
-
-    // Custom getter for serialization
-
-
-    // Regular getter and setter
-
-
 }

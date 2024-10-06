@@ -13,17 +13,19 @@ import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
 import { get, put } from "@/libs/Utils";
-import { BoardStore } from "@/stores/store.js";
 // import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
 import { useToast } from "vue-toast-notification";
 import { useRoute, useRouter } from "vue-router";
 import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
+import { useVisibilityStore } from "@/stores/VisibilityStore";
+import {BoardStore} from '@/stores/store.js'
 
 const toast = useToast();
 const taskStore = useTaskStore();
 const statusStore = useStatusStore();
+const boardStore = BoardStore()
 const route = useRoute();
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
@@ -290,18 +292,27 @@ const toggleSortOrder = () => {
 
 // visibility
 // const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
-const isPrivate = ref(localStorage.getItem("isPrivate") === "true");
+// const isPrivate = ref(localStorage.getItem("isPrivate") === "true");
 const showModalVis = ref(false);
+const visibilityStore = useVisibilityStore()
+const visibility = ref(visibilityStore.visibility)
 
-const handleVisibilityChange = () => {
-  // need to send request to PATCH: /boards/{id}
+const newVisibility = ref('')
 
-  // moackup
-  isPrivate.value = !isPrivate.value;
-  localStorage.setItem("isPrivate", isPrivate.value);
-  console.log(isPrivate.value);
+const toggleVisibility = () => {
+  console.log(`from store ${boardStore.getVisibility}`);
+  console.log(`old is ${visibility.value}`);
+  newVisibility.value = visibility.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+
+  console.log(`new is ${newVisibility.value}`);
+  showModalVis.value = true;
+};
+
+const confirmChange = () => {
+  visibilityStore.updateVisibility(newVisibility.value , boardIdRoute);
   showModalVis.value = false;
 };
+
 </script>
 
 <template>
@@ -316,7 +327,7 @@ const handleVisibilityChange = () => {
             <div class="overflow-x-auto">
               <div class="for-button mb-9 flex flex-row justify-between">
                 <button
-                  @click="showModalVis = !showModalVis"
+                  @click="toggleVisibility"
                   class="itbkk-board-visibility flex items-center rounded-full w-10 h-10 justify-center"
                 >
                   <svg
@@ -587,7 +598,8 @@ const handleVisibilityChange = () => {
         <p class="my-4 text-base font-medium overflow-y-auto">
           Do you want to change board visibility to
           <span class="text-cyan-800 italic font-bold">{{
-            isPrivate ? "Public" : "Private"
+            // isPrivate ? "Public" : "Private"
+            newVisibility
           }}</span>
           ?
         </p>
@@ -600,7 +612,7 @@ const handleVisibilityChange = () => {
           </button>
 
           <button
-            @click="handleVisibilityChange"
+            @click="confirmChange"
             class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Confirm

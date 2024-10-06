@@ -4,6 +4,7 @@ import { addItem, getItemById, getItems } from "@/libs/fetchUtils";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
 import router from "@/router";
+import { useVisibilityStore } from "./VisibilityStore";
 
 const toast = useToast();
 const token = localStorage.getItem("token");
@@ -14,7 +15,7 @@ export const pinia = createPinia();
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
     // token: null,
-    token : null,
+    token: null,
     refreshToken: null,
     currentUser: null,
   }),
@@ -31,7 +32,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       this.currentUser = user;
     },
 
-     clearTokens() {
+    clearTokens() {
       this.token = null;
       this.refreshToken = null;
       localStorage.removeItem("token");
@@ -50,9 +51,12 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
       try {
         // mockup
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/validate-token`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/validate-token`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (res.status === 200) {
           // Token ยัง valid
@@ -102,7 +106,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
         console.error("Error refreshing access token:", error);
         this.clearTokens();
       }
-    }
+    },
   },
 });
 
@@ -113,6 +117,7 @@ export const BoardStore = defineStore("BoardStore", {
     id: null, // ตัวแปรสำหรับเก็บ id
     tasks: [],
     currentBoardId: null,
+    visibility: "private",
   }),
   getters: {
     getBoards: (state) => state.board,
@@ -124,11 +129,12 @@ export const BoardStore = defineStore("BoardStore", {
     getBoardById: (state) => (id) => {
       return state.board.find((board) => board.id === id);
     },
+    getVisibility: (state) => state.visibility,
   },
   actions: {
     setCurrentBoardID(id) {
       this.currentBoardId = id;
-    } ,
+    },
     async getBoard() {
       try {
         const data = await getItems(
@@ -137,6 +143,9 @@ export const BoardStore = defineStore("BoardStore", {
         );
         if (data && Array.isArray(data)) {
           this.board = data; // อัปเดต array ของบอร์ด
+          // this.visibility = data.visibility;
+          console.log(data[0].visibility);
+          this.visibility = data[0].visibility;
         } else {
           toast.error("Failed to fetch Board or invalid data received.");
         }
@@ -152,6 +161,7 @@ export const BoardStore = defineStore("BoardStore", {
           token
         );
         if (data) {
+
           return data;
         } else {
           toast.error("Failed to fetch Board or invalid data received.");
@@ -179,7 +189,7 @@ export const BoardStore = defineStore("BoardStore", {
           // เก็บ id จากการตอบกลับ
           this.currentBoard = data; // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
           this.id = data.id; // เก็บค่า id แยกไว้
-          this.board.push(data); // เพิ่มบอร์ดใน array
+          this.board.push(data);
           // router.push(`board/${this.id}`)
         }
       } catch (error) {

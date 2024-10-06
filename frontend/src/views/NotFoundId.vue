@@ -15,11 +15,9 @@ const timeout = setTimeout(() => {
 <template>
     <div class="flex justify-center items-center h-screen ">
         <div class="text-red-600 font-bold text-2xl">
-
             The request does not exist
         </div>
         <RouterView/>
-
     </div>
 </template>
 

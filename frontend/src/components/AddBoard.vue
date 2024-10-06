@@ -4,7 +4,7 @@ import router from "@/router";
 import VueJwtDecode from "vue-jwt-decode";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-import { BoardStore } from "@/stores/store.js";
+import { BoardStore } from "@/stores/Store.js";
 
 const boardStore = BoardStore();
 const newBoardName = ref('')
@@ -20,6 +20,8 @@ console.log(newBoardName.value);
 
 const addBoard = () => {
   boardStore.addBoard(newBoardName.value);
+  // moackup
+  localStorage.setItem('isPrivate', 'true');
   router.push('/board')
 };
 

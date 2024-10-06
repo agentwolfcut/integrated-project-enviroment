@@ -1,17 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Task from "@/components/FirstPage.vue";
-import AddTask from "@/components/AddEditTask.vue";
+import Task from "../views/ManageTask.vue";
+import AddTask from "@/components/AddTask.vue";
 import NotFoundId from "@/views/NotFoundId.vue";
 import NotFound from "@/views/NotFound.vue";
 import EditTask from "@/components/EditTask.vue";
-import ManageStatus from "@/components/ManageStatus.vue";
+import ManageStatus from "@/views/ManageStatus.vue";
 import AddStatus from "@/components/AddStatus.vue";
 import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
-import { BoardStore } from "@/stores/store.js";
+import { BoardStore  , AuthUserStore} from "@/stores/Store.js";
 import { useToast } from "vue-toast-notification";
+import AccesDeny from "@/views/AccesDeny.vue";
+
 
 const toast = useToast();
 // set history of stor path when visit
@@ -20,6 +22,7 @@ const history = createWebHistory(import.meta.env.BASE_URL);
 const routes = [
   // first page & wait t. give endpoint
   { path: "/", redirect: "/login" },
+  { path: "/test", name: "AccessDeny", component: AccesDeny },
   { path: "/login", name: "Login", component: Login },
   {
     path: "/status",
@@ -53,7 +56,7 @@ const routes = [
     component: Task,
     props: true,
     children: [
-      { path: "task/add", component: AddTask, name: "AddTask" , props :true },
+      { path: "task/add", component: AddTask, name: "AddTask", props: true },
       {
         path: ":taskId/edit",
         component: EditTask,
@@ -67,11 +70,11 @@ const routes = [
       const boardID = to.params.boardID;
       const boardStore = BoardStore();
       console.log(`beforeEnter ${boardID}`);
-      
-      const board = await boardStore.getBoardById(boardID)
+
+      const board = await boardStore.getBoardById(boardID);
       if (!board) {
         toast.error(`Board  with ID ${boardID} does not exist`);
-        next({ path: '/board' });
+        next({ path: "/board" });
       } else {
         next();
       }
@@ -107,5 +110,17 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = AuthUserStore();
+//   const accessToken = localStorage.getItem("accessToken");
+
+//   if (!accessToken && to.path !== "/login") {
+//     next("/login");
+//   } else {
+//     await authStore.checkTokenValidity(); // ตรวจสอบและรีเฟรช token
+//     next();
+//   }
+// });
 
 export default router;

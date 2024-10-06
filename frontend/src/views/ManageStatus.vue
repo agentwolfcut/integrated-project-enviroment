@@ -1,20 +1,20 @@
 <script setup>
 import { onMounted, ref, provide } from "vue";
-import HeaderIT from "./Header.vue";
+import HeaderIT from "@/components/Header.vue";
 import {
   getItems,
   transferTasksAndDeleteStatus,
   deleteItemById,
-} from "../libs/fetchUtils";
+} from "@/libs/fetchUtils.js";
 import { StatusManagement } from "@/libs/StatusManagement";
-import SideBar from "./SideBar.vue";
-import buttonSlot from "./Button.vue";
+import SideBar from "@/components/SideBar.vue";
+import buttonSlot from "@/components/Button.vue";
 import Trash from "@/assets/icons/CiTrashFull.vue";
 import Edit from "@/assets/icons/CiEditPencil01.vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import VueJwtDecode from "vue-jwt-decode";
-import { createToaster } from "../../node_modules/@meforma/vue-toaster";
+import { createToaster } from "@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
 import { post, put } from "@/libs/Utils";
 

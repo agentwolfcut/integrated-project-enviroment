@@ -2,11 +2,11 @@
 import { onMounted, ref } from "vue";
 import { deleteItemById, getItems } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
-import TaskDetail from "./TaskDetail.vue";
-import HeaderIT from "./Header.vue";
-import SideBar from "./SideBar.vue";
+import TaskDetail from '@/components/TaskDetail.vue'
+import HeaderIT from "@/components/Header.vue";
+import SideBar from "@/components/SideBar.vue";
 import router from "@/router";
-import buttonSlot from "./Button.vue";
+import buttonSlot from "@/components/Button.vue";
 import Trash from "@/assets/icons/CiTrashFull.vue";
 import Edit from "@/assets/icons/CiEditPencil01.vue";
 import SortDown from "@/assets/icons/SortDown.vue";
@@ -295,7 +295,6 @@ const showModalVis = ref(false);
 
 const handleVisibilityChange = () => {
   // need to send request to PATCH: /boards/{id}
-
 
   // moackup
   isPrivate.value = !isPrivate.value;

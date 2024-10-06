@@ -18,7 +18,7 @@ localStorage.clear();
 
 const inputUsrpw = async () => {
   try {
-    authUserStore.clearToken();
+    authUserStore.clearTokens();
     boardStore.board = [];
     // wait for agent api
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
@@ -31,9 +31,10 @@ const inputUsrpw = async () => {
 
     if (res.ok) {
       const data = await res.json();
-      authUserStore.setToken(data.access_token);
-      token = data.access_token;
-      localStorage.setItem("token", token);
+      const refresh_token = 'xxxx'
+      authUserStore.setTokens(data.access_token , refresh_token);
+      // token = data.access_token;
+      // localStorage.setItem("token", token);
       decode();
         router.push("/board");
     } else {
@@ -53,7 +54,8 @@ const inputUsrpw = async () => {
 
 const decode = () => {
   // Take token from window local storage
-  let token = localStorage.getItem("token");
+  const token = authUserStore.token
+  
   try {
     let decoded = VueJwtDecode.decode(token);
     current_user.value = decoded.name; // Store the decoded token

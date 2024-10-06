@@ -13,19 +13,95 @@ const token = localStorage.getItem("token");
 export const pinia = createPinia();
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
-    token: null,
+    // token: null,
+    token : null,
+    refreshToken: null,
     currentUser: null,
   }),
+
   actions: {
-    setToken(token) {
+    setTokens(token, refreshToken) {
       this.token = token;
+      this.refreshToken = refreshToken;
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
     },
+
     setUser(user) {
       this.currentUser = user;
     },
-    clearToken() {
+
+     clearTokens() {
       this.token = null;
-      this.currentUser = null;
+      this.refreshToken = null;
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+    },
+
+    async checkTokenValidity() {
+      const token = localStorage.getItem("token");
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!token || !refreshToken) {
+        this.clearTokens();
+        router.push("/login");
+        return;
+      }
+
+      try {
+        // mockup
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/validate-token`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 200) {
+          // Token ยัง valid
+          return;
+        } else if (res.status === 401) {
+          // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
+          await this.refreshtoken();
+        } else {
+          this.clearTokens();
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Error checking token validity:", error);
+        this.clearTokens();
+        router.push("/login");
+      }
+    },
+
+    async refreshtoken() {
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        this.clearTokens();
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        });
+
+        if (res.status === 200) {
+          const { token } = await res.json();
+          this.setTokens(token, refreshToken);
+        } else if (res.status === 401) {
+          this.clearTokens();
+          router.push("/login");
+        } else {
+          toast.error("There is a problem. Please try again later.");
+        }
+      } catch (error) {
+        console.error("Error refreshing access token:", error);
+        this.clearTokens();
+      }
     }
   },
 });

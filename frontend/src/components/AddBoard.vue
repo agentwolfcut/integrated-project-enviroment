@@ -20,6 +20,8 @@ console.log(newBoardName.value);
 
 const addBoard = () => {
   boardStore.addBoard(newBoardName.value);
+  // moackup
+  localStorage.setItem('isPrivate', 'true');
   router.push('/board')
 };
 

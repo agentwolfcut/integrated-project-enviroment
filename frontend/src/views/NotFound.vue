@@ -17,8 +17,6 @@ const timeout = setTimeout(() => {
         <div class="text-red-600 font-bold text-2xl">
             Bad request , please try again 
         </div>
-    
-
     </div>
 </template>
 

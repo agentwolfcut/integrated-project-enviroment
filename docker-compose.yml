@@ -53,6 +53,7 @@ services:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
       - ./cert/privkey.pem:/etc/ssl/private/privkey.pem
       - ./cert/ddns.net.pem:/etc/ssl/certs/ddns.net.pem
+      - ./ssl/dhparam-2048.pem:/etc/nginx/ssl/dhparam-2048.pem # ???????? mount dhparam
     depends_on:
       - frontend
     networks:

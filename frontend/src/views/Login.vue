@@ -2,8 +2,7 @@
 import router from "@/router";
 import { computed, ref } from "vue";
 import VueJwtDecode from "vue-jwt-decode";
-import { AuthUserStore } from "../stores/Store.js";
-import { BoardStore } from "../stores/Store.js";
+import { AuthUserStore , BoardStore } from '@/stores/Store.js'
 
 const usrpw = ref({ username: "", password: "" });
 const error = ref(false);

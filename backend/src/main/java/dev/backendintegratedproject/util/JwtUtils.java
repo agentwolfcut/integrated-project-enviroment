@@ -21,6 +21,8 @@ public class JwtUtils implements Serializable {
     private String SECRET_KEY;
     @Value("#{${jwt.token.lifespan-hour}*60*60*1000}")
     private long JWT_TOKEN_VALIDITY;
+    private static final long REFRESH_TOKEN_VALIDITY = 24 * 60 * 60 * 1000;
+
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -50,7 +52,7 @@ public class JwtUtils implements Serializable {
 
     public String generateToken(UserDetailsDTO userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("iss", "https://intproj23.sit.kmutt.ac.th/sy1/");
+        claims.put("iss", "https://intproj23.sit.kmutt.ac.th/kk3/");
         claims.put("name", userDetails.getName());
         claims.put("oid", userDetails.getOid());
         claims.put("email", userDetails.getEmail());
@@ -72,6 +74,15 @@ public class JwtUtils implements Serializable {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String generateRefreshToken(UserDetailsDTO userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("iss", "https://intproj23.sit.kmutt.ac.th/kk3/");
+        claims.put("iat", new Date(System.currentTimeMillis()));
+        claims.put("oid", userDetails.getOid());
+
+        return doGenerateToken(claims, userDetails.getOid(), REFRESH_TOKEN_VALIDITY);
     }
 
 

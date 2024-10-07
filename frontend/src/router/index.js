@@ -10,7 +10,7 @@ import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
-import { BoardStore  , AuthUserStore} from "@/stores/Store.js";
+import { BoardStore} from  '@/stores/Store.js'
 import { useToast } from "vue-toast-notification";
 import AccesDeny from "@/views/AccesDeny.vue";
 

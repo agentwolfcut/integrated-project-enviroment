@@ -20,7 +20,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import {BoardStore} from '@/stores/store.js'
+import {BoardStore} from '@/stores/Store.js'
 
 const toast = useToast();
 const taskStore = useTaskStore();

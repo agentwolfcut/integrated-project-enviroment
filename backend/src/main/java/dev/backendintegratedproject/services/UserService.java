@@ -45,19 +45,19 @@ public class UserService implements UserDetailsService {
         return new UserDetailsDTO(user.getOid(), user.getName(), user.getEmail(), user.getUsername(), user.getPassword(), user.getRole(), roles);
     }
 
-//        public UserDetailsDTO loadUserByOid (String oid) {
-//            Optional<User> user = userRepository.findById(oid);
-//            if (user == null) {
-//                throw new UsernameNotFoundException("Username or Password is incorrect.");
-//            }
-//            List<GrantedAuthority> roles = new ArrayList<>();
-//            GrantedAuthority grantedAuthority = new GrantedAuthority() {
-//                @Override
-//                public String getAuthority() {
-//                    return user.get().getRole();
-//                }
-//            };
-//            roles.add(grantedAuthority);
-//            return new UserDetailsDTO(user.get().getOid(), user.get().getName(), user.get().getEmail(), user.get().getUsername(), user.get().getPassword(), user.get().getRole(), roles);
-//        }
+        public UserDetailsDTO loadUserByOid (String oid) {
+            Optional<User> user = userRepository.findById(oid);
+            if (user == null) {
+                throw new UsernameNotFoundException("Username or Password is incorrect.");
+            }
+            List<GrantedAuthority> roles = new ArrayList<>();
+            GrantedAuthority grantedAuthority = new GrantedAuthority() {
+                @Override
+                public String getAuthority() {
+                    return user.get().getRole();
+                }
+            };
+            roles.add(grantedAuthority);
+            return new UserDetailsDTO(user.get().getOid(), user.get().getName(), user.get().getEmail(), user.get().getUsername(), user.get().getPassword(), user.get().getRole(), roles);
+        }
 }

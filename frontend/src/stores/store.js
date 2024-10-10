@@ -143,9 +143,9 @@ export const BoardStore = defineStore("BoardStore", {
         );
         if (data && Array.isArray(data)) {
           this.board = data; // อัปเดต array ของบอร์ด
+
           // this.visibility = data.visibility;
-          console.log(data[0].visibility);
-          this.visibility = data[0].visibility;
+          // this.visibility = data[0].visibility;
         } else {
           toast.error("Failed to fetch Board or invalid data received.");
         }
@@ -154,6 +154,7 @@ export const BoardStore = defineStore("BoardStore", {
         toast.error("An error occurred while fetching boards.");
       }
     },
+
     async fetchBoardById(id) {
       try {
         const data = await getItems(
@@ -161,7 +162,6 @@ export const BoardStore = defineStore("BoardStore", {
           token
         );
         if (data) {
-
           return data;
         } else {
           toast.error("Failed to fetch Board or invalid data received.");

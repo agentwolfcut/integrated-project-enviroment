@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { deleteItemById, getItems } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
-import TaskDetail from '@/components/TaskDetail.vue'
+import TaskDetail from "@/components/TaskDetail.vue";
 import HeaderIT from "@/components/Header.vue";
 import SideBar from "@/components/SideBar.vue";
 import router from "@/router";
@@ -20,12 +20,13 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import {BoardStore} from '@/stores/Store.js'
+import { BoardStore } from "@/stores/Store.js";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();
 const taskStore = useTaskStore();
 const statusStore = useStatusStore();
-const boardStore = BoardStore()
+const boardStore = BoardStore();
 const route = useRoute();
 const taskMan = ref(new TaskManagement());
 const showModalDetail = ref(false);
@@ -55,22 +56,32 @@ const props = defineProps({
     required: true,
   },
 });
-
 const boardIdRoute = route.params.boardID;
+const boardPermissionStore = useBoardPermissionStore();
+const visibilitys = ref("PRIVATE");
 
 onMounted(async () => {
-  try {
-    await taskStore.fetchTask(boardIdRoute);
-    const tasks = taskStore.tasks;
-    taskMan.value.addtasks(tasks);
-    sortedTasks.value = taskMan.value.gettasks();
-    // status
-    await statusStore.fetchStatus(boardIdRoute);
-    statuses.value = statusStore.statuses;
-    statusFilter.value = statuses.value.map((status) => status.name);
-    console.log(statusFilter.value);
-  } catch (error) {
-    console.error(error);
+  await boardPermissionStore.fetchBoardById(boardIdRoute);
+  if (!boardPermissionStore.hasAccess) {
+    toast.error(
+      "Access denied. You do not have permission to view this board."
+    );
+    router.push("/test"); // Redirect if no permission
+  } else {
+    visibilitys.value = boardPermissionStore.boardDetails.visibility;
+    try {
+      await taskStore.fetchTask(boardIdRoute);
+      const tasks = taskStore.tasks;
+      taskMan.value.addtasks(tasks);
+      sortedTasks.value = taskMan.value.gettasks();
+      // status
+      await statusStore.fetchStatus(boardIdRoute);
+      statuses.value = statusStore.statuses;
+      statusFilter.value = statuses.value.map((status) => status.name);
+      console.log(statusFilter.value);
+    } catch (error) {
+      console.error(error);
+    }
   }
 });
 
@@ -294,25 +305,35 @@ const toggleSortOrder = () => {
 // const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
 // const isPrivate = ref(localStorage.getItem("isPrivate") === "true");
 const showModalVis = ref(false);
-const visibilityStore = useVisibilityStore()
-const visibility = ref(visibilityStore.visibility)
+const visibilityStore = useVisibilityStore();
+const visibility = ref(visibilityStore.visibility);
+const newVisibility = ref("");
 
-const newVisibility = ref('')
-
-const toggleVisibility = () => {
+const toggleVisibility = async () => {
   console.log(`from store ${boardStore.getVisibility}`);
   console.log(`old is ${visibility.value}`);
-  newVisibility.value = visibility.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-
-  console.log(`new is ${newVisibility.value}`);
+  if (!boardPermissionStore.isOwner) {
+    toast.error("You do not have permission to change visibility.");
+    return;
+  }
+  // newVisibility.value = visibility.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+  // console.log(`new is ${newVisibility.value}`);
+  // showModalVis.value = true;
+  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+  console.log(`new is ${newVisibility}`);
   showModalVis.value = true;
 };
 
-const confirmChange = () => {
-  visibilityStore.updateVisibility(newVisibility.value , boardIdRoute);
+const confirmChange = async () => {
+  try {
+    await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
+    visibilitys.value = newVisibility; // Update the local state
+  } catch (error) {
+    toast.error("Failed to update visibility.");
+  }
+  // visibilityStore.updateVisibility(newVisibility.value, boardIdRoute);
   showModalVis.value = false;
 };
-
 </script>
 
 <template>

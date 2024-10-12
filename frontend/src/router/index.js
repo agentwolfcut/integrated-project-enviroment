@@ -10,12 +10,9 @@ import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
-import { BoardStore} from  '@/stores/Store.js'
-import { useToast } from "vue-toast-notification";
 import AccesDeny from "@/views/AccesDeny.vue";
 
 
-const toast = useToast();
 // set history of stor path when visit
 const history = createWebHistory(import.meta.env.BASE_URL);
 // give roue paths
@@ -63,22 +60,7 @@ const routes = [
         name: "EditTask",
         props: true,
       },
-    ],
-    beforeEach: async (to, from, next) => {
-      // Check if the boardID exists
-      // You can replace this with your own logic to check if the boardID exists
-      const boardID = to.params.boardID;
-      const boardStore = BoardStore();
-      console.log(`beforeEnter ${boardID}`);
-
-      const board = await boardStore.getBoardById(boardID);
-      if (!board) {
-        toast.error(`Board  with ID ${boardID} does not exist`);
-        next({ path: "/board" });
-      } else {
-        next();
-      }
-    },
+    ]
   },
 
   {
@@ -100,27 +82,5 @@ const router = createRouter({
   history,
   routes,
   linkActiveClass: "text-blue-300",
-});
-
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
-  if (!token && to.path !== "/login") {
-    next("/login");
-  } else {
-    next();
-  }
-});
-
-// router.beforeEach(async (to, from, next) => {
-//   const authStore = AuthUserStore();
-//   const accessToken = localStorage.getItem("accessToken");
-
-//   if (!accessToken && to.path !== "/login") {
-//     next("/login");
-//   } else {
-//     await authStore.checkTokenValidity(); // ตรวจสอบและรีเฟรช token
-//     next();
-//   }
-// });
-
+})
 export default router;

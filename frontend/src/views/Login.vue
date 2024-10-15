@@ -2,14 +2,13 @@
 import router from "@/router";
 import { computed, ref } from "vue";
 import VueJwtDecode from "vue-jwt-decode";
-import { AuthUserStore , BoardStore } from '@/stores/Store.js'
+import { AuthUserStore, BoardStore } from "@/stores/Store.js";
 
 const usrpw = ref({ username: "", password: "" });
 const error = ref(false);
 const complete = ref(false);
 const classNotify = ref("");
 const textNotify = ref("");
-let token = "";
 const authUserStore = AuthUserStore();
 const boardStore = BoardStore();
 const current_user = ref(null);
@@ -30,12 +29,12 @@ const inputUsrpw = async () => {
 
     if (res.ok) {
       const data = await res.json();
-      const refresh_token = 'xxxx'
-      authUserStore.setTokens(data.access_token , refresh_token);
-      // token = data.access_token;
-      // localStorage.setItem("token", token);
+      const refresh_token = "xxxx";
+      authUserStore.setTokens(data.access_token, refresh_token);
       decode();
-        router.push("/board");
+      router.push("/board");
+      console.log(`current user is ${authUserStore.currentUser}`);
+      
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("username or Password is incorrect.");
@@ -52,9 +51,7 @@ const inputUsrpw = async () => {
 };
 
 const decode = () => {
-  // Take token from window local storage
-  const token = authUserStore.token
-  
+  const token = authUserStore.token;
   try {
     let decoded = VueJwtDecode.decode(token);
     current_user.value = decoded.name; // Store the decoded token

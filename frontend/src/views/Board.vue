@@ -4,7 +4,7 @@ import HeaderIT from "@/components/Header.vue";
 import { onMounted, computed } from "vue";
 import buttonSlot from "@/components/Button.vue";
 import "vue-toast-notification/dist/theme-sugar.css";
-import { BoardStore } from "@/stores/Store.js";
+import { BoardStore , AuthUserStore } from "@/stores/Store.js";
 import router from "@/router";
 
 const boardStore = BoardStore();

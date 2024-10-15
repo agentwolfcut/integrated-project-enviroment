@@ -20,7 +20,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import { BoardStore } from "@/stores/Store.js";
+import { BoardStore , AuthUserStore} from "@/stores/Store.js";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();
@@ -63,6 +63,8 @@ const visibilitys = ref("PRIVATE");
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(boardIdRoute);
   if (!boardPermissionStore.hasAccess) {
+    console.log(boardPermissionStore.hasAccess);
+    
     toast.error(
       "Access denied. You do not have permission to view this board."
     );

@@ -17,7 +17,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     // token: null,
     token: null,
     refreshToken: null,
-    currentUser: null,
+    currentUser: null, // String
   }),
 
   actions: {
@@ -30,6 +30,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
     setUser(user) {
       this.currentUser = user;
+      localStorage.setItem('currentUser' , user)
     },
 
     clearTokens() {
@@ -43,19 +44,18 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       const token = localStorage.getItem("token");
       const refreshToken = localStorage.getItem("refreshToken");
 
+      console.log(token);
+      
       if (!token || !refreshToken) {
         this.clearTokens();
-        router.push("/login");
+        router.push("/login");        
         return;
       }
 
       try {
         // mockup
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/validate-token`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          `${import.meta.env.VITE_BASE_URL}/validate-token`,{headers: { Authorization: `Bearer ${token}` }, }
         );
 
         if (res.status === 200) {

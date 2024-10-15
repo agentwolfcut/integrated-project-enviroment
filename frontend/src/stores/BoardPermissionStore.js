@@ -75,7 +75,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ visibility: newVisibility }),
+            body:  `"visibility" : "${newVisibility}"` 
           }
         );
         if (res.ok) {

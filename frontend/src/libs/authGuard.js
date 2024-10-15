@@ -8,11 +8,11 @@ export async function checkBoardAccess(to, from, next) {
   const toast = useToast();
 
   if (!token) {
-    toast.error("You need to log in to access this page.");
-    next("/login"); // Redirect to login if user is not authenticated
+    toast.warning("You are guest user");
+    next("/test"); // Redirect to login if user is not authenticated
   } else {
     const boardID = to.params.boardID;
-    await boardPermStore.fetchBoardById(boardID);
+    await boardPermStore.fetchBoardById(`/boards/${boardID}`);
 
     const { hasAccess, isOwner } = boardPermStore;
     if (hasAccess || isOwner) {

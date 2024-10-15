@@ -20,7 +20,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import { BoardStore , AuthUserStore} from "@/stores/Store.js";
+import { BoardStore, AuthUserStore } from "@/stores/Store.js";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();
@@ -61,10 +61,10 @@ const boardPermissionStore = useBoardPermissionStore();
 const visibilitys = ref("PRIVATE");
 
 onMounted(async () => {
-  await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}` , "GET");
+  await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
     console.log(boardPermissionStore.hasAccess);
-    
+
     toast.error(
       "Access denied. You do not have permission to view this board."
     );
@@ -86,24 +86,6 @@ onMounted(async () => {
     }
   }
 });
-
-const errorNotify = () => {
-  error.value = true;
-  classNotify.value = "bg-red-500";
-  textNotify.value = `An error has occurred, the task does not exist.`;
-  setTimeout(() => {
-    error.value = false;
-  }, 1000);
-};
-
-const completeNotify = (task, action) => {
-  complete.value = true;
-  classNotify.value = "bg-green-600";
-  textNotify.value = `The task ${task} has been successfully ${action}.`;
-  setTimeout(() => {
-    complete.value = false;
-  }, 1500);
-};
 
 const openDetails = async (id) => {
   try {
@@ -175,12 +157,12 @@ const deleteTask = async (removeId) => {
     token
   );
   if (removeTask === 200) {
-    completeNotify(removeId, "deleted");
+    toast.success(`The task ${removeId} has been successfully deleted`);
     sortedTasks.value = taskMan.value.gettasks();
     sortMode.value = "default";
     taskMan.value.removetask(removeId);
   } else {
-    errorNotify();
+    toast.error("An error has occurred, the task does not exist.");
   }
 };
 
@@ -233,7 +215,9 @@ const editTask = async (editedTask) => {
     taskMan.value.updatetask(res);
     sortedTasks.value = taskMan.value.gettasks();
     router.back();
-    completeNotify(selectTask.value.title, "updated");
+    toast.success(
+      `The task ${selectTask.value.title} has been successfully updated`
+    );
 
     // รีเซ็ต selectTask
     selectTask.value = {
@@ -243,8 +227,7 @@ const editTask = async (editedTask) => {
       statusId: "",
     };
   } catch (error) {
-    console.error("Error editing task:", error);
-    errorNotify();
+    toast.error(error);
   }
 };
 
@@ -259,7 +242,7 @@ const cancelHandle = () => {
 };
 
 const handelFail = () => {
-  errorNotify();
+  toast.error("this is error");
 };
 
 // Filter
@@ -304,7 +287,7 @@ const toggleSortOrder = () => {
 };
 
 // visibility
-// const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
+const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
 // const isPrivate = ref(localStorage.getItem("isPrivate") === "true");
 const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
@@ -312,28 +295,23 @@ const visibility = ref(visibilityStore.visibility);
 const newVisibility = ref("");
 
 const toggleVisibility = async () => {
-  console.log(`from store ${boardStore.getVisibility}`);
-  console.log(`old is ${visibility.value}`);
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
     return;
   }
-  // newVisibility.value = visibility.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  // console.log(`new is ${newVisibility.value}`);
-  // showModalVis.value = true;
-  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  console.log(`new is ${newVisibility}`);
+
   showModalVis.value = true;
 };
 
-const confirmChange = async () => {
+const confirmChange = async () => { 
+  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+  console.log(`new is ${newVisibility}`);   
   try {
     await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
     visibilitys.value = newVisibility; // Update the local state
   } catch (error) {
     toast.error("Failed to update visibility.");
   }
-  // visibilityStore.updateVisibility(newVisibility.value, boardIdRoute);
   showModalVis.value = false;
 };
 </script>
@@ -620,10 +598,9 @@ const confirmChange = async () => {
         >
         <p class="my-4 text-base font-medium overflow-y-auto">
           Do you want to change board visibility to
-          <span class="text-cyan-800 italic font-bold">{{
-            // isPrivate ? "Public" : "Private"
-            newVisibility
-          }}</span>
+          <span class="text-cyan-800 italic font-bold">
+            {{ isPrivate ? "Public" : "Private" }}</span
+          >
           ?
         </p>
         <div class="flex justify-end">

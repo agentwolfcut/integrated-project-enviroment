@@ -9,8 +9,8 @@ import EditStatus from "@/components/EditStatus.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
-import AccessDeny from "@/views/AccessDeny.vue";
-import { checkBoardAccess } from "@/utils/authGuard"; // Import the reusable function
+import AccessDeny from '@/views/AccesDeny.vue'
+import { checkBoardAccess } from "@/libs/authGuard.js"; // Import the reusable function
 
 const routes = [
   { path: "/", redirect: "/login" },

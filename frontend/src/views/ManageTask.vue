@@ -61,7 +61,7 @@ const boardPermissionStore = useBoardPermissionStore();
 const visibilitys = ref("PRIVATE");
 
 onMounted(async () => {
-  await boardPermissionStore.fetchBoardById(boardIdRoute);
+  await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}` , "GET");
   if (!boardPermissionStore.hasAccess) {
     console.log(boardPermissionStore.hasAccess);
     

@@ -14,46 +14,42 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
   }),
 
   actions: {
-    async fetchBoardById(boardID) {
+    async fetchBoardById(path, method) {
       const token = localStorage.getItem("token");
       const toast = useToast();
       const authStore = AuthUserStore(); // Initialize authStore correctly before using it
 
       const currentUser = authStore.currentUser; // Now we can access currentUser
-
       console.log(`currentUser is ${currentUser}`);
 
-      if (!currentUser) {
-        useToast().error("User is not authenticated");
-        router.push("/login"); // Redirect to login if user is not authenticated
-        return;
-      }
+      // if (!currentUser) {
+      //   useToast().error("User is not authenticated");
+      //   router.push("/login"); // Redirect to login if user is not authenticated
+      //   return;
+      // }
 
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/boards/${boardID}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
+          method: method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (res.ok) {
           const boardData = await res.json();
           this.boardDetails = boardData;
           // ตอนนี้ยังเป็นชื่อ รอเขียนฟังก์ชัน
-          const currentUserId = authStore.currentUser;
-
+          // const currentUserId = authStore.currentUser;
+          const currentUserId = "2b2f94fd-68be-4ff2-8c67-cb35e139f6fb"; // bypass OLARN
           this.isOwner = boardData.ownerID === currentUserId;
           console.log(`user id =  ${currentUserId}`); // edit
-          console.log(`boardData = ${boardData.ownerID}`);
-
+          console.log(`ownerid = ${boardData.ownerID}`);
           this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
           console.log(boardData.visibility);
         } else if (res.status === 401) {
           router.push("/login");
+          // real BE
         } else if (res.status === 403) {
           toast.error("You do not have permission to access this board.");
           router.push("/test");

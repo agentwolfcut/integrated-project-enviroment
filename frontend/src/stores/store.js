@@ -1,17 +1,17 @@
-import { createPinia, defineStore } from "pinia";
-import { get } from "@/libs/Utils";
-import { addItem, getItemById, getItems } from "@/libs/fetchUtils";
-import { useToast } from "vue-toast-notification";
-import "vue-toast-notification/dist/theme-sugar.css";
-import router from "@/router";
-import { useVisibilityStore } from "./VisibilityStore";
+import { createPinia, defineStore } from "pinia"
+import { get } from "@/libs/Utils"
+import { addItem, getItemById, getItems } from "@/libs/fetchUtils"
+import { useToast } from "vue-toast-notification"
+import "vue-toast-notification/dist/theme-sugar.css"
+import router from "@/router"
+import { useVisibilityStore } from "./VisibilityStore"
 
-const toast = useToast();
-const token = localStorage.getItem("token");
+const toast = useToast()
+const token = localStorage.getItem("token")
 
 // interface ขึ้นกับ res ของpostman
 
-export const pinia = createPinia();
+export const pinia = createPinia()
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
     // token: null,
@@ -22,66 +22,67 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
   actions: {
     setTokens(token, refreshToken) {
-      this.token = token;
-      this.refreshToken = refreshToken;
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
+      this.token = token
+      this.refreshToken = refreshToken
+      localStorage.setItem("token", token)
+      localStorage.setItem("refreshToken", refreshToken)
     },
 
     setUser(user) {
-      this.currentUser = user;
-      localStorage.setItem('currentUser' , user)
+      this.currentUser = user
+      localStorage.setItem("currentUser", user)
     },
 
     clearTokens() {
-      this.token = null;
-      this.refreshToken = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      this.token = null
+      this.refreshToken = null
+      localStorage.removeItem("token")
+      localStorage.removeItem("refreshToken")
     },
 
     async checkTokenValidity() {
-      const token = localStorage.getItem("token");
-      const refreshToken = localStorage.getItem("refreshToken");
+      const token = localStorage.getItem("token")
+      const refreshToken = localStorage.getItem("refreshToken")
 
-      console.log(token);
-      
+      console.log(token)
+
       if (!token || !refreshToken) {
-        this.clearTokens();
-        router.push("/login");        
-        return;
+        this.clearTokens()
+        router.push("/login")
+        return
       }
 
       try {
         // mockup
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/validate-token`,{headers: { Authorization: `Bearer ${token}` }, }
-        );
+          `${import.meta.env.VITE_BASE_URL}/validate-token`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
 
         if (res.status === 200) {
           // Token ยัง valid
-          return;
+          return
         } else if (res.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
-          await this.refreshtoken();
+          await this.refreshtoken()
         } else {
-          this.clearTokens();
-          router.push("/login");
+          this.clearTokens()
+          router.push("/login")
         }
       } catch (error) {
-        console.error("Error checking token validity:", error);
-        this.clearTokens();
-        router.push("/login");
+        console.error("Error checking token validity:", error)
+        this.clearTokens()
+        router.push("/login")
       }
     },
 
     async refreshtoken() {
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = localStorage.getItem("refreshToken")
 
       if (!refreshToken) {
-        this.clearTokens();
-        router.push("/login");
-        return;
+        this.clearTokens()
+        router.push("/login")
+        return
       }
 
       try {
@@ -91,24 +92,52 @@ export const AuthUserStore = defineStore("AuthUserStore", {
             "Content-Type": "application/json",
             Authorization: `Bearer ${refreshToken}`,
           },
-        });
+        })
 
         if (res.status === 200) {
-          const { token } = await res.json();
-          this.setTokens(token, refreshToken);
+          const { token } = await res.json()
+          this.setTokens(token, refreshToken)
         } else if (res.status === 401) {
-          this.clearTokens();
-          router.push("/login");
+          this.clearTokens()
+          router.push("/login")
         } else {
-          toast.error("There is a problem. Please try again later.");
+          toast.error("There is a problem. Please try again later.")
         }
       } catch (error) {
-        console.error("Error refreshing access token:", error);
-        this.clearTokens();
+        console.error("Error refreshing access token:", error)
+        this.clearTokens()
       }
     },
+
+    async findCurrentUser(username) {
+      try {
+        const users = await getItems(`${import.meta.env.VITE_BASE_URL}/users`);
+        const normalizedUsername = username
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "."); 
+        console.log(`Looking for user: ${normalizedUsername}`);
+        console.log(users); // Log all users to ensure the response is as expected
+       
+        const userFound = users.find(
+          (item) => item.username.toLowerCase().trim().replace(/\s+/g, ".") === normalizedUsername
+        );
+        
+        if (userFound) {
+          console.log(`User found: ${userFound.username}, OID: ${userFound.oid}`);
+          this.currentUser = userFound.oid; // Store the oid of the matched user
+          return userFound.oid; // Return the oid
+        } else {
+          console.log("User not found");
+          return null;
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        return null;
+      }
+    }
   },
-});
+})
 
 export const BoardStore = defineStore("BoardStore", {
   state: () => ({
@@ -123,78 +152,78 @@ export const BoardStore = defineStore("BoardStore", {
     getBoards: (state) => state.board,
     getCurrentBoard: (state) => state.currentBoard,
     getid: (state) => (id) => {
-      return state.board.find((board) => board.id === id);
+      return state.board.find((board) => board.id === id)
     },
     getTasks: (state) => state.tasks, // Getter สำหรับดึง tasks ของบอร์ด
     getBoardById: (state) => (id) => {
-      return state.board.find((board) => board.id === id);
+      return state.board.find((board) => board.id === id)
     },
     getVisibility: (state) => state.visibility,
   },
   actions: {
     setCurrentBoardID(id) {
-      this.currentBoardId = id;
+      this.currentBoardId = id
     },
     async getBoard() {
       try {
         const data = await getItems(
           `${import.meta.env.VITE_BASE_URL}/boards`,
           token
-        );
+        )
         if (data && Array.isArray(data)) {
-          this.board = data; // อัปเดต array ของบอร์ด
+          this.board = data // อัปเดต array ของบอร์ด
 
-          // this.visibility = data.visibility;
-          // this.visibility = data[0].visibility;
+          // this.visibility = data.visibility
+          // this.visibility = data[0].visibility
         } else {
-          toast.error("Failed to fetch Board or invalid data received.");
+          toast.error("Failed to fetch Board or invalid data received.")
         }
       } catch (error) {
-        console.error("Error fetching boards:", error);
-        toast.error("An error occurred while fetching boards.");
+        console.error("Error fetching boards:", error)
+        toast.error("An error occurred while fetching boards.")
       }
     },
 
-    async fetchBoardById(id) {
-      try {
-        const data = await getItems(
-          `${import.meta.env.VITE_BASE_URL}/boards/${id}`,
-          token
-        );
-        if (data) {
-          return data;
-        } else {
-          toast.error("Failed to fetch Board or invalid data received.");
-          return null;
-        }
-      } catch (error) {
-        console.error("Error fetching board:", error);
-        toast.error("An error occurred while fetching the board");
-        return null;
-      }
-    }, // Action สำหรับดึงบอร์ดโดย ID
+    // async fetchBoardById(id) {
+    //   try {
+    //     const data = await getItems(
+    //       `${import.meta.env.VITE_BASE_URL}/boards/${id}`,
+    //       token
+    //     )
+    //     if (data) {
+    //       return data
+    //     } else {
+    //       toast.error("Failed to fetch Board or invalid data received.")
+    //       return null
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching board:", error)
+    //     toast.error("An error occurred while fetching the board")
+    //     return null
+    //   }
+    // }, // Action สำหรับดึงบอร์ดโดย ID
     async addBoard(name) {
       try {
         const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, {
           name: name,
-        });
+        })
         if (data.status < 200 || data.status >= 300) {
           if (data.status === 401) {
-            router.push("/login");
+            router.push("/login")
           } else {
-            toast.error("Failed to add Board");
+            toast.error("Failed to add Board")
           }
         } else {
-          toast.success("Board added successfully");
+          toast.success("Board added successfully")
           // เก็บ id จากการตอบกลับ
-          this.currentBoard = data; // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
-          this.id = data.id; // เก็บค่า id แยกไว้
-          this.board.push(data);
+          this.currentBoard = data // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
+          this.id = data.id // เก็บค่า id แยกไว้
+          this.board.push(data)
           // router.push(`board/${this.id}`)
         }
       } catch (error) {
-        console.error("Error adding board:", error);
-        toast.error("An error occurred while adding the board");
+        console.error("Error adding board:", error)
+        toast.error("An error occurred while adding the board")
       }
     },
     async addTask(taskData, id) {
@@ -203,18 +232,18 @@ export const BoardStore = defineStore("BoardStore", {
           `${import.meta.env.VITE_BASE_URL}/boards/${id}/tasks`,
           taskData,
           token
-        );
+        )
         if (data.status < 200 || data.status >= 300) {
-          toast.error("Failed to add Task");
+          toast.error("Failed to add Task")
         } else {
-          toast.success("Task added successfully");
+          toast.success("Task added successfully")
           // อัปเดต tasks ใน store ด้วย task ใหม่
-          this.tasks.push(data); // เพิ่ม task ใน array tasks
+          this.tasks.push(data) // เพิ่ม task ใน array tasks
         }
       } catch (error) {
-        console.error("Error adding task:", error);
-        toast.error("An error occurred while adding the task");
+        console.error("Error adding task:", error)
+        toast.error("An error occurred while adding the task")
       }
     },
   },
-});
+})

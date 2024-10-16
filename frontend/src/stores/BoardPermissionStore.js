@@ -1,10 +1,10 @@
-import { defineStore } from "pinia";
-import { useToast } from "vue-toast-notification";
-import router from "@/router";
-import { AuthUserStore } from "@/stores/Store.js";
+import { defineStore } from "pinia"
+import { useToast } from "vue-toast-notification"
+import router from "@/router"
+import { AuthUserStore } from "@/stores/Store.js"
 
-const token = localStorage.getItem("token");
-const toast = useToast();
+const token = localStorage.getItem("token")
+const toast = useToast()
 
 export const useBoardPermissionStore = defineStore("boardPermission", {
   state: () => ({
@@ -15,18 +15,9 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
 
   actions: {
     async fetchBoardById(path, method) {
-      const token = localStorage.getItem("token");
-      const toast = useToast();
-      const authStore = AuthUserStore(); // Initialize authStore correctly before using it
-
-      const currentUser = authStore.currentUser; // Now we can access currentUser
-      console.log(`currentUser is ${currentUser}`);
-
-      // if (!currentUser) {
-      //   useToast().error("User is not authenticated");
-      //   router.push("/login"); // Redirect to login if user is not authenticated
-      //   return;
-      // }
+      const token = localStorage.getItem("token")
+      const toast = useToast()
+      const authStore = AuthUserStore() // Initialize authStore correctly before using it
 
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
@@ -34,37 +25,35 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (res.ok) {
-          const boardData = await res.json();
-          this.boardDetails = boardData;
-          // ตอนนี้ยังเป็นชื่อ รอเขียนฟังก์ชัน
-          // const currentUserId = authStore.currentUser;
-          const currentUserId = "2b2f94fd-68be-4ff2-8c67-cb35e139f6fb"; // bypass OLARN
-          this.isOwner = boardData.ownerID === currentUserId;
-          console.log(`user id =  ${currentUserId}`); // edit
-          console.log(`ownerid = ${boardData.ownerID}`);
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
-          console.log(boardData.visibility);
+          const boardData = await res.json()
+          this.boardDetails = boardData
+          const currentUser = localStorage.getItem("currentUser")
+          const currentUserId = await authStore.findCurrentUser(currentUser)
+          this.isOwner = boardData.ownerID === currentUserId
+          console.log(`owner ${this.isOwner}`)
+          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC"
+          console.log(boardData.visibility);                
         } else if (res.status === 401) {
-          router.push("/login");
+          router.push("/login")
           // real BE
         } else if (res.status === 403) {
-          toast.error("You do not have permission to access this board.");
-          router.push("/test");
+          toast.error("You do not have permission to access this board.")
+          router.push("/test")
         } else {
-          toast.error("Failed to fetch board details.");
+          toast.error("Failed to fetch board details.")
         }
       } catch (error) {
-        console.error("Error fetching board details:", error);
-        toast.error("An error occurred while fetching board details.");
+        console.error("Error fetching board details:", error)
+        toast.error("An error occurred while fetching board details.")
       }
     },
 
     async updateVisibility(boardID, newVisibility) {
-      const token = localStorage.getItem("token");
-      const toast = useToast();
+      const token = localStorage.getItem("token")
+      const toast = useToast()
 
       try {
         const res = await fetch(
@@ -75,23 +64,23 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body:  `"visibility" : "${newVisibility}"` 
+            body: `"visibility" : "${newVisibility}"`,
           }
-        );
+        )
         if (res.ok) {
-          this.visibility = newVisibility;
-          toast.success(`Visibility updated to ${newVisibility}`);
+          this.visibility = newVisibility
+          toast.success(`Visibility updated to ${newVisibility}`)
         } else if (res.status === 401) {
-          router.push("/login");
+          router.push("/login")
         } else if (res.status === 403) {
-          toast.error("You do not have permission to change visibility.");
+          toast.error("You do not have permission to change visibility.")
         } else {
-          toast.error("There was a problem. Please try again later.");
+          toast.error("There was a problem. Please try again later.")
         }
       } catch (error) {
-        console.error("Error changing visibility:", error);
-        toast.error("An error occurred while changing visibility.");
+        console.error("Error changing visibility:", error)
+        toast.error("An error occurred while changing visibility.")
       }
     },
   },
-});
+})

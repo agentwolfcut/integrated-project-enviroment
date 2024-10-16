@@ -60,11 +60,12 @@ const boardIdRoute = route.params.boardID;
 const boardPermissionStore = useBoardPermissionStore();
 const visibilitys = ref("PRIVATE");
 
+const useAuthUserStore = AuthUserStore()
+
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
     console.log(boardPermissionStore.hasAccess);
-
     toast.error(
       "Access denied. You do not have permission to view this board."
     );
@@ -288,7 +289,6 @@ const toggleSortOrder = () => {
 
 // visibility
 const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
-// const isPrivate = ref(localStorage.getItem("isPrivate") === "true");
 const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
 const visibility = ref(visibilityStore.visibility);

@@ -63,6 +63,10 @@ CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`boards` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+ALTER TABLE `itbkk-kk3`.`boards`
+ADD COLUMN `isPublic` TINYINT(1) NOT NULL DEFAULT 0;
+
+
 
 
 -- -----------------------------------------------------
@@ -91,7 +95,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `itbkk-kk3`.`tasks`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `itbkk-kk3`.`tasks` ;
 
 CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`tasks` (
   `taskID` INT NOT NULL AUTO_INCREMENT,
@@ -99,12 +102,12 @@ CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`tasks` (
   `taskDescription` VARCHAR(500) NULL DEFAULT NULL,
   `taskStatus` INT NOT NULL,
   `boardID` CHAR(10) NOT NULL,
-  `createdOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `createdOn` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedOn` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `taskAssignees` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`taskID`),
-  INDEX `taskStatus` (`taskStatus` ASC) VISIBLE,
-  INDEX `boardID` (`boardID` ASC) VISIBLE,
+  INDEX (`taskStatus`),
+  INDEX (`boardID`),
   CONSTRAINT `tasks_ibfk_1`
     FOREIGN KEY (`taskStatus`)
     REFERENCES `itbkk-kk3`.`statuses` (`statusID`),

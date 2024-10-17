@@ -17,8 +17,10 @@ const setCurrentBoardId = (id) => {
 onMounted(async () => {
   await boardStore.getBoard();
   if (boardStore.getBoards.length > 0) {
-    const boardId = boardStore.getBoards[0].id;
-    // router.push(`/board/${boardId}`);
+    const boardId = boardStore.getBoards[0].id
+    setTimeout(()=>{
+      router.push(`/board/${boardId}`)
+    } , 700)
   }
 });
 

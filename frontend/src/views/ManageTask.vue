@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref , computed} from "vue";
 import { deleteItemById, getItems } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "@/components/TaskDetail.vue";
@@ -12,8 +12,7 @@ import Edit from "@/assets/icons/CiEditPencil01.vue";
 import SortDown from "@/assets/icons/SortDown.vue";
 import SortUp from "@/assets/icons/SortUp.vue";
 import SortDefault from "@/assets/icons/SortDefault.vue";
-import { get, put } from "@/libs/Utils";
-// import Toaster from "@meforma/vue-toaster/src/Toaster.vue";
+import { put } from "@/libs/Utils";
 import { useToast } from "vue-toast-notification";
 import { useRoute, useRouter } from "vue-router";
 import { useTaskStore } from "@/stores/TaskStore.js";
@@ -58,9 +57,8 @@ const props = defineProps({
 });
 const boardIdRoute = route.params.boardID;
 const boardPermissionStore = useBoardPermissionStore();
-const visibilitys = ref("PRIVATE");
-
-const useAuthUserStore = AuthUserStore()
+const visibilitys = ref('')
+const useAuthUserStore = AuthUserStore();
 
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
@@ -68,10 +66,11 @@ onMounted(async () => {
     console.log(boardPermissionStore.hasAccess);
     toast.error(
       "Access denied. You do not have permission to view this board."
-    );
+    )
+    
     router.push("/test"); // Redirect if no permission
   } else {
-    visibilitys.value = boardPermissionStore.boardDetails.visibility;
+    visibilitys.value = boardPermissionStore.boardDetails.visibility    
     try {
       await taskStore.fetchTask(boardIdRoute);
       const tasks = taskStore.tasks;
@@ -81,7 +80,6 @@ onMounted(async () => {
       await statusStore.fetchStatus(boardIdRoute);
       statuses.value = statusStore.statuses;
       statusFilter.value = statuses.value.map((status) => status.name);
-      console.log(statusFilter.value);
     } catch (error) {
       console.error(error);
     }
@@ -194,22 +192,6 @@ const editTask = async (editedTask) => {
       selectTask.value,
       token
     );
-    //   {
-    //     method: "PUT",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(selectTask.value),
-    //   }
-    // );
-
-    // if (!res.ok) {
-    //   router.back();
-    //   throw new Error(
-    //     `Failed to update task. Server responded with status ${res.status}`
-    //   );
-    // }
 
     // const resJson = await res.json();
     console.log(res);
@@ -278,17 +260,16 @@ const toggleSortOrder = () => {
   sortalp.value = !sortalp.value;
   if (sortalp.value) {
     sortMode.value = "alp";
-    console.log(`sort mode = ${sortMode.value}`);
     sortTasksByStatusNamealp();
   } else {
     sortTasksByStatusNamerev();
     sortMode.value = "rev";
-    console.log(`sort mode = ${sortMode.value}`);
   }
 };
 
 // visibility
-const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
+// const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
+const isPrivate = computed(() => visibilitys.value === "PRIVATE");
 const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
 const visibility = ref(visibilityStore.visibility);
@@ -297,15 +278,16 @@ const newVisibility = ref("");
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
-    return;
-  }
+    return
+  }  
+  showModalVis.value = true
+  console.log(`visible is ${visibilitys.value} and isPrivate is ${isPrivate.value}`);
+      
+}
 
-  showModalVis.value = true;
-};
-
-const confirmChange = async () => { 
+const confirmChange = async () => {
   const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  console.log(`new is ${newVisibility}`);   
+  console.log(`new is ${newVisibility}`);
   try {
     await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
     visibilitys.value = newVisibility; // Update the local state
@@ -343,15 +325,6 @@ const confirmChange = async () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <!-- <label for="toggle" class="mr-3 font-semibold italic">
-                    {{ isPrivate ? "Private" : "Public" }}
-                  </label>
-                  <input
-                    type="checkbox"
-                    class="toggle border-slate-500 bg-slate-500 [--tglbg:white] checked:bg-cyan-500 checked:border-cyan-300"
-                    :checked="isPrivate"
-                    @click="showModalVis = !showModalVis"
-                  /> -->
                 </button>
 
                 <div class="flex flex-row">

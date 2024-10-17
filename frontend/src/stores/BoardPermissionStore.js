@@ -17,7 +17,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     async fetchBoardById(path, method) {
       const token = localStorage.getItem("token")
       const toast = useToast()
-      const authStore = AuthUserStore() // Initialize authStore correctly before using it
+      const authStore = AuthUserStore() 
 
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
@@ -33,9 +33,9 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const currentUser = localStorage.getItem("currentUser")
           const currentUserId = await authStore.findCurrentUser(currentUser)
           this.isOwner = boardData.ownerID === currentUserId
-          console.log(`owner ${this.isOwner}`)
           this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC"
-          console.log(boardData.visibility);                
+          this.visibility = boardData.visibility
+          
         } else if (res.status === 401) {
           router.push("/login")
           // real BE

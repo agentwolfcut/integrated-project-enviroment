@@ -10,7 +10,6 @@ const toast = useToast()
 const token = localStorage.getItem("token")
 
 // interface ขึ้นกับ res ของpostman
-
 export const pinia = createPinia()
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
@@ -43,9 +42,6 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     async checkTokenValidity() {
       const token = localStorage.getItem("token")
       const refreshToken = localStorage.getItem("refreshToken")
-
-      console.log(token)
-
       if (!token || !refreshToken) {
         this.clearTokens()
         router.push("/login")
@@ -116,19 +112,15 @@ export const AuthUserStore = defineStore("AuthUserStore", {
           .toLowerCase()
           .trim()
           .replace(/\s+/g, "."); 
-        console.log(`Looking for user: ${normalizedUsername}`);
-        console.log(users); // Log all users to ensure the response is as expected
-       
         const userFound = users.find(
           (item) => item.username.toLowerCase().trim().replace(/\s+/g, ".") === normalizedUsername
         );
         
         if (userFound) {
-          console.log(`User found: ${userFound.username}, OID: ${userFound.oid}`);
           this.currentUser = userFound.oid; // Store the oid of the matched user
           return userFound.oid; // Return the oid
         } else {
-          console.log("User not found");
+          toast.error('user not found')
           return null;
         }
       } catch (error) {
@@ -172,7 +164,6 @@ export const BoardStore = defineStore("BoardStore", {
         )
         if (data && Array.isArray(data)) {
           this.board = data // อัปเดต array ของบอร์ด
-
           // this.visibility = data.visibility
           // this.visibility = data[0].visibility
         } else {
@@ -219,7 +210,7 @@ export const BoardStore = defineStore("BoardStore", {
           this.currentBoard = data // บันทึกบอร์ดที่เพิ่มใหม่ใน currentBoard
           this.id = data.id // เก็บค่า id แยกไว้
           this.board.push(data)
-          // router.push(`board/${this.id}`)
+          router.push(`board/${this.id}`)
         }
       } catch (error) {
         console.error("Error adding board:", error)

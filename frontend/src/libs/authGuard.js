@@ -4,7 +4,6 @@ import router from "@/router";
 
 export async function checkBoardAccess(to, from, next) {
   const boardPermStore = useBoardPermissionStore();
-  const token = localStorage.getItem("token");
   const toast = useToast();
   const boardID = to.params.boardID;
 

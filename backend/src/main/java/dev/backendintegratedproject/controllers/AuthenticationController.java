@@ -26,7 +26,6 @@ public class AuthenticationController {
 
     @PostMapping("/token")
     public ResponseEntity<AccessTokenDTO> refreshToken(HttpServletRequest request) throws InvalidTokenException {
-
         String refreshToken = request.getHeader("Authorization");
 
         if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
@@ -34,7 +33,6 @@ public class AuthenticationController {
         } else {
             throw new InvalidTokenException("Refresh token is missing or malformed");
         }
-
         return ResponseEntity.ok(authenticationService.refreshAccessToken(refreshToken));
     }
 

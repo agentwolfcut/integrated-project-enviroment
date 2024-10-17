@@ -67,7 +67,7 @@ onMounted(async () => {
     toast.error(
       "Access denied. You do not have permission to view this board."
     )
-    
+
     router.push("/test"); // Redirect if no permission
   } else {
     visibilitys.value = boardPermissionStore.boardDetails.visibility    
@@ -274,6 +274,7 @@ const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
 const visibility = ref(visibilityStore.visibility);
 const newVisibility = ref("");
+const isOwner = boardPermissionStore.isOwner
 
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
@@ -452,6 +453,7 @@ const confirmChange = async () => {
                           <button
                             @click="editMode(task)"
                             class="itbkk-button-edit pr-2"
+                            :disabled="!isOwner || visibilitys === 'PUBLIC'"
                           >
                             <Edit />
                           </button>
@@ -462,6 +464,7 @@ const confirmChange = async () => {
                             (showDeleteModal = true), (taskToDelete = task)
                           "
                           class="itbkk-button-delete pr-1"
+                          :disabled="!isOwner || visibilitys === 'PUBLIC'"
                         >
                           <Trash />
                         </button>

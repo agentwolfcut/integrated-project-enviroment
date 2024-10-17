@@ -18,7 +18,6 @@ const inputUsrpw = async () => {
   try {
     authUserStore.clearTokens();
     boardStore.board = [];
-    // wait for agent api
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
       method: "POST",
       headers: {
@@ -29,12 +28,12 @@ const inputUsrpw = async () => {
 
     if (res.ok) {
       const data = await res.json();
-      const refresh_token = "xxxx";
-      authUserStore.setTokens(data.access_token, refresh_token);
+      authUserStore.setTokens(data.access_token, data.refresh_token);
       decode();
-      router.push("/board");
+      // Set automatic token refresh
+      authUserStore.scheduleTokenRefresh();
+      router.push("/board")
       console.log(`current user is ${authUserStore.currentUser}`);
-      
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("username or Password is incorrect.");

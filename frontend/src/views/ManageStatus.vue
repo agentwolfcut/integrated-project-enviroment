@@ -17,6 +17,7 @@ import VueJwtDecode from "vue-jwt-decode";
 import { createToaster } from "@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
 import { post, put } from "@/libs/Utils";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toaster = createToaster({
   /* options */
@@ -45,13 +46,15 @@ const boardIdRoute = route.params.boardID;
 const props = defineProps({
   boardID: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
+const visibilitys = ref("");
+const boardPermissionStore = useBoardPermissionStore();
+const isOwner = boardPermissionStore.isOwner;
 
 // GET
 onMounted(async () => {
-
   const statusRes = await getItems(
     `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses`,
     token
@@ -67,6 +70,9 @@ onMounted(async () => {
       currentUser.value = decoded.name;
     }
   }
+  visibilitys.value = boardPermissionStore.boardDetails.visibility;
+  console.log(visibilitys.value);
+  console.log(isOwner);
 });
 
 const statusList = ref(statusMan.value.getStatuses());
@@ -147,13 +153,16 @@ const addStatus = async () => {
 // DELETE
 const checkTasksBeforeDelete = async (status) => {
   console.log(status);
-  if (status.id === 'No Status' || status.name === "Done") {
+  if (status.id === "No Status" || status.name === "Done") {
     deleteDefault.value = true;
     setTimeout(() => {
       deleteDefault.value = false;
     }, 1000);
   } else {
-    const res = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`, token);
+    const res = await getItems(
+      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks`,
+      token
+    );
     tasks.value = { ...res };
     console.log(tasks.value);
 
@@ -236,7 +245,9 @@ const updateStatus = async (editStatus) => {
       }
     }
     const resJson = await put(
-      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses/${editingStatus.value.id}`,
+      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses/${
+        editingStatus.value.id
+      }`,
       editingStatus.value,
       token
     );
@@ -281,7 +292,11 @@ const handelFail = () => {
               <div class="flex justify-end mb-9">
                 <router-link :to="`/board/${boardIdRoute}`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="light" class="itbkk-manage-task">
+                    <buttonSlot
+                      size="sm"
+                      type="light"
+                      class="itbkk-manage-task"
+                    >
                       <template v-slot:title> TASK </template>
                     </buttonSlot>
                   </div>
@@ -298,16 +313,25 @@ const handelFail = () => {
               <div class="mt-7 overflow-x-auto rounded-2xl">
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
-                  <thead class="text-slate-50 text" style="background-color: #15161a">
+                  <thead
+                    class="text-slate-50 text"
+                    style="background-color: #15161a"
+                  >
                     <tr class="focus:outline-none h-16 text-base">
-                      <th class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left">
+                      <th
+                        class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
+                      >
                         Name
                       </th>
-                      <th class="p-3 text-base font-medium tracking-wide text-left">
+                      <th
+                        class="p-3 text-base font-medium tracking-wide text-left"
+                      >
                         Description
                       </th>
 
-                      <th class="p-3 w-2/12 text-base font-medium tracking-wide text-left">
+                      <th
+                        class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
+                      >
                         Action
                       </th>
                     </tr>
@@ -315,51 +339,80 @@ const handelFail = () => {
 
                   <!-- body content -->
                   <tbody class="container">
-                    <tr v-for="(status, index) in statusList" :key="index" :class="{ 'bg-slate-100': index % 2 === 0 }"
-                      class="itbkk-item h-16 box ease-in transition-colors">
+                    <tr
+                      v-for="(status, index) in statusList"
+                      :key="index"
+                      :class="{ 'bg-slate-100': index % 2 === 0 }"
+                      class="itbkk-item h-16 box ease-in transition-colors"
+                    >
                       <td class="min-w-60">
                         <div class="flex items-center pl-5">
                           <div class="flex flex-row justify-start">
-                            <p class="text-base font-medium leading-none text-gray-700 mr-4">
+                            <p
+                              class="text-base font-medium leading-none text-gray-700 mr-4"
+                            >
                               {{ index + 1 }}
                             </p>
                           </div>
 
-                          <div class="itbkk-status-name truncate text-base font-medium leading-none text-gray-700 mr-4">
+                          <div
+                            class="itbkk-status-name truncate text-base font-medium leading-none text-gray-700 mr-4"
+                          >
                             {{ status.name }}
                           </div>
                         </div>
                       </td>
 
                       <td class="">
-                        <div v-if="status.description"
-                          class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2">
+                        <div
+                          v-if="status.description"
+                          class="itbkk-status-description text-base truncate font-medium leading-none text-gray-700 mr-2"
+                        >
                           {{ status.description }}
                         </div>
-                        <div v-else
-                          class="itbkk-status-description text-base font-normal italic leading-none text-gray-400 mr-2">
+                        <div
+                          v-else
+                          class="itbkk-status-description text-base font-normal italic leading-none text-gray-400 mr-2"
+                        >
                           No description is provided
                         </div>
                       </td>
 
                       <td class="p-3">
-                        <div class="text-base font-medium leading-none text-gray-700 mr-2">
-                          <button class="itbkk-button-edit">
-                            <router-link class="itbkk-button-edit" :to="{
-                            name: 'EditStatus',
-                            params: { id: status.id },
-                          }">
-                            <button class="itbkk-button-edit pr-2" @click="openToEdit(status)">
-                              <Edit />
-                            </button>
-                          </router-link>
-                          </button>
-                          
+                        <div v-show="isOwner"
+                          class="text-base font-medium leading-none text-gray-700 mr-2"
+                        >
+                          <button
+                            class="itbkk-button-edit"
+                            :disabled="!isOwner"
+                            
+                          >
+                            <router-link
+                              class="itbkk-button-edit"
 
-                          <button class="pr-1 itbkk-button-delete" @click="
-                            (statusDelete = status),
-                            checkTasksBeforeDelete(status)
-                            ">
+                              :to="{
+                                name: 'EditStatus',
+                                params: { id: status.id },
+                              }"
+                            >
+                              <button
+                                class="itbkk-button-edit pr-2"
+                                @click="openToEdit(status)"
+                                                              :disabled="!isOwner"
+                              >
+                                <Edit />
+                              </button>
+                            </router-link>
+                          </button>
+
+                          <button
+                            class="pr-1 itbkk-button-delete"
+                            :disabled="!isOwner"
+                            @click="
+                              (statusDelete = status),
+                                checkTasksBeforeDelete(status)
+                            "
+                          >
                             <Trash />
                           </button>
                         </div>
@@ -373,25 +426,43 @@ const handelFail = () => {
         </div>
       </div>
 
-      <div v-show="error || complete" :class="[
-        'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
-        classNotify,
-      ]" v-text="textNotify"></div>
+      <div
+        v-show="error || complete"
+        :class="[
+          'itbkk-message absolute bottom-0 right-0 text-white font-semibold py-3 px-6 rounded-lg shadow-xl m-12',
+          classNotify,
+        ]"
+        v-text="textNotify"
+      ></div>
     </div>
   </div>
 
-  <router-view :status="editingStatus" @saveStatus="addStatus" @saveEdit="updateStatus" @cancelEdit="clearEdit"
-    @cancelAdd="clearEdit" @failEdit="handelFail" />
+  <router-view
+    :status="editingStatus"
+    @saveStatus="addStatus"
+    @saveEdit="updateStatus"
+    @cancelEdit="clearEdit"
+    @cancelAdd="clearEdit"
+    @failEdit="handelFail"
+  />
 
   <div v-if="deleteDefault">
-    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-      <div class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-3 relative w-1/3">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-3 relative w-1/3"
+      >
         <div class="m-1 flex justify-end">
           <button @click="deleteDefault = false" class="mb-2">
-            <LineMdCloseSmall class="bg-black text-white rounded-full w-5 h-5 hover:bg-gray-700" />
+            <LineMdCloseSmall
+              class="bg-black text-white rounded-full w-5 h-5 hover:bg-gray-700"
+            />
           </button>
         </div>
-        <div class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex">
+        <div
+          class="mb-5 text-xl font-medium overflow-y-auto justify-center items-center flex"
+        >
           <p>
             <span class="text-red-500">
               {{ statusDelete.name }}
@@ -404,19 +475,27 @@ const handelFail = () => {
   </div>
 
   <div v-if="confirmDelete">
-    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-      <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
         <div class="mb-4 text-base font-medium overflow-y-auto">
           <p>Do you want to delete the status "{{ statusDelete.name }}"?</p>
         </div>
 
         <div class="flex justify-end mt-4">
-          <button @click="confirmDelete = false"
-            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
+          <button
+            @click="confirmDelete = false"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
             Cancel
           </button>
-          <button @click="deleteStatus"
-            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900">
+          <button
+            @click="deleteStatus"
+            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
+          >
             Confirm
           </button>
         </div>
@@ -425,8 +504,12 @@ const handelFail = () => {
   </div>
 
   <div v-if="confirmTransfer">
-    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
-      <div class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
         <div class="mb-4 text-base font-medium overflow-y-auto">
           <p>
             There are
@@ -437,24 +520,35 @@ const handelFail = () => {
           </p>
         </div>
         <div>
-          <select v-model="destinationStatusId" class="w-full p-2 border rounded">
+          <select
+            v-model="destinationStatusId"
+            class="w-full p-2 border rounded"
+          >
             <option value="" selected disabled>
               Select destination status
             </option>
-            <option :disabled="statusDelete.name === status.name" v-for="status in statusList" :key="status.id"
-              :value="status.id">
+            <option
+              :disabled="statusDelete.name === status.name"
+              v-for="status in statusList"
+              :key="status.id"
+              :value="status.id"
+            >
               {{ status.name }}
             </option>
           </select>
         </div>
         <div class="flex justify-end mt-4">
-          <button @click="confirmTransfer = false"
-            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400">
+          <button
+            @click="confirmTransfer = false"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
             Cancel
           </button>
-          <button @click="transferAndDeleteStatus(destinationStatusId)"
+          <button
+            @click="transferAndDeleteStatus(destinationStatusId)"
             :disabled="hasTasksToTransfer && !destinationStatusId"
-            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900">
+            class="itbkk-button-confirm transition-all ease-in bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-900"
+          >
             Transfer and Delete
           </button>
         </div>
@@ -479,7 +573,6 @@ const handelFail = () => {
 
 .itbkk-manage-task:hover {
   background-color: #f1da7c;
-
 }
 
 table {
@@ -491,7 +584,7 @@ table {
   transition: opacity 0.6s ease;
 }
 
-.container:hover> :not(:hover) {
+.container:hover > :not(:hover) {
   opacity: 0.2;
 }
 </style>

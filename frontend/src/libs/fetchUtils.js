@@ -111,6 +111,32 @@ async function getTasksByStatus(url, id) {
   }
 }
 
+async function patchItem(url, id, patchData) {
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+      'Authorization' : 'Bearer ' + localStorage.getItem('token')
+    };
+    const res = await fetch(`${url}/${id}`, {
+      method: "PATCH", // PATCH request
+      headers: headers,
+      body: JSON.stringify({
+        ...patchData, // Send the data to patch
+      }),
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const patchedItem = await res.json(); // Parse the response
+    return patchedItem; // Return the patched item
+  } catch (error) {
+    console.log(`error: ${error}`);
+    throw error; // Re-throw the error to handle it in the calling function
+  }
+}
+
 // destructuring
 export {
   getItems,
@@ -120,4 +146,5 @@ export {
   editItem,
   getTasksByStatus,
   transferTasksAndDeleteStatus,
+  patchItem
 };

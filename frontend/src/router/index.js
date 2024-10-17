@@ -11,12 +11,12 @@ import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
 import AccessDeny from '@/views/AccesDeny.vue'
 import { checkBoardAccess } from "@/libs/authGuard.js"; // Import the reusable function
+import { AuthUserStore } from "@/stores/Store";
 
 const routes = [
   { path: "/", redirect: "/login" },
   { path: "/test", name: "AccessDeny", component: AccessDeny },
   { path: "/login", name: "Login", component: Login },
-
   {
     path: "/status",
     component: ManageStatus,
@@ -66,6 +66,19 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   linkActiveClass: "text-blue-300",
+})
+
+router.beforeEach(async (to, from, next) => {
+  const authUserStore = AuthUserStore();  // Initialize the store
+
+  await authUserStore.checkAccessToken();  // Check if the token is valid or refresh it
+
+  // If no access token and the user is not navigating to the login page, redirect to login
+  if (!authUserStore.token && to.path !== '/login') {
+    return next('/login');
+  }
+
+  next();  // Allow the navigation if the token is valid
 });
 
 export default router;

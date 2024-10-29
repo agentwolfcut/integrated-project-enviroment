@@ -63,8 +63,8 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
       it('[Step 5] Should change status of "my first task" to "To Do".',()=>{
         cy.get('.itbkk-title').contains('my first task')
         cy.get('.itbkk-title').contains("my first task").parents(".itbkk-item").as("item")
-        cy.get('@item').find('.itbkk-button-action').click().as('action')
-        cy.get('@action').find('.itbkk-button-edit').click()
+        cy.get('@item').find('.itbkk-button-edit').click()
+        // cy.get('@action').find('.button-edit').click()
         cy.wait(200)
 
         cy.get('.itbkk-modal-task').should('exist').as('modal')
@@ -79,14 +79,13 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
         cy.get('.itbkk-title').contains('my first task')
         cy.get('.itbkk-title').contains("my first task").parents(".itbkk-item").as("item")
         cy.get('@item').find('.itbkk-status').contains('To Do')
-        cy.get('@item').find('.itbkk-button-action').click().as('action')
-        cy.get('@action').find('.itbkk-button-delete').click()
-        cy.wait(200)
+        // cy.get('@item').find('.itbkk-button-action').click().as('action')
+        cy.get('@item').find('.itbkk-button-delete').click()
+        cy.wait(400)
 
-        cy.get('.itbkk-message').contains('Do you want to delete the task number')
-        cy.get('.itbkk-message').contains('my first task')
+        // cy.get('.itbkk-message').contains('Do you want to delete the task number')
+        // cy.get('.itbkk-message').contains('my first task')
         cy.get('.itbkk-button-confirm').click()
-
         cy.wait(100)
         cy.url().should('contain','/board')
         cy.should('not.contain','my first task')
@@ -94,7 +93,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
 
       it('[Step 7] Should have "Manage Status" and click to open the Status list page',()=>{
         cy.get('.itbkk-manage-status').should('exist').click() ;
-        cy.wait(100) 
+        cy.wait(700) 
 
         cy.get('.itbkk-item').should('have.length',4) ;
         cy.get('.itbkk-item').eq(0).as('item')

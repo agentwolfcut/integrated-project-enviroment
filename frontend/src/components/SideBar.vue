@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, inject, ref, onMounted } from 'vue'
+import { defineProps, ref, onMounted } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode';
 import buttonSlot from "./Button.vue";
 import router from "@/router";

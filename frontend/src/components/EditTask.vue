@@ -1,9 +1,7 @@
 <script setup>
 import router from '@/router';
 import { ref, onMounted, computed } from 'vue'
-import { getItems } from '../libs/fetchUtils';
-import Login from '@/views/Login.vue';
-
+import { getItems } from '../libs/fetchUtils'
 
 const emit = defineEmits(['saveEdit', 'cancelOpe', 'failEdit']); // Define the custom event
 const props = defineProps({
@@ -21,11 +19,7 @@ const props = defineProps({
     boardID: {
         type: String,
         required: true
-    },
-    taskId: {
-        type: String,
-        required: false,
-    },
+    }
 });
 
 const previousTask = ref({ ...props.task })

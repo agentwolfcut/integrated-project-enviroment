@@ -20,9 +20,16 @@ async function getItems(url) {
   }
 }
 
-async function getItemById(url, id) {
+async function getItemById(url) {
+  const headers = {
+    "Content-Type": "application/json",
+    'Authorization' : 'Bearer ' + localStorage.getItem('token')
+  }
   try {
-    const data = await fetch(`${url}/${id}`);
+    const data = await fetch(`${url}` , {
+      method: 'GET',
+      headers: headers,
+    })
     const item = await data.json();
     return item;
   } catch (error) {
@@ -111,14 +118,14 @@ async function getTasksByStatus(url, id) {
   }
 }
 
-async function patchItem(url, id, patchData) {
+async function patchItem(url, patchData) {
   try {
     const headers = {
       "Content-Type": "application/json",
       'Authorization' : 'Bearer ' + localStorage.getItem('token')
     };
-    const res = await fetch(`${url}/${id}`, {
-      method: "PATCH", // PATCH request
+    const res = await fetch(`${url}`, {
+      method: 'PATCH', // PATCH request
       headers: headers,
       body: JSON.stringify({
         ...patchData, // Send the data to patch
@@ -128,9 +135,8 @@ async function patchItem(url, id, patchData) {
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
-
     const patchedItem = await res.json(); // Parse the response
-    return patchedItem; // Return the patched item
+    return patchedItem // Return the patched item
   } catch (error) {
     console.log(`error: ${error}`);
     throw error; // Re-throw the error to handle it in the calling function

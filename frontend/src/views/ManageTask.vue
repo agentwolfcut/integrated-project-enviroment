@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref , computed} from "vue";
-import { deleteItemById, getItems } from "../libs/fetchUtils";
+import { onMounted, ref, computed } from "vue";
+import { deleteItemById, getItemById, getItems, patchItem } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "@/components/TaskDetail.vue";
 import HeaderIT from "@/components/Header.vue";
@@ -57,7 +57,7 @@ const props = defineProps({
 });
 const boardIdRoute = route.params.boardID;
 const boardPermissionStore = useBoardPermissionStore();
-const visibilitys = ref('')
+const visibilitys = ref("");
 const useAuthUserStore = AuthUserStore();
 
 onMounted(async () => {
@@ -66,11 +66,11 @@ onMounted(async () => {
     console.log(boardPermissionStore.hasAccess);
     toast.error(
       "Access denied. You do not have permission to view this board."
-    )
+    );
 
     router.push("/test"); // Redirect if no permission
   } else {
-    visibilitys.value = boardPermissionStore.boardDetails.visibility    
+    visibilitys.value = boardPermissionStore.boardDetails.visibility;
     try {
       await taskStore.fetchTask(boardIdRoute);
       const tasks = taskStore.tasks;
@@ -88,12 +88,14 @@ onMounted(async () => {
 
 const openDetails = async (id) => {
   try {
-    const task = await taskStore.getTaskById(id, boardIdRoute);
+    // const task = await taskStore.getTaskById(id,boardIdRoute)
+    const task = await getItemById(
+      `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/tasks/${id}`
+    );
     selectTask.value = task;
     showModalDetail.value = true;
   } catch (error) {
-    console.error("Error fetching item details:", error);
-    // Handle error appropriately
+    toast.error(error);
   }
 };
 
@@ -271,32 +273,32 @@ const toggleSortOrder = () => {
 // const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
 const isPrivate = computed(() => visibilitys.value === "PRIVATE");
 const showModalVis = ref(false);
-const visibilityStore = useVisibilityStore();
-const visibility = ref(visibilityStore.visibility);
-const newVisibility = ref("");
-const isOwner = boardPermissionStore.isOwner
+const visibilityStore = useVisibilityStore()
+const isOwner = boardPermissionStore.isOwner;
 
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
-    return
-  }  
-  showModalVis.value = true
-  console.log(`visible is ${visibilitys.value} and isPrivate is ${isPrivate.value}`);
-      
+    return;
+  }
+  showModalVis.value = true;
+  console.log(
+    `visible is ${visibilitys.value} and isPrivate is ${isPrivate.value}`
+  )
 }
 
 const confirmChange = async () => {
-  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  console.log(`new is ${newVisibility}`);
+  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE"
+  const patchData = {visibility :  newVisibility}
   try {
-    await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
+    // await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility)
+    await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}` , patchData )
     visibilitys.value = newVisibility; // Update the local state
   } catch (error) {
     toast.error("Failed to update visibility.");
   }
-  showModalVis.value = false;
-};
+  showModalVis.value = false
+}
 </script>
 
 <template>

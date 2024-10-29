@@ -32,7 +32,7 @@ public class BackendIntegratedProjectApplication {
 			public void addCorsMappings(CorsRegistry reg) {
 				reg.addMapping("/**")
 						.allowedOrigins("http://localhost:5173", "ip23kk3@sit.kmutt.ac.th" , "http://intproj23.sit.kmutt.ac.th")
-						.allowedMethods("GET", "POST", "PUT", "DELETE")
+						.allowedMethods("GET", "POST", "PUT", "DELETE" , "PATCH")
 						.allowedHeaders("*")
 						.allowCredentials(true);
 			}

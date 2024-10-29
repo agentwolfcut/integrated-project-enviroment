@@ -36,7 +36,7 @@ export const useTaskStore = defineStore("tasks", {
         task.status = task.status.name
         this.tasks.push(task)
       }
-      return  task;
+      return task;
     },
     async updateTask(task, boardId) {
       try {

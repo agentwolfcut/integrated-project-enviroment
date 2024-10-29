@@ -86,12 +86,9 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     // },
     async updateVisibility(boardID, newVisibility) {
       const toast = useToast();
-    
       try {
         const patchData = { visibility: newVisibility }; // Set the data to be patched
-    
         const patchedItem = await patchItem(`${import.meta.env.VITE_BASE_URL}/boards`, boardID, patchData);
-    
         if (patchedItem) {
           this.visibility = newVisibility; // Update local visibility
           toast.success(`Visibility updated to ${newVisibility}`);

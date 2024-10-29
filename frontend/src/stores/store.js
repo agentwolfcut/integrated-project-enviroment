@@ -119,7 +119,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       const storedExpiry = localStorage.getItem('tokenExpiry');
 
       if (!storedAccessToken || !storedExpiry || Date.now() > storedExpiry) {
-        await refreshTokens(); // Try refreshing the token
+        await refreshTokens() // Try refreshing the token
       } else {
         this.accessToken = storedAccessToken;
         this.tokenExpiry = storedExpiry;

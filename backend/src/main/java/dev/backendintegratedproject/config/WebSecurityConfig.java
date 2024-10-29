@@ -23,8 +23,6 @@ public class WebSecurityConfig {
     @Autowired
     private JwtAuthenticFilter jwtAuthenticFilter;
 
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable());
@@ -50,7 +48,6 @@ public class WebSecurityConfig {
             response.setContentType("application/json");
             String message = authException.getMessage();
             response.getWriter().write("{\"message\":\"" + message + "\"}");
-
         });
     }
 

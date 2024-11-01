@@ -291,8 +291,8 @@ const confirmChange = async () => {
   const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE"
   const patchData = {visibility :  newVisibility}
   try {
-    // await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility)
-    await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}` , patchData )
+    await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility)
+    // await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}` , patchData )
     visibilitys.value = newVisibility; // Update the local state
   } catch (error) {
     toast.error("Failed to update visibility.");

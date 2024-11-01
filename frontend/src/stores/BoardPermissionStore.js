@@ -29,7 +29,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
         })
 
         if (res.ok) {
-          const boardData = await res.json()
+          const boardData = await res.json()          
           this.boardDetails = boardData
           const currentUser = localStorage.getItem("currentUser")
           const currentUserId = await authStore.findCurrentUser(currentUser)
@@ -88,7 +88,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
       const toast = useToast();
       try {
         const patchData = { visibility: newVisibility }; // Set the data to be patched
-        const patchedItem = await patchItem(`${import.meta.env.VITE_BASE_URL}/boards`, boardID, patchData);
+        const patchedItem = await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardID}`, patchData);
         if (patchedItem) {
           this.visibility = newVisibility; // Update local visibility
           toast.success(`Visibility updated to ${newVisibility}`);

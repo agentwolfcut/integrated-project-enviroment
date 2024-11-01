@@ -26,7 +26,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = {"http://ip23kk3.sit.kmutt.ac.th:80", "http://localhost:5173", "http://intproj23.sit.kmutt.ac.th" } , allowCredentials = "true" , allowedHeaders = "*")
+
+//@CrossOrigin(origins = {"http://ip23kk3.sit.kmutt.ac.th:80", "http://localhost:5173", "http://intproj23.sit.kmutt.ac.th" })
 public class BoardTaskController {
 
     @Autowired
@@ -155,6 +156,7 @@ public class BoardTaskController {
 
 
 
+    @CrossOrigin("*")
     @PatchMapping("/{boardID}")
     public void changeVisibility(@PathVariable String boardID, @RequestBody(required = false) VisibilityDTO visibility, Authentication authentication) {
         // Check if authentication is provided

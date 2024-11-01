@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", {
         if (data) {
           this.users = data;
         } else {
-          toast.error("Failed to fetch Users");
+          toast.error("Failed to fetch Users OR You're guest user");
         }
       } catch (error) {
         toast.error(`error from UserStore : ${error}`);

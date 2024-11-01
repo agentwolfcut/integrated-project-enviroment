@@ -1,16 +1,30 @@
+import { useToast } from "vue-toast-notification"
+import router from "@/router"
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore"
+
+const toast = useToast();
+
 // async task must wait , inside are promise
 async function getItems(url) {
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization' : 'Bearer ' + localStorage.getItem('token')
-    };
+    const token = localStorage.getItem('token')
+    let headers = {}
+    if (token) {
+      headers = {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      }
+    } else {
+      headers = {
+        "Content-Type": "application/json"
+      }
+    }
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: headers,
-    });
+    })
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status getitems from : ${response.status}`);
     }
     const items = await response.json();
     return items;
@@ -23,13 +37,13 @@ async function getItems(url) {
 async function getItemById(url) {
   const headers = {
     "Content-Type": "application/json",
-    'Authorization' : 'Bearer ' + localStorage.getItem('token')
-  }
+    Authorization: "Bearer " + localStorage.getItem("token"),
+  };
   try {
-    const data = await fetch(`${url}` , {
-      method: 'GET',
+    const data = await fetch(`${url}`, {
+      method: "GET",
       headers: headers,
-    })
+    });
     const item = await data.json();
     return item;
   } catch (error) {
@@ -37,12 +51,12 @@ async function getItemById(url) {
   }
 }
 
-async function deleteItemById(url, id ,token = null) {
+async function deleteItemById(url, id, token = null) {
   try {
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization' : 'Bearer ' + token
-    }
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE",
       headers: headers,
@@ -53,11 +67,11 @@ async function deleteItemById(url, id ,token = null) {
   }
 }
 
-async function transferTasksAndDeleteStatus(url, id, desId , token = null) {
+async function transferTasksAndDeleteStatus(url, id, desId, token = null) {
   try {
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization' : 'Bearer ' + token
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
     };
     const res = await fetch(`${url}/${id}/${desId}`, {
       method: "DELETE",
@@ -75,8 +89,8 @@ async function addItem(url, newItem) {
       method: "POST", // add
       headers: {
         "content-type": "application/json", // add contents
-        'Authorization' : 'Bearer ' + localStorage.getItem('token')
-      },      
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
       body: JSON.stringify({
         ...newItem, // sent add data . destructuring object
       }), // js to  json
@@ -89,13 +103,13 @@ async function addItem(url, newItem) {
 }
 
 async function editItem(url, id, editItem) {
-  const token = localStorage.getItem('token'); // เพิ่มการประกาศ token
+  const token = localStorage.getItem("token"); // เพิ่มการประกาศ token
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        'Authorization': 'Bearer ' + token
+        Authorization: "Bearer " + token,
       },
       body: JSON.stringify({
         ...editItem,
@@ -108,7 +122,8 @@ async function editItem(url, id, editItem) {
   }
 }
 
-async function getTasksByStatus(url, statusId) { // เพิ่ม statusId เป็นพารามิเตอร์
+async function getTasksByStatus(url, statusId) {
+  // เพิ่ม statusId เป็นพารามิเตอร์
   try {
     const res = await fetch(`${url}/${statusId}`);
     const allTasks = await res.json(); // เพิ่ม await
@@ -120,6 +135,7 @@ async function getTasksByStatus(url, statusId) { // เพิ่ม statusId เ
     console.log(`error: ${error}`);
   }
 }
+
 async function patchItem(url, patchData) {
   try {
     const headers = {
@@ -133,10 +149,14 @@ async function patchItem(url, patchData) {
       body: JSON.stringify(patchData), // Send the data directly
     });
     
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    if (res.ok) {
+      toast.success(`updated visibility successfully`)
+    } else if (res.status === 401) {
+      localStorage.removeItem('token')
+      router.push('/login')
+    } else if (res.status === 403) {
+      toast.error('You do not have permission to change board visibility mode')
     }
-
     // Only try to parse JSON if there is a response body
     const text = await res.text();
     return text ? JSON.parse(text) : null; // If empty, return null or handle accordingly
@@ -145,29 +165,6 @@ async function patchItem(url, patchData) {
     throw error; // Re-throw to handle in calling function
   }
 }
-// async function patchItem(url, patchData) {
-//   try {
-//     const headers = {
-//       "Content-Type": "application/json",
-//       'Authorization': 'Bearer ' + localStorage.getItem('token')
-//     };
-
-//     const res = await fetch(url, {
-//       method: 'PATCH', // PATCH request
-//       headers: headers,
-//       body: JSON.stringify(patchData), // Send the data directly
-//     });
-    
-//     if (!res.ok) {
-//       throw new Error(`HTTP error! status: ${res.status}`);
-//     }
-//     // Parse and return the response
-//     return await res.json();
-//   } catch (error) {
-//     console.error(`Error in patchItem: ${error}`);
-//     throw error; // Re-throw to handle in calling function
-//   }
-// }
 
 // destructuring
 export {
@@ -178,5 +175,5 @@ export {
   editItem,
   getTasksByStatus,
   transferTasksAndDeleteStatus,
-  patchItem
+  patchItem,
 };

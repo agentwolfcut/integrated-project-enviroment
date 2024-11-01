@@ -20,7 +20,7 @@ const route = useRouter();
           you do not have permission to view this page.
         </p>
         <div class="flex items-center mt-6 gap-x-3">
-          <button
+          <!-- <button
             @click="route.back()"
             class="flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700"
           >
@@ -40,10 +40,10 @@ const route = useRouter();
             </svg>
 
             <span>Go back</span>
-          </button>
+          </button> -->
 
           <button
-            @click="route.push('/board')"
+            @click="route.push('/login')"
             class="itbkk-button-back w-1/2 px-5 py-2 text-sm tracking-wide  transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto hover:bg-blue-600 dark:hover:bg-blue-500 dark:bg-blue-600"
           >
             Take me home

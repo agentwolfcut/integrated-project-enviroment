@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import { deleteItemById, getItemById, getItems, patchItem } from "../libs/fetchUtils";
+import { deleteItemById, getItemById } from "../libs/fetchUtils";
 import { TaskManagement } from "@/libs/TaskManagement";
 import TaskDetail from "@/components/TaskDetail.vue";
 import HeaderIT from "@/components/Header.vue";
@@ -289,11 +289,9 @@ const toggleVisibility = async () => {
 
 const confirmChange = async () => {
   const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE"
-  const patchData = {visibility :  newVisibility}
   try {
     await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility)
-    // await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}` , patchData )
-    visibilitys.value = newVisibility; // Update the local state
+    visibilitys.value = newVisibility; 
   } catch (error) {
     toast.error("Failed to update visibility.");
   }

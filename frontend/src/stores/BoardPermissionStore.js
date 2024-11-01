@@ -1,11 +1,11 @@
-import { defineStore } from "pinia"
-import { useToast } from "vue-toast-notification"
-import router from "@/router"
-import { AuthUserStore } from "@/stores/Store.js"
-import { patchItem } from "@/libs/fetchUtils"
+import { defineStore } from "pinia";
+import { useToast } from "vue-toast-notification";
+import router from "@/router";
+import { AuthUserStore } from "@/stores/Store.js";
+import { patchItem } from "@/libs/fetchUtils";
 
-const token = localStorage.getItem("token")
-const toast = useToast()
+const token = localStorage.getItem("token");
+const toast = useToast();
 
 export const useBoardPermissionStore = defineStore("boardPermission", {
   state: () => ({
@@ -16,39 +16,83 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
 
   actions: {
     async fetchBoardById(path, method) {
-      const token = localStorage.getItem("token")
-      const toast = useToast()
-      const authStore = AuthUserStore() 
+      const token = localStorage.getItem("token");
+      const toast = useToast();
+      const authStore = AuthUserStore();
+
+      try {
+        let headers = {};
+        if (token) {
+          headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          };
+        } else {
+          headers = {
+            "Content-Type": "application/json",
+          };
+        }
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
+          method: method,
+          headers: headers,
+        });
+
+        if (res.ok) {
+          const boardData = await res.json();
+          this.boardDetails = boardData;
+          const currentUser = localStorage.getItem("currentUser");
+          const currentUserId = await authStore.findCurrentUser(currentUser);
+          this.isOwner = boardData.ownerID === currentUserId;
+          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
+          console.log(this.hasAccess);
+
+          this.visibility = boardData.visibility;
+        } else if (res.status === 401) {
+          router.push("/login");
+          // real BE
+        } else if (res.status === 403) {
+          toast.error("You do not have permission to access this board.");
+          router.push("/test");
+        } else {
+          toast.error("Failed to fetch board details.");
+        }
+      } catch (error) {
+        console.error("Error fetching board details:", error);
+        toast.error("An error occurred while fetching board details.");
+      }
+    },
+
+    async fetchBoardByIdForPublic(path, method) {
+      const toast = useToast();
+      const authStore = AuthUserStore();
 
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
           method: method,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        });
 
         if (res.ok) {
-          const boardData = await res.json()          
-          this.boardDetails = boardData
-          const currentUser = localStorage.getItem("currentUser")
-          const currentUserId = await authStore.findCurrentUser(currentUser)
-          this.isOwner = boardData.ownerID === currentUserId
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC"
-          this.visibility = boardData.visibility
-          
+          const boardData = await res.json();
+          this.boardDetails = boardData;
+          const currentUser = localStorage.getItem("currentUser");
+          const currentUserId = await authStore.findCurrentUser(currentUser);
+          this.isOwner = boardData.ownerID === currentUserId;
+          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
+          console.log(this.hasAccess);
+
+          this.visibility = boardData.visibility;
         } else if (res.status === 401) {
-          router.push("/login")
+          router.push("/login");
           // real BE
         } else if (res.status === 403) {
-          toast.error("You do not have permission to access this board.")
-          router.push("/test")
+          toast.error("You do not have permission to access this board.");
+          router.push("/test");
         } else {
-          toast.error("Failed to fetch board details.")
+          toast.error("Failed to fetch board details.");
         }
       } catch (error) {
-        console.error("Error fetching board details:", error)
-        toast.error("An error occurred while fetching board details.")
+        console.error("Error fetching board details:", error);
+        toast.error("An error occurred while fetching board details.");
       }
     },
 
@@ -88,22 +132,24 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
       const toast = useToast();
       try {
         const patchData = { visibility: newVisibility }; // Set the data to be patched
-        const patchedItem = await patchItem(`${import.meta.env.VITE_BASE_URL}/boards/${boardID}`, patchData);
+        const patchedItem = await patchItem(
+          `${import.meta.env.VITE_BASE_URL}/boards/${boardID}`,
+          patchData
+        );
         if (patchedItem) {
           this.visibility = newVisibility; // Update local visibility
-          toast.success(`Visibility updated to ${newVisibility}`);
         }
       } catch (error) {
         console.error("Error changing visibility:", error);
-    
-        if (error.message.includes('401')) {
+        if (error.message.includes("401")) {
+          localStorage.removeItem("token");
           router.push("/login");
-        } else if (error.message.includes('403')) {
+        } else if (error.message.includes("403")) {
           toast.error("You do not have permission to change visibility.");
         } else {
           toast.error("There was a problem. Please try again later.");
         }
       }
-    }
+    },
   },
-})
+});

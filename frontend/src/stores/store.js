@@ -48,9 +48,9 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       this.token = null;
       this.refreshToken = null;
       this.tokenExpiry = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('tokenExpiry');
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("tokenExpiry");
     },
 
     async checkTokenValidity() {
@@ -73,11 +73,11 @@ export const AuthUserStore = defineStore("AuthUserStore", {
           return;
         } else if (res.status === 401) {
           // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
-          toast.info('use refreshToken')
+          toast.info("use refreshToken");
           await this.refreshtoken();
         } else {
-          this.clearTokens()
-          toast.error("There is a problem. Please try again later.")
+          this.clearTokens();
+          toast.error("There is a problem. Please try again later.");
           router.push("/login");
         }
       } catch (error) {
@@ -89,37 +89,37 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
     async refreshTokens() {
       const toast = useToast();
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      console.log(storedRefreshToken)
+      const storedRefreshToken = localStorage.getItem("refreshToken");
+      console.log(storedRefreshToken);
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${storedRefreshToken}`,
+            Authorization: `Bearer ${storedRefreshToken}`,
           },
         });
 
         if (res.ok) {
           const data = await res.json();
           this.setTokens(data.accessToken, storedRefreshToken);
-          this.scheduleTokenRefresh();  // Set the next refresh
+          this.scheduleTokenRefresh(); // Set the next refresh
         } else if (res.status === 401) {
           this.clearTokens();
-          router.push('/login');
+          router.push("/login");
         }
       } catch (error) {
-        toast.error('Failed to refresh token. Please login again.');
+        toast.error("Failed to refresh token. Please login again.");
         this.clearTokens();
-        router.push('/login');
+        router.push("/login");
       }
     },
 
     async checkAccessToken() {
-      const storedAccessToken = localStorage.getItem('accessToken');
-      const storedExpiry = localStorage.getItem('tokenExpiry');
+      const storedAccessToken = localStorage.getItem("accessToken");
+      const storedExpiry = localStorage.getItem("tokenExpiry");
 
       if (!storedAccessToken || !storedExpiry || Date.now() > storedExpiry) {
-        await refreshTokens() // Try refreshing the token
+        await refreshTokens(); // Try refreshing the token
       } else {
         this.accessToken = storedAccessToken;
         this.tokenExpiry = storedExpiry;
@@ -128,27 +128,34 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     },
 
     async findCurrentUser(username) {
-      try {
-        const users = await getItems(`${import.meta.env.VITE_BASE_URL}/users`);
-        const normalizedUsername = username
-          .toLowerCase()
-          .trim()
-          .replace(/\s+/g, ".");
-        const userFound = users.find(
-          (item) =>
-            item.username.toLowerCase().trim().replace(/\s+/g, ".") ===
-            normalizedUsername
-        );
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const users = await getItems(
+            `${import.meta.env.VITE_BASE_URL}/users`
+          );
+          const normalizedUsername = username
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ".");
+          const userFound = users.find(
+            (item) =>
+              item.username.toLowerCase().trim().replace(/\s+/g, ".") ===
+              normalizedUsername
+          );
 
-        if (userFound) {
-          this.currentUser = userFound.oid; // Store the oid of the matched user
-          return userFound.oid; // Return the oid
-        } else {
-          toast.error("user not found");
+          if (userFound) {
+            this.currentUser = userFound.oid; // Store the oid of the matched user
+            return userFound.oid; // Return the oid
+          } else {
+            toast.error("user not found");
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching users:", error);
           return null;
         }
-      } catch (error) {
-        console.error("Error fetching users:", error);
+      } else {
         return null;
       }
     },

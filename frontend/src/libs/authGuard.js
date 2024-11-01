@@ -8,7 +8,8 @@ export async function checkBoardAccess(to, from, next) {
   const toast = useToast();
   const boardID = to.params.boardID;
 
-  await boardPermStore.fetchBoardById(`/boards/${boardID}` , 'GET')
+  // no token
+  await boardPermStore.fetchBoardByIdForPublic(`/boards/${boardID}` , 'GET')
   const { hasAccess, isOwner } = boardPermStore
   console.log(`hasAccess : ${hasAccess}, isOwner: ${isOwner}`)
   if (hasAccess || isOwner) {

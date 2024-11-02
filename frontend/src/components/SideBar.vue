@@ -10,6 +10,8 @@ const token = localStorage.getItem('token')
 if (token) {
   const decoded = VueJwtDecode.decode(token);
   currentUser.value = decoded.name;
+} else {
+  currentUser.value = 'Guest user'
 }
 
 const signout = () => {

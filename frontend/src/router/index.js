@@ -11,7 +11,7 @@ import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
 import AccessDeny from '@/views/AccesDeny.vue'
 import { checkBoardAccess } from "@/libs/authGuard.js"; // Import the reusable function
-import { AuthUserStore } from "@/stores/Store";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -21,8 +21,8 @@ const routes = [
     path: "/status",
     component: ManageStatus,
     children: [
-      { path: "add", component: AddStatus, name: "AddStatus" },
-      { path: ":id/edit", component: EditStatus, name: "EditStatus", props: true },
+      { path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true } },
+      { path: ":id/edit", component: EditStatus, name: "EditStatus", props: true , meta: { requiresOwner: true } },
     ],
   },
 
@@ -32,8 +32,8 @@ const routes = [
     component: Task,
     props: true,
     children: [
-      { path: "task/add", component: AddTask, name: "AddTask", props: true },
-      { path: ":taskId/edit", component: EditTask, name: "EditTask", props: true },
+      { path: "task/add", component: AddTask, name: "AddTask", props: true  , meta: { requiresOwner: true }},
+      { path: ":taskId/edit", component: EditTask, name: "EditTask", props: true  , meta: { requiresOwner: true }},
     ],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
@@ -43,7 +43,7 @@ const routes = [
     component: ManageStatus,
     name: "Status",
     props: true,
-    children: [{ path: "add", component: AddStatus, name: "AddStatus" }],
+    children: [{ path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true }}],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
 
@@ -68,14 +68,19 @@ const router = createRouter({
   linkActiveClass: "text-blue-300",
 })
 
-// router.beforeEach(async (to, from, next) => {
-//   const authUserStore = AuthUserStore();  // Initialize the store
-//   await authUserStore.checkAccessToken();  // Check if the token is valid or refresh it
-//   // If no access token and the user is not navigating to the login page, redirect to login
-//   if (!authUserStore.token && to.path !== '/login') {
-//     return next('/login');
-//   }
-//   next();  // Allow the navigation if the token is valid
-// });
+router.beforeEach(async (to, from, next) => {
+  const boardPermissionStore = useBoardPermissionStore()
+  const isOwner = boardPermissionStore.isOwner
+  
+  // Check if route requires the user to be the board owner
+  if (to.meta.requiresOwner) {
+    await boardPermissionStore.fetchBoardByIdForPublic(`/board/${to.params.id}`, 'GET');
+    if (!isOwner) {
+      return next('/test');
+    }
+  }
+  
+  next();
+})
 
 export default router;

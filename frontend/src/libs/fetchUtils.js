@@ -35,10 +35,18 @@ async function getItems(url) {
 }
 
 async function getItemById(url) {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: "Bearer " + localStorage.getItem("token"),
-  };
+  const token = localStorage.getItem('token')
+  let headers = {}
+    if (token) {
+      headers = {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      }
+    } else {
+      headers = {
+        "Content-Type": "application/json"
+      }
+    }
   try {
     const data = await fetch(`${url}`, {
       method: "GET",

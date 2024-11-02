@@ -19,7 +19,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import { BoardStore, AuthUserStore } from "@/stores/Store.js";
+import { BoardStore, AuthUserStore } from "@/stores/store";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();
@@ -273,7 +273,6 @@ const toggleSortOrder = () => {
 // const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
 const isPrivate = computed(() => visibilitys.value === "PRIVATE");
 const showModalVis = ref(false);
-const visibilityStore = useVisibilityStore()
 const isOwner = boardPermissionStore.isOwner;
 
 const toggleVisibility = async () => {
@@ -284,19 +283,21 @@ const toggleVisibility = async () => {
   showModalVis.value = true;
   console.log(
     `visible is ${visibilitys.value} and isPrivate is ${isPrivate.value}`
-  )
-}
+  );
+};
 
 const confirmChange = async () => {
-  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE"
+  const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
   try {
-    await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility)
-    visibilitys.value = newVisibility; 
+    await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
+    visibilitys.value = newVisibility;
   } catch (error) {
     toast.error("Failed to update visibility.");
   }
-  showModalVis.value = false
-}
+  showModalVis.value = false;
+};
+
+const showTooltip = ref(false)
 </script>
 
 <template>
@@ -334,21 +335,28 @@ const confirmChange = async () => {
                       <buttonSlot
                         size="sm"
                         type="light"
-                        class="itbkk-manage-status"
+                        class="itbkk-manage-status disabled:cursor-not-allowed"
                       >
                         <template v-slot:title> STATUS </template>
                       </buttonSlot>
                     </div>
                   </router-link>
+
+                  <!-- fix this button  -->
                   <router-link :to="`/board/${boardIdRoute}/task/add`">
                     <div class="rounded-lg ml-4 sm:ml-8">
                       <buttonSlot
                         size="sm"
                         type="dark"
-                        class="itbkk-button-add"
+                        class="itbkk-button-add disabled:cursor-not-allowed"
+                        :disabled="!isOwner"
+                        @mouseenter="showTooltip = !isOwner"
+                        @mouseleave="showTooltip = false"
                       >
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
+                      <span v-if="showTooltip" class="tooltip">You need to be the board owner to perform this action.</span>
+
                     </div>
                   </router-link>
                 </div>
@@ -452,8 +460,8 @@ const confirmChange = async () => {
                         >
                           <button
                             @click="editMode(task)"
-                            class="itbkk-button-edit pr-2"
-                            :disabled="!isOwner || visibilitys === 'PUBLIC'"
+                            class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
+                            :disabled="!isOwner"
                           >
                             <Edit />
                           </button>
@@ -463,8 +471,8 @@ const confirmChange = async () => {
                           @click="
                             (showDeleteModal = true), (taskToDelete = task)
                           "
-                          class="itbkk-button-delete pr-1"
-                          :disabled="!isOwner || visibilitys === 'PUBLIC'"
+                          class="itbkk-button-delete pr-1 disabled:cursor-not-allowed"
+                          :disabled="!isOwner"
                         >
                           <Trash />
                         </button>
@@ -656,5 +664,13 @@ table {
 
 .container:hover > :not(:hover) {
   opacity: 0.2;
+}
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
 }
 </style>

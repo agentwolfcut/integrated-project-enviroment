@@ -51,7 +51,7 @@ const props = defineProps({
 });
 const visibilitys = ref("");
 const boardPermissionStore = useBoardPermissionStore();
-const isOwner = boardPermissionStore.isOwner;
+const isOwner = boardPermissionStore.isOwner
 
 // GET
 onMounted(async () => {
@@ -296,6 +296,7 @@ const handelFail = () => {
                       size="sm"
                       type="light"
                       class="itbkk-manage-task"
+                      
                     >
                       <template v-slot:title> TASK </template>
                     </buttonSlot>
@@ -303,7 +304,7 @@ const handelFail = () => {
                 </router-link>
                 <router-link :to="`/board/${boardIdRoute}/status/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-add">
+                    <buttonSlot size="sm" type="dark" class="itbkk-button-add disabled:cursor-not-allowed" :disabled="!isOwner">
                       <template v-slot:title> Add Status </template>
                     </buttonSlot>
                   </div>
@@ -379,17 +380,16 @@ const handelFail = () => {
                       </td>
 
                       <td class="p-3">
-                        <div v-show="isOwner"
+                        <div
+                          v-show="isOwner"
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
                           <button
                             class="itbkk-button-edit"
                             :disabled="!isOwner"
-                            
                           >
                             <router-link
                               class="itbkk-button-edit"
-
                               :to="{
                                 name: 'EditStatus',
                                 params: { id: status.id },
@@ -398,7 +398,7 @@ const handelFail = () => {
                               <button
                                 class="itbkk-button-edit pr-2"
                                 @click="openToEdit(status)"
-                                                              :disabled="!isOwner"
+                                :disabled="!isOwner"
                               >
                                 <Edit />
                               </button>

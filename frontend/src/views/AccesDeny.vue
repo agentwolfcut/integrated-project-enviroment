@@ -1,7 +1,15 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
 
-const route = useRouter();
+const route = useRouter()
+const token = localStorage.getItem('token')
+const authenCondition = () => {
+  if (token) {
+    route.back()
+  } else {
+    route.push('/login')
+  }
+}
 </script>
 
 <template>
@@ -43,7 +51,7 @@ const route = useRouter();
           </button> -->
 
           <button
-            @click="route.push('/login')"
+            @click="authenCondition"
             class="itbkk-button-back w-1/2 px-5 py-2 text-sm tracking-wide  transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto hover:bg-blue-600 dark:hover:bg-blue-500 dark:bg-blue-600"
           >
             Take me home

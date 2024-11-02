@@ -51,7 +51,7 @@ const props = defineProps({
 });
 const visibilitys = ref("");
 const boardPermissionStore = useBoardPermissionStore();
-const isOwner = boardPermissionStore.isOwner
+const isOwner = boardPermissionStore.isOwner;
 
 // GET
 onMounted(async () => {
@@ -277,6 +277,8 @@ const clearEdit = () => {
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
 };
+
+const showTooltip = ref(false);
 </script>
 
 <template>
@@ -296,7 +298,6 @@ const handelFail = () => {
                       size="sm"
                       type="light"
                       class="itbkk-manage-task"
-                      
                     >
                       <template v-slot:title> TASK </template>
                     </buttonSlot>
@@ -304,9 +305,20 @@ const handelFail = () => {
                 </router-link>
                 <router-link :to="`/board/${boardIdRoute}/status/add`">
                   <div class="rounded-lg ml-4 sm:ml-8">
-                    <buttonSlot size="sm" type="dark" class="itbkk-button-add disabled:cursor-not-allowed" :disabled="!isOwner">
+                    <buttonSlot
+                      size="sm"
+                      type="dark"
+                      class="itbkk-button-add disabled:cursor-not-allowed"
+                      :disabled="!isOwner"
+                      @mouseenter="showTooltip = !isOwner"
+                      @mouseleave="showTooltip = false"
+                    >
                       <template v-slot:title> Add Status </template>
                     </buttonSlot>
+                    <span v-if="showTooltip" class="tooltip"
+                      >You need to be the board owner to perform this
+                      action.</span
+                    >
                   </div>
                 </router-link>
               </div>
@@ -381,7 +393,6 @@ const handelFail = () => {
 
                       <td class="p-3">
                         <div
-                          v-show="isOwner"
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
                           <button
@@ -396,9 +407,11 @@ const handelFail = () => {
                               }"
                             >
                               <button
-                                class="itbkk-button-edit pr-2"
+                                class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
                                 @click="openToEdit(status)"
                                 :disabled="!isOwner"
+                                @mouseenter="showTooltip = !isOwner"
+                                @mouseleave="showTooltip = false"
                               >
                                 <Edit />
                               </button>
@@ -406,12 +419,14 @@ const handelFail = () => {
                           </button>
 
                           <button
-                            class="pr-1 itbkk-button-delete"
+                            class="pr-1 itbkk-button-delete disabled:cursor-not-allowed"
                             :disabled="!isOwner"
                             @click="
                               (statusDelete = status),
                                 checkTasksBeforeDelete(status)
                             "
+                            @mouseenter="showTooltip = !isOwner"
+                            @mouseleave="showTooltip = false"
                           >
                             <Trash />
                           </button>
@@ -586,5 +601,13 @@ table {
 
 .container:hover > :not(:hover) {
   opacity: 0.2;
+}
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
 }
 </style>

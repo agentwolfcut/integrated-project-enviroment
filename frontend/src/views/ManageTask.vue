@@ -297,7 +297,7 @@ const confirmChange = async () => {
   showModalVis.value = false;
 };
 
-const showTooltip = ref(false)
+const showTooltip = ref(false);
 </script>
 
 <template>
@@ -355,8 +355,10 @@ const showTooltip = ref(false)
                       >
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
-                      <span v-if="showTooltip" class="tooltip">You need to be the board owner to perform this action.</span>
-
+                      <span v-if="showTooltip" class="tooltip"
+                        >You need to be the board owner to perform this
+                        action.</span
+                      >
                     </div>
                   </router-link>
                 </div>
@@ -462,10 +464,13 @@ const showTooltip = ref(false)
                             @click="editMode(task)"
                             class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
                             :disabled="!isOwner"
+                            @mouseenter="showTooltip = !isOwner"
+                            @mouseleave="showTooltip = false"
                           >
                             <Edit />
                           </button>
                         </router-link>
+                        
 
                         <button
                           @click="
@@ -473,9 +478,12 @@ const showTooltip = ref(false)
                           "
                           class="itbkk-button-delete pr-1 disabled:cursor-not-allowed"
                           :disabled="!isOwner"
+                          @mouseenter="showTooltip = !isOwner"
+                          @mouseleave="showTooltip = false"
                         >
                           <Trash />
                         </button>
+                       
                       </td>
                     </tr>
                   </tbody>

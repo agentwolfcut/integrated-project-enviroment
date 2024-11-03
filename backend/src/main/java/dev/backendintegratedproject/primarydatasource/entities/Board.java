@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Immutable;
 
 @Entity
 @Table(name = "boards")
@@ -22,7 +23,7 @@ public class Board {
 
     @Column(name = "boardName", nullable = false, length = 45)
     private String name;
-
+    @Immutable
     @Column(name = "ownerID", nullable = false, length = 36)
     private String ownerID;
 

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "board_permissions")
 @Getter
@@ -13,19 +15,24 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BoardPermission {
-    @Id
-    @Column(name = "userID")
-    private String userID;
-    @Column(name = "boardID")
-    private String boardID;
-    @Column(name = "permission", nullable = false)
-    private String permission = "user";
 
-//    @ManyToOne
-//    @JoinColumn(name = "userID", insertable = false, updatable = false)
-//    private PrimaryUser primaryUser;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "boardID", insertable = false, updatable = false)
-//    private Board board;
+    @EmbeddedId
+    private BoardPermissionId id;
+
+    @Column(name = "permission", nullable = false)
+    private String permission;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
+    @JoinColumn(name = "userID", insertable = false, updatable = false)
+    private PrimaryUser primaryUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("boardId")
+    @JoinColumn(name = "boardID", insertable = false, updatable = false)
+    private Board board;
+
+    // เพิ่มฟิลด์ addedOn ตรงนี้ให้ตรงกับฐานข้อมูล
+    @Column(name = "addedOn", nullable = false, updatable = false)
+    private LocalDateTime addedOn = LocalDateTime.now();
 }

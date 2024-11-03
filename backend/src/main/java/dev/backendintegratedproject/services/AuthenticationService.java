@@ -26,15 +26,18 @@ public class AuthenticationService {
     PrimaryUserRepository primaryUserRepository;
 
     public TokenDTO loginUser(LoginUserDTO loginUserDTO) throws LoginInvalidException {
-        UserDetailsDTO user = null;
+        UserDetailsDTO user;
         try {
             user = userService.loadUserByUsername(loginUserDTO.getUsername());
             if (!primaryUserRepository.existsById(user.getOid())) {
-                primaryUserService.createUser(new PrimaryUser(user.getOid(), user.getUsername()));
+                // กำหนดให้สร้าง PrimaryUser ใหม่โดยไม่ต้องใช้ email
+                PrimaryUser newUser = new PrimaryUser(user.getOid(), user.getUsername());
+                primaryUserService.createUser(newUser);
             }
-        }catch (UsernameNotFoundException ex){
+        } catch (UsernameNotFoundException ex) {
             throw new LoginInvalidException("Username or Password is incorrect.");
         }
+
         Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16, 32, 1, 60000, 10);
         if (!argon2PasswordEncoder.matches(loginUserDTO.getPassword(), user.getPassword())) {
             throw new LoginInvalidException("Username or Password is incorrect.");
@@ -44,6 +47,7 @@ public class AuthenticationService {
         String refreshToken = jwtUtils.generateRefreshToken(user);
         return new TokenDTO(accessToken, refreshToken);
     }
+
     public AccessTokenDTO refreshAccessToken(String refreshToken) throws InvalidTokenException {
         try{
             String username = jwtUtils.getUsernameFromToken(refreshToken);

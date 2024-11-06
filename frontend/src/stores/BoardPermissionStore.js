@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useToast } from "vue-toast-notification";
 import router from "@/router";
-import { AuthUserStore } from "@/stores/Store.js";
+import { AuthUserStore } from '@/stores/store'
 import { patchItem } from "@/libs/fetchUtils";
 
 const token = localStorage.getItem("token");

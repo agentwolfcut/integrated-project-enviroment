@@ -22,8 +22,8 @@ const routes = [
     path: "/status",
     component: ManageStatus,
     children: [
-      { path: "add", component: AddStatus, name: "AddStatus" },
-      { path: ":id/edit", component: EditStatus, name: "EditStatus", props: true },
+      { path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true } },
+      { path: ":id/edit", component: EditStatus, name: "EditStatus", props: true , meta: { requiresOwner: true } },
     ],
   },
 
@@ -33,8 +33,8 @@ const routes = [
     component: Task,
     props: true,
     children: [
-      { path: "task/add", component: AddTask, name: "AddTask", props: true },
-      { path: ":taskId/edit", component: EditTask, name: "EditTask", props: true },
+      { path: "task/add", component: AddTask, name: "AddTask", props: true , meta: { requiresOwner: true } },
+      { path: ":taskId/edit", component: EditTask, name: "EditTask", props: true , meta: { requiresOwner: true }},
     ],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
@@ -44,7 +44,7 @@ const routes = [
     component: ManageStatus,
     name: "Status",
     props: true,
-    children: [{ path: "add", component: AddStatus, name: "AddStatus" }],
+    children: [{ path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true }}],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
 
@@ -68,6 +68,27 @@ const router = createRouter({
   routes,
   linkActiveClass: "text-blue-300",
 })
+
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
+router.beforeEach(async (to, from, next) => {
+  const boardPermissionStore = useBoardPermissionStore();
+  const boardID = to.params.boardID;
+
+  if (to.meta.requiresOwner) {
+    if (!boardID) {
+      return next('/test');      
+    }
+    if(boardPermissionStore.isOwner) {
+      await boardPermissionStore.fetchBoardById(`/board/${boardID}`, 'GET')
+    } else {
+      await boardPermissionStore.fetchBoardByIdForPublic(`/board/${boardID}`, 'GET');
+    }
+    if (!boardPermissionStore.isOwner) {
+      return next('/test');
+    }
+  }
+  next();
+});
 
 
 export default router;

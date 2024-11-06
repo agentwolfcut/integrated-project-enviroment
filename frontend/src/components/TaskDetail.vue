@@ -2,18 +2,20 @@
 // useRoute use with parameters , useRouter  use with path
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
+import LineMdCloseSmall from '@/assets/icons/LineMdCloseSmall.vue'
 
 const { params } = useRoute();
 
-defineEmits(["closeModal"]);
+defineEmits([ "closeModal"]);
 const props = defineProps({
   task: {
-    type: Object,
+    type: Object
   },
 });
 
 const taskSelect = computed(() => props.task);
+
+
 const formatLocalDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -27,6 +29,7 @@ const formatLocalDate = (dateString) => {
   //   return `${year}-${day}-${day} ${hours}:${minutes}:${seconds}`
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} `;
 };
+
 </script>
 
 <template>
@@ -40,16 +43,13 @@ const formatLocalDate = (dateString) => {
         <!-- head -->
 
         <div class="m-4 py-3 border-b border-slate-600 flex flex-row">
-          <div
-            class="itbkk-title font-semibold text-2xl text-black flex flex-1"
-          >
+          <div class="itbkk-title font-semibold text-2xl text-black flex flex-1">
             {{ taskSelect.title }}
           </div>
 
-          <button @click="$emit('closeModal', false)" class="mb-2">
-            <LineMdCloseSmall
-              class="bg-black text-white rounded-full p-1 hover:bg-gray-700"
-            />
+          <button @click="$emit('closeModal',false)" class="mb-2"
+          >
+            <LineMdCloseSmall class="bg-black text-white rounded-full p-1 hover:bg-gray-700"/>
           </button>
         </div>
 

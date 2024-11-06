@@ -52,6 +52,7 @@ const props = defineProps({
 const visibilitys = ref("");
 const boardPermissionStore = useBoardPermissionStore();
 const isOwner = boardPermissionStore.isOwner;
+const showTooltip = ref(false);
 
 // GET
 onMounted(async () => {
@@ -277,8 +278,6 @@ const clearEdit = () => {
 const handelFail = () => {
   toaster.error(`An error has occurred, the status does not exist.`);
 };
-
-const showTooltip = ref(false);
 </script>
 
 <template>
@@ -396,11 +395,11 @@ const showTooltip = ref(false);
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
                           <button
-                            class="itbkk-button-edit"
-                            :disabled="!isOwner"
+                            class="itbkk-button-edit "
+                           
                           >
                             <router-link
-                              class="itbkk-button-edit"
+                              class="itbkk-button-edit "
                               :to="{
                                 name: 'EditStatus',
                                 params: { id: status.id },
@@ -410,8 +409,8 @@ const showTooltip = ref(false);
                                 class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
                                 @click="openToEdit(status)"
                                 :disabled="!isOwner"
-                                @mouseenter="showTooltip = !isOwner"
-                                @mouseleave="showTooltip = false"
+                            @mouseenter="showTooltip = !isOwner"
+                            @mouseleave="showTooltip = false"
                               >
                                 <Edit />
                               </button>
@@ -421,12 +420,12 @@ const showTooltip = ref(false);
                           <button
                             class="pr-1 itbkk-button-delete disabled:cursor-not-allowed"
                             :disabled="!isOwner"
+                            @mouseenter="showTooltip = !isOwner"
+                            @mouseleave="showTooltip = false"
                             @click="
                               (statusDelete = status),
                                 checkTasksBeforeDelete(status)
                             "
-                            @mouseenter="showTooltip = !isOwner"
-                            @mouseleave="showTooltip = false"
                           >
                             <Trash />
                           </button>

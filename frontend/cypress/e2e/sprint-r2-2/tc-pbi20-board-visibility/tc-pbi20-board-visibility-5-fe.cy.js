@@ -3,7 +3,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                     - un-authenticated user can view public board only`, () => {
 
     beforeEach(()=> {
-        cy.visit('/board/iZbduus70n') // <------ add your board id here
+        cy.visit('/board/hLM72Jkrrw') // <------ add your board id here
         cy.wait(100) ;
     }) ;
 
@@ -110,7 +110,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/iZbduus70n/task/add') // <------ add your board id here
+        cy.visit('/board/hLM72Jkrrw/task/add') // <------ add your board id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -124,7 +124,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/iZbduus70n/task/84/edit') // <------ add your board id and task id here
+        cy.visit('/board/hLM72Jkrrw/task/84/edit') // <------ add your board id and task id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -137,7 +137,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/iZbduus70n/status/add') // <------ add your board id here
+        cy.visit('/board/hLM72Jkrrw/status/add') // <------ add your board id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -149,7 +149,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
     it(`[Step 2.7] Should no open /board/:id/status/:status-id/edit page and 
                 show message "Access denied, you do not have permission to view this page.`,()=>{
 
-        cy.visit('/board/iZbduus70n/status/192/edit') // <------ add your board id and status id here
+        cy.visit('/board/hLM72Jkrrw/status/192/edit') // <------ add your board id and status id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')

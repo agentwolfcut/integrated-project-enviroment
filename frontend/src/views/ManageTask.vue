@@ -313,7 +313,10 @@ const confirmChange = async () => {
               <div class="for-button mb-9 flex flex-row justify-between">
                 <button
                   @click="toggleVisibility"
-                  class="itbkk-board-visibility flex items-center rounded-full w-10 h-10 justify-center"
+                  :disabled="!isOwner"
+                  @mouseenter="showTooltip = !isOwner"
+                  @mouseleave="showTooltip = false"
+                  class="itbkk-board-visibility flex items-center disabled:cursor-not-allowed rounded-full w-10 h-10 justify-center"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -354,9 +357,9 @@ const confirmChange = async () => {
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
                       <span v-if="showTooltip" class="tooltip"
-                      >You need to be the board owner to perform this
-                      action.</span
-                    >
+                        >You need to be the board owner to perform this
+                        action.</span
+                      >
                     </div>
                   </router-link>
                 </div>
@@ -474,8 +477,8 @@ const confirmChange = async () => {
                           "
                           class="itbkk-button-delete pr-1 disabled:cursor-not-allowed"
                           :disabled="!isOwner"
-                            @mouseenter="showTooltip = !isOwner"
-                            @mouseleave="showTooltip = false"
+                          @mouseenter="showTooltip = !isOwner"
+                          @mouseleave="showTooltip = false"
                         >
                           <Trash />
                         </button>
@@ -538,7 +541,7 @@ const confirmChange = async () => {
     ></div>
   </div>
 
-  <div v-if="showDeleteModal">
+  <div v-if="showDeleteModal" class="itbkk-modal-alert">
     <div
       class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
     >

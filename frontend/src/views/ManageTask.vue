@@ -361,7 +361,6 @@ const confirmChange = async () => {
                   </router-link>
                 </div>
               </div>
-
               <div class="mt-7 overflow-x-auto rounded-2xl">
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->

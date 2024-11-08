@@ -4,9 +4,6 @@ import router from "@/router";
 import { AuthUserStore } from '@/stores/store'
 import { patchItem } from "@/libs/fetchUtils";
 
-const token = localStorage.getItem("token");
-const toast = useToast();
-
 export const useBoardPermissionStore = defineStore("boardPermission", {
   state: () => ({
     boardDetails: null,
@@ -16,10 +13,10 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
 
   actions: {
     async fetchBoardById(path, method) {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const toast = useToast();
-      const authStore = AuthUserStore();
-
+      const authStore = AuthUserStore()
+      
       try {
         let headers = {};
         if (token) {
@@ -44,8 +41,6 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
           this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
-          console.log(this.hasAccess);
-
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");
@@ -78,8 +73,6 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
           this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
-          console.log(this.hasAccess);
-
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");

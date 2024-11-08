@@ -42,7 +42,6 @@ const editingStatus = ref({ id: undefined, name: "", description: "" });
 // sem2
 const token = localStorage.getItem("token");
 const boardIdRoute = route.params.boardID;
-// console.log(boardIdRoute);
 const props = defineProps({
   boardID: {
     type: String,
@@ -71,9 +70,7 @@ onMounted(async () => {
       currentUser.value = decoded.name;
     }
   }
-  visibilitys.value = boardPermissionStore.boardDetails.visibility;
-  console.log(visibilitys.value);
-  console.log(isOwner);
+  visibilitys.value = boardPermissionStore.boardDetails.visibility
 });
 
 const statusList = ref(statusMan.value.getStatuses());

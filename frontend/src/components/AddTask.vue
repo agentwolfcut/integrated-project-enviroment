@@ -4,7 +4,6 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
 import { getItems } from '../libs/fetchUtils';
 import router from '@/router';
-import { BoardStore } from "@/stores/Store.js";
 
 const props = defineProps({
     task: {
@@ -25,8 +24,6 @@ const statusOptions = ref('')
 const route = useRoute();
 const taskId = ref(route.params.taskId)
 const token = localStorage.getItem('token');
-
-const boardStore = BoardStore()
 // const boardId = boardStore.currentBoardId
 const boardIdRoute = route.params.boardID;
 

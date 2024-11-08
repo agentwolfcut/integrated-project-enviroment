@@ -20,11 +20,7 @@ const routes = [
   // ห้ามลบ
   {
     path: "/status",
-    component: ManageStatus,
-    children: [
-      { path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true } },
-      { path: ":id/edit", component: EditStatus, name: "EditStatus", props: true , meta: { requiresOwner: true } },
-    ],
+    component: ManageStatus
   },
 
   {
@@ -44,7 +40,9 @@ const routes = [
     component: ManageStatus,
     name: "Status",
     props: true,
-    children: [{ path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true }}],
+    children: [
+      { path: "add", component: AddStatus, name: "AddStatus" , meta: { requiresOwner: true }},
+      { path: ':id/edit' , component: EditStatus , name: 'EditStatus', props:true , meta: {requiresOwner : true}}],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
 
@@ -69,17 +67,20 @@ const router = createRouter({
   linkActiveClass: "text-blue-300",
 })
 
-import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore"
+
 router.beforeEach(async (to, from, next) => {
   const boardPermissionStore = useBoardPermissionStore();
   const boardID = to.params.boardID;
 
   if (to.meta.requiresOwner) {
     if (!boardID) {
-      return next('/test');      
+      return next('/test')      
     }
     if(boardPermissionStore.isOwner) {
-      await boardPermissionStore.fetchBoardById(`/board/${boardID}`, 'GET')
+      console.log('this is owner');
+      
+      // await boardPermissionStore.fetchBoardById(`/board/${boardID}`, 'GET')
     } else {
       await boardPermissionStore.fetchBoardByIdForPublic(`/board/${boardID}`, 'GET');
     }

@@ -13,10 +13,10 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
 
   actions: {
     async fetchBoardById(path, method) {
-      const token = localStorage.getItem('token');
       const toast = useToast();
       const authStore = AuthUserStore()
-      
+      const token = authStore.token
+      authStore.checkAccessToken()
       try {
         let headers = {};
         if (token) {
@@ -123,6 +123,8 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     // },
     async updateVisibility(boardID, newVisibility) {
       const toast = useToast();
+      const authStore = AuthUserStore()
+
       try {
         const patchData = { visibility: newVisibility }; // Set the data to be patched
         const patchedItem = await patchItem(

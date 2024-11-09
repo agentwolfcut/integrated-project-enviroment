@@ -4,9 +4,6 @@ import router from "@/router";
 import "vue-toast-notification/dist/theme-sugar.css";
 // import { updateItem } from "@/libs/fetchUtils"
 
-const toast = useToast();
-const token = localStorage.getItem("token");
-
 export const pinia = createPinia();
 export const useVisibilityStore = defineStore("visibility", {
   state: () => ({

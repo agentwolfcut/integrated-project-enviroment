@@ -1,28 +1,31 @@
-import { useToast } from "vue-toast-notification"
-import router from "@/router"
-import { useBoardPermissionStore } from "@/stores/BoardPermissionStore"
-
+import { useToast } from "vue-toast-notification";
+import router from "@/router";
+import { AuthUserStore } from "@/stores/store";
 const toast = useToast();
 
 // async task must wait , inside are promise
 async function getItems(url) {
   try {
-    const token = localStorage.getItem('token')
-    let headers = {}
+    const useAuthStore = AuthUserStore();
+    useAuthStore.checkAccessToken();
+    const token = useAuthStore.token;
+    let headers = {};
     if (token) {
       headers = {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      }
+        Authorization: "Bearer " + token,
+      };
     } else {
+      console.log(token);
+
       headers = {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      };
     }
     const response = await fetch(url, {
       method: "GET",
       headers: headers,
-    })
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status getitems from : ${response.status}`);
     }
@@ -35,18 +38,20 @@ async function getItems(url) {
 }
 
 async function getItemById(url) {
-  const token = localStorage.getItem('token')
-  let headers = {}
-    if (token) {
-      headers = {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      }
-    } else {
-      headers = {
-        "Content-Type": "application/json"
-      }
-    }
+  const useAuthStore = AuthUserStore();
+  useAuthStore.checkAccessToken();
+  const token = useAuthStore.token;
+  let headers = {};
+  if (token) {
+    headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+  } else {
+    headers = {
+      "Content-Type": "application/json",
+    };
+  }
   try {
     const data = await fetch(`${url}`, {
       method: "GET",
@@ -92,12 +97,13 @@ async function transferTasksAndDeleteStatus(url, id, desId, token = null) {
 }
 
 async function addItem(url, newItem) {
+  const token = useAuthStore.token;
   try {
     const res = await fetch(url, {
       method: "POST", // add
       headers: {
         "content-type": "application/json", // add contents
-        Authorization: "Bearer " + localStorage.getItem("token"),
+        Authorization: "Bearer " + token,
       },
       body: JSON.stringify({
         ...newItem, // sent add data . destructuring object
@@ -111,7 +117,7 @@ async function addItem(url, newItem) {
 }
 
 async function editItem(url, id, editItem) {
-  const token = localStorage.getItem("token"); // เพิ่มการประกาศ token
+  const token = useAuthStore.token;
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
@@ -145,25 +151,29 @@ async function getTasksByStatus(url, statusId) {
 }
 
 async function patchItem(url, patchData) {
+  const useAuthStore = AuthUserStore();
+  useAuthStore.checkAccessToken();
+  const token = useAuthStore.token;
+
   try {
     const headers = {
       "Content-Type": "application/json",
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
+      Authorization: "Bearer " + token,
     };
 
     const res = await fetch(url, {
-      method: 'PATCH', // PATCH request
+      method: "PATCH", // PATCH request
       headers: headers,
       body: JSON.stringify(patchData), // Send the data directly
     });
-    
+
     if (res.ok) {
-      toast.success(`updated visibility successfully`)
+      toast.success(`updated visibility successfully`);
     } else if (res.status === 401) {
-      localStorage.removeItem('token')
-      router.push('/login')
+      localStorage.removeItem("token");
+      router.push("/login");
     } else if (res.status === 403) {
-      toast.error('You do not have permission to change board visibility mode')
+      toast.error("You do not have permission to change board visibility mode");
     }
     // Only try to parse JSON if there is a response body
     const text = await res.text();

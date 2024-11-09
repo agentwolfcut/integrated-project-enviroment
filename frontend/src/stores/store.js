@@ -1,19 +1,17 @@
 import { createPinia, defineStore } from "pinia";
-import { get } from "@/libs/Utils";
-import { addItem, getItemById, getItems } from "@/libs/fetchUtils";
+import { addItem, getItems } from "@/libs/fetchUtils";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
 import router from "@/router";
-import { useVisibilityStore } from "./VisibilityStore";
+import jwtDecode from "vue-jwt-decode";
+import VueJwtDecode from "vue-jwt-decode";
 
 const toast = useToast();
-const token = localStorage.getItem("token");
-
 // interface ขึ้นกับ res ของpostman
 export const pinia = createPinia();
+
 export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
-    // token: null,
     token: null,
     refreshToken: null,
     currentUser: null, // String
@@ -24,24 +22,11 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     setTokens(accessToken, refreshToken) {
       this.token = accessToken;
       this.refreshToken = refreshToken;
+      //acess token lifetime
+      this.tokenExpiry = Date.now() + 30 * 60 * 1000;
       localStorage.setItem("token", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-
-      // Set the expiry for 30 minutes (access token lifetime)
-      this.tokenExpiry = Date.now() + 30 * 60 * 1000;
       localStorage.setItem("tokenExpiry", this.tokenExpiry);
-    },
-
-    scheduleTokenRefresh() {
-      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000; // 1 minute before expiry
-      if (refreshInMs > 0) {
-        setTimeout(this.refreshToken, refreshInMs);
-      }
-    },
-
-    setUser(user) {
-      this.currentUser = user;
-      localStorage.setItem("currentUser", user);
     },
 
     clearTokens() {
@@ -53,56 +38,49 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       localStorage.removeItem("tokenExpiry");
     },
 
-    async checkTokenValidity() {
-      const token = localStorage.getItem("token");
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!token || !refreshToken) {
-        this.clearTokens();
-        router.push("/login");
-        return;
-      }
-
+    checkTokenValidity2(token) {
       try {
-        // mockup
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.status === 200) {
-          // Token ยัง valid
-          return;
-        } else if (res.status === 401) {
-          // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
-          toast.info("use refreshToken");
-          await this.refreshtoken();
+        const decodedToken = jwtDecode.decode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const remainingTime = decodedToken.exp - currentTime;
+        if (remainingTime > 0) {
+          console.log(
+            `${tokenType} token will expire in ${remainingTime} seconds`
+          );
+          return true;
         } else {
-          this.clearTokens();
-          toast.error("There is a problem. Please try again later.");
-          router.push("/login");
+          console.log(`${tokenType} token has expired`);
+          return false;
         }
       } catch (error) {
-        console.error("Error checking token validity:", error);
-        this.clearTokens();
-        router.push("/login");
+        console.error(`Error decoding ${tokenType} token:`, error);
+        return false;
       }
     },
 
+    // real use
     async refreshTokens() {
       const toast = useToast();
       const storedRefreshToken = localStorage.getItem("refreshToken");
-      console.log(storedRefreshToken);
+      if (!storedRefreshToken) {
+        this.clearTokens();
+        throw new Error("No refresh token found");
+      }
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${storedRefreshToken}`,
           },
+          body: JSON.stringify({}), // add
         });
 
         if (res.ok) {
           const data = await res.json();
-          this.setTokens(data.accessToken, storedRefreshToken);
+          // from backend
+          this.setTokens(data.access_token, storedRefreshToken);
           this.scheduleTokenRefresh(); // Set the next refresh
+          return data.access_token;
         } else if (res.status === 401) {
           this.clearTokens();
           router.push("/login");
@@ -114,17 +92,63 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       }
     },
 
+    scheduleTokenRefresh() {
+      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000; // 1 minute before expiry
+      if (refreshInMs > 0) {
+        setTimeout(this.refreshToken, refreshInMs);
+      }
+    },
+
+    // async checkTokenValidity() {
+    //   const token = localStorage.getItem("token");
+    //   const refreshToken = localStorage.getItem("refreshToken");
+    //   if (!token || !refreshToken) {
+    //     this.clearTokens();
+    //     router.push("/login");
+    //     return;
+    //   }
+    //   try {
+    //     // mockup
+    //     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
+    //       headers: { Authorization: `Bearer ${token}` },
+    //     });
+
+    //     if (res.status === 200) {
+    //       // Token ยัง valid
+    //       return;
+    //     } else if (res.status === 401) {
+    //       // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
+    //       toast.info("use refreshToken");
+    //       await this.refreshtoken();
+    //     } else {
+    //       this.clearTokens();
+    //       toast.error("There is a problem. Please try again later.");
+    //       router.push("/login");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking token validity:", error);
+    //     this.clearTokens();
+    //     router.push("/login");
+    //   }
+    // },
+
     async checkAccessToken() {
-      const storedAccessToken = localStorage.getItem("accessToken");
+      const storedToken = localStorage.getItem("token");
       const storedExpiry = localStorage.getItem("tokenExpiry");
 
-      if (!storedAccessToken || !storedExpiry || Date.now() > storedExpiry) {
-        await refreshTokens(); // Try refreshing the token
+      if (storedToken !== this.token) {
+        await this.refreshTokens(); // Try refreshing the token
       } else {
-        this.accessToken = storedAccessToken;
+        console.log(`new is ${storedToken} , old is ${this.token}`);
+        this.token = storedToken;
         this.tokenExpiry = storedExpiry;
         this.scheduleTokenRefresh();
       }
+    },
+
+    setUser(user) {
+      this.currentUser = user;
+      localStorage.setItem("currentUser", user);
     },
 
     async findCurrentUser(username) {
@@ -188,6 +212,9 @@ export const BoardStore = defineStore("BoardStore", {
       this.currentBoardId = id;
     },
     async getBoard() {
+      const useAuthStore = AuthUserStore();
+      const token = useAuthStore.token;
+      useAuthStore.checkAccessToken();
       try {
         const data = await getItems(
           `${import.meta.env.VITE_BASE_URL}/boards`,
@@ -249,6 +276,8 @@ export const BoardStore = defineStore("BoardStore", {
       }
     },
     async addTask(taskData, id) {
+      const useAuthStore = AuthUserStore();
+      const token = useAuthStore.token;
       try {
         const data = await addItem(
           `${import.meta.env.VITE_BASE_URL}/boards/${id}/tasks`,

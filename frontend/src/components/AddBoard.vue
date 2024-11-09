@@ -4,13 +4,14 @@ import router from "@/router";
 import VueJwtDecode from "vue-jwt-decode";
 import { useToast } from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-import { BoardStore } from "@/stores/Store.js";
+import { BoardStore , AuthUserStore } from '@/stores/store'
 
 const boardStore = BoardStore();
 const newBoardName = ref('')
 const toast = useToast();
 const currentUser = ref("");
-const token = localStorage.getItem("token");
+const authUserStore = AuthUserStore()
+const token = authUserStore.token
 const decoded = VueJwtDecode.decode(token);
 currentUser.value = decoded.name;
 

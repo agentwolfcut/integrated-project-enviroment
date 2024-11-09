@@ -56,8 +56,7 @@ const showTooltip = ref(false);
 // GET
 onMounted(async () => {
   const statusRes = await getItems(
-    `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses`,
-    token
+    `${import.meta.env.VITE_BASE_URL}/boards/${boardIdRoute}/statuses`
   );
   statusMan.value.addStatuses(statusRes);
   if (route.state && route.state.currentUser) {

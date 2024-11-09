@@ -5,7 +5,6 @@ import router from "@/router";
 import { getItems } from "@/libs/fetchUtils";
 
 const toast = useToast();
-const token = localStorage.getItem("token");
 
 export const pinia = createPinia();
 export const useTaskStore = defineStore("tasks", {

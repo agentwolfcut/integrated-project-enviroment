@@ -2,6 +2,7 @@
 import router from '@/router';
 import { ref, onMounted, computed } from 'vue'
 import { getItems } from '../libs/fetchUtils'
+import { AuthUserStore } from '@/stores/store';
 
 const emit = defineEmits(['saveEdit', 'cancelOpe', 'failEdit']); // Define the custom event
 const props = defineProps({
@@ -24,11 +25,12 @@ const props = defineProps({
 
 const previousTask = ref({ ...props.task })
 const statusOptions = ref([])
-const token = localStorage.getItem('token');
+const authUserStore = AuthUserStore()
+const token = authUserStore.token
 
 onMounted(async () => {
     try {
-        const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`, token)
+        const statusRes = await getItems(`${import.meta.env.VITE_BASE_URL}/boards/${props.boardID}/statuses`)
         statusOptions.value = statusRes;
     } catch (error) {
         console.error('Error fetching status options:', error);

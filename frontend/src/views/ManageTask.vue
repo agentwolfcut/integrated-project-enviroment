@@ -47,7 +47,7 @@ const selectTask = ref({
   statusId: "",
 });
 // sem2
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 const props = defineProps({
   //  จาก route
   boardID: {
@@ -60,6 +60,8 @@ const boardPermissionStore = useBoardPermissionStore();
 const visibilitys = ref("");
 const useAuthUserStore = AuthUserStore();
 const showTooltip = ref(false);
+useAuthUserStore.checkAccessToken();
+const token = useAuthUserStore.token;
 
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");

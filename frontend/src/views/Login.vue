@@ -2,7 +2,7 @@
 import router from "@/router";
 import { computed, ref } from "vue";
 import VueJwtDecode from "vue-jwt-decode";
-import { AuthUserStore, BoardStore } from "@/stores/Store.js";
+import { AuthUserStore, BoardStore } from '@/stores/store'
 
 const usrpw = ref({ username: "", password: "" });
 const error = ref(false);
@@ -30,10 +30,8 @@ const inputUsrpw = async () => {
       const data = await res.json();
       authUserStore.setTokens(data.access_token, data.refresh_token);
       decode();
-      // Set automatic token refresh
       authUserStore.scheduleTokenRefresh();
       router.push("/board")
-      console.log(`current user is ${authUserStore.currentUser}`);
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("username or Password is incorrect.");
@@ -55,6 +53,8 @@ const decode = () => {
     let decoded = VueJwtDecode.decode(token);
     current_user.value = decoded.name; // Store the decoded token
     authUserStore.setUser(current_user.value);
+    console.log(decoded.exp);
+    
   } catch (err) {
     console.log("token is null: ", err);
   }

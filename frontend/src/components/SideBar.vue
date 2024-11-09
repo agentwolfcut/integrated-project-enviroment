@@ -2,12 +2,15 @@
 import { defineProps, ref, onMounted } from 'vue'
 import VueJwtDecode from 'vue-jwt-decode';
 import buttonSlot from "./Button.vue";
-import router from "@/router";
+import router from "@/router"
+import { AuthUserStore } from '@/stores/store';
 
+const authUserStore = AuthUserStore()
+const token = authUserStore.token
 let currentUser = ref('')
-const token = localStorage.getItem('token')
 
 if (token) {
+  authUserStore.checkAccessToken()
   const decoded = VueJwtDecode.decode(token);
   currentUser.value = decoded.name;
 } else {

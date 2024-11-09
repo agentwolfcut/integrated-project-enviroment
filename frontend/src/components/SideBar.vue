@@ -6,7 +6,7 @@ import router from "@/router"
 import { AuthUserStore } from '@/stores/store';
 
 const authUserStore = AuthUserStore()
-const token = authUserStore.token
+const token = localStorage.getItem('token')
 let currentUser = ref('')
 
 if (token) {

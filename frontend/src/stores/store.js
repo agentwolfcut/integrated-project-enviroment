@@ -16,6 +16,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     refreshToken: null,
     currentUser: null, // String
     tokenExpiry: null,
+    refreshTokenExpiry : null
   }),
 
   actions: {
@@ -24,18 +25,24 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       this.refreshToken = refreshToken;
       //acess token lifetime
       this.tokenExpiry = Date.now() + 30 * 60 * 1000;
+      // Refresh token lifetime (24 hours)
+      this.refreshTokenExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
       localStorage.setItem("token", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("tokenExpiry", this.tokenExpiry);
+      localStorage.setItem("refreshTokenExpiry", this.refreshTokenExpiry); // Store refresh token expiry
+
     },
 
     clearTokens() {
       this.token = null;
       this.refreshToken = null;
       this.tokenExpiry = null;
+      this.refreshTokenExpiry = null; // Clear refresh token expiry
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("tokenExpiry");
+      localStorage.removeItem("refreshTokenExpiry"); // Remove refresh token expiry from localStorage
     },
 
     checkTokenValidity2(token) {
@@ -61,11 +68,22 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     // real use
     async refreshTokens() {
       const toast = useToast();
-      const storedRefreshToken = localStorage.getItem("refreshToken");
+      const storedRefreshToken = localStorage.getItem("refreshToken")
+      const storedRefreshTokenExpiry = localStorage.getItem("refreshTokenExpiry");
+
       if (!storedRefreshToken) {
         this.clearTokens();
         throw new Error("No refresh token found");
       }
+
+      // Check if the refresh token has expired
+      if (Date.now() > storedRefreshTokenExpiry) {
+        this.clearTokens();
+        toast.error("Refresh token has expired. Please login again.");
+        router.push("/login");
+        return;
+      }
+
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
           method: "POST",
@@ -93,10 +111,11 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     },
 
     scheduleTokenRefresh() {
-      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000; // 1 minute before expiry
+      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000; // 1 minute before access token expiry
       if (refreshInMs > 0) {
-        setTimeout(this.refreshToken, refreshInMs);
+        setTimeout(this.refreshTokens, refreshInMs);
       }
+      // Optionally, you could also check refresh token expiry here if needed
     },
 
     // async checkTokenValidity() {
@@ -132,6 +151,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     //   }
     // },
 
+    // ยังไม่เช็ค expiry
     async checkAccessToken() {
       const storedToken = localStorage.getItem("token");
       const storedExpiry = localStorage.getItem("tokenExpiry");
@@ -142,7 +162,6 @@ export const AuthUserStore = defineStore("AuthUserStore", {
         console.log(`new is ${storedToken} , old is ${this.token}`);
         this.token = storedToken;
         this.tokenExpiry = storedExpiry;
-        this.scheduleTokenRefresh();
       }
     },
 
@@ -213,8 +232,8 @@ export const BoardStore = defineStore("BoardStore", {
     },
     async getBoard() {
       const useAuthStore = AuthUserStore();
-      const token = useAuthStore.token;
       useAuthStore.checkAccessToken();
+      const token = localStorage.getItem("token");
       try {
         const data = await getItems(
           `${import.meta.env.VITE_BASE_URL}/boards`,

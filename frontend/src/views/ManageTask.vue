@@ -19,7 +19,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import { BoardStore, AuthUserStore } from "@/stores/Store.js";
+import { BoardStore, AuthUserStore } from '@/stores/store'
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();

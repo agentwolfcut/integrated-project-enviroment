@@ -2,13 +2,10 @@ import { useToast } from "vue-toast-notification";
 import router from "@/router";
 import { AuthUserStore } from "@/stores/store";
 const toast = useToast();
-
 // async task must wait , inside are promise
 async function getItems(url) {
   try {
-    const useAuthStore = AuthUserStore();
-    useAuthStore.checkAccessToken();
-    const token = useAuthStore.token;
+    const token = localStorage.getItem('token')
     let headers = {};
     if (token) {
       headers = {
@@ -17,7 +14,6 @@ async function getItems(url) {
       };
     } else {
       console.log(token);
-
       headers = {
         "Content-Type": "application/json",
       };
@@ -40,7 +36,7 @@ async function getItems(url) {
 async function getItemById(url) {
   const useAuthStore = AuthUserStore();
   useAuthStore.checkAccessToken();
-  const token = useAuthStore.token;
+  //
   let headers = {};
   if (token) {
     headers = {
@@ -97,7 +93,9 @@ async function transferTasksAndDeleteStatus(url, id, desId, token = null) {
 }
 
 async function addItem(url, newItem) {
-  const token = useAuthStore.token;
+  const useAuthStore = AuthUserStore();
+  useAuthStore.checkAccessToken();
+  const token = localStorage.getItem('token')
   try {
     const res = await fetch(url, {
       method: "POST", // add
@@ -117,7 +115,7 @@ async function addItem(url, newItem) {
 }
 
 async function editItem(url, id, editItem) {
-  const token = useAuthStore.token;
+  //
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
@@ -153,7 +151,7 @@ async function getTasksByStatus(url, statusId) {
 async function patchItem(url, patchData) {
   const useAuthStore = AuthUserStore();
   useAuthStore.checkAccessToken();
-  const token = useAuthStore.token;
+  //
 
   try {
     const headers = {

@@ -5,7 +5,10 @@ const toast = useToast();
 // async task must wait , inside are promise
 async function getItems(url) {
   try {
-    const token = localStorage.getItem('token')
+    const authStore = AuthUserStore()
+    authStore.checkAccessToken()
+    let token = localStorage.getItem('token') || authStore.token
+    console.log(`token from fetch is : ${token}`);
     let headers = {};
     if (token) {
       headers = {
@@ -36,7 +39,7 @@ async function getItems(url) {
 async function getItemById(url) {
   const useAuthStore = AuthUserStore();
   useAuthStore.checkAccessToken();
-  //
+  const token = localStorage.getItem('token')
   let headers = {};
   if (token) {
     headers = {

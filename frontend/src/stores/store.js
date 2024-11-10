@@ -96,10 +96,12 @@ export const AuthUserStore = defineStore("AuthUserStore", {
         if (res.ok) {
           const data = await res.json();
           // from backend
+          console.log('done refresh token');
           this.setTokens(data.access_token, storedRefreshToken);
           this.scheduleTokenRefresh(); // Set the next refresh
           return data.access_token;
         } else if (res.status === 401) {
+          toast.error('invalid token')
           this.clearTokens();
           router.push("/login");
         }
@@ -152,16 +154,20 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     // },
 
     // ยังไม่เช็ค expiry
-    async checkAccessToken() {
+    async checkAccessToken() {      
       const storedToken = localStorage.getItem("token");
       const storedExpiry = localStorage.getItem("tokenExpiry");
 
       if (storedToken !== this.token) {
         await this.refreshTokens(); // Try refreshing the token
+        console.log('do refresh');
+        
       } else {
-        console.log(`new is ${storedToken} , old is ${this.token}`);
+        // console.log(`new is ${storedToken} , old is ${this.token}`);
         this.token = storedToken;
         this.tokenExpiry = storedExpiry;
+        console.log(' do nothing');
+        
       }
     },
 
@@ -170,13 +176,16 @@ export const AuthUserStore = defineStore("AuthUserStore", {
       localStorage.setItem("currentUser", user);
     },
 
-    async findCurrentUser(username) {
-      const token = localStorage.getItem("token");
+    async findCurrentUser (username) {
+      const useAuthStore = AuthUserStore()
+    
+      // Ensure the access token is checked and refreshed if necessary
+      await useAuthStore.checkAccessToken(); // Wait for the token check to complete
+    
+      const token = useAuthStore.token; // Get the current token after checking
       if (token) {
         try {
-          const users = await getItems(
-            `${import.meta.env.VITE_BASE_URL}/users`
-          );
+          const users = await getItems(`${import.meta.env.VITE_BASE_URL}/users`);
           const normalizedUsername = username
             .toLowerCase()
             .trim()
@@ -186,12 +195,12 @@ export const AuthUserStore = defineStore("AuthUserStore", {
               item.username.toLowerCase().trim().replace(/\s+/g, ".") ===
               normalizedUsername
           );
-
+    
           if (userFound) {
-            this.currentUser = userFound.oid; // Store the oid of the matched user
+            this.currentUser  = userFound.oid; // Store the oid of the matched user
             return userFound.oid; // Return the oid
           } else {
-            toast.error("user not found");
+            toast.error("User  not found");
             return null;
           }
         } catch (error) {
@@ -199,9 +208,9 @@ export const AuthUserStore = defineStore("AuthUserStore", {
           return null;
         }
       } else {
-        return null;
+        return null; // If no token, return null
       }
-    },
+    }
   },
 });
 

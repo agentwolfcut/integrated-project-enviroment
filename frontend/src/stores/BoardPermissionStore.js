@@ -15,7 +15,8 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     async fetchBoardById(path, method) {
       const toast = useToast();
       const authStore = AuthUserStore()
-      const token = authStore.token
+      // const token = authStore.token
+      const token = localStorage.getItem('token') // fix problem 1
       authStore.checkAccessToken()
       try {
         let headers = {};

@@ -10,7 +10,8 @@ export async function checkBoardAccess(to, from, next) {
   const boardID = to.params.boardID;
 
   const authUserStore = AuthUserStore()
-  const token = authUserStore.token  
+  // case 1 problem
+  const token = localStorage.getItem('token') 
   if (token) {    
     await boardPermStore.fetchBoardById(`/boards/${boardID}`, "GET");
   } else {

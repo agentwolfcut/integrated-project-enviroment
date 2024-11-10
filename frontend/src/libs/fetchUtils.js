@@ -151,7 +151,7 @@ async function getTasksByStatus(url, statusId) {
 async function patchItem(url, patchData) {
   const useAuthStore = AuthUserStore();
   useAuthStore.checkAccessToken();
-  //
+  const token = localStorage.getItem('token')
 
   try {
     const headers = {

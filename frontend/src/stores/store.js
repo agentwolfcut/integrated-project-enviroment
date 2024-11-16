@@ -96,14 +96,13 @@ export const AuthUserStore = defineStore("AuthUserStore", {
         if (res.ok) {
           const data = await res.json();
           // from backend
-          console.log('done refresh token');
           this.setTokens(data.access_token, storedRefreshToken);
           this.scheduleTokenRefresh(); // Set the next refresh
           return data.access_token;
         } else if (res.status === 401) {
           toast.error('invalid token')
+          router.push('/login')
           this.clearTokens();
-          router.push("/login");
         }
       } catch (error) {
         toast.error("Failed to refresh token. Please login again.");
@@ -160,13 +159,11 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
       if (storedToken !== this.token) {
         await this.refreshTokens(); // Try refreshing the token
-        console.log('do refresh');
         
       } else {
         // console.log(`new is ${storedToken} , old is ${this.token}`);
         this.token = storedToken;
         this.tokenExpiry = storedExpiry;
-        console.log(' do nothing');
         
       }
     },

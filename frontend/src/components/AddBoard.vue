@@ -17,7 +17,6 @@ currentUser.value = decoded.name;
 
 provide("currentUser", currentUser);
 newBoardName.value =  `${currentUser.value} personal Board`
-console.log(newBoardName.value);
 
 const addBoard = () => {
   boardStore.addBoard(newBoardName.value);

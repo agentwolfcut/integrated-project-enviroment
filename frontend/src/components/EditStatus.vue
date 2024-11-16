@@ -17,7 +17,6 @@ const emits = defineEmits(['saveEdit', 'cancelEdit','failEdit'])
 const route = useRoute()
 // const statusId = ref(route.params.id)
 const initialStatus = JSON.parse(JSON.stringify(props.status))
-console.log(initialStatus);
 
 const previousStatus = ref({...props.status})
 if (previousStatus.value.id === undefined || previousStatus.value.name === null || previousStatus.value.name === undefined || previousStatus.value.title == '') {

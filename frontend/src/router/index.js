@@ -11,6 +11,8 @@ import Board from "@/views/Board.vue";
 import AddBoard from "@/components/AddBoard.vue";
 import AccessDeny from '@/views/AccesDeny.vue'
 import { checkBoardAccess } from "@/libs/authGuard.js"; // Import the reusable function
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore"
+import BoardCollab from "@/views/BoardCollab.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -29,6 +31,7 @@ const routes = [
     component: Task,
     props: true,
     children: [
+      { path: 'collab' , component: BoardCollab , name : "CollabBoard", props: true , meta: { requiresOwner: true }  }, 
       { path: "task/add", component: AddTask, name: "AddTask", props: true , meta: { requiresOwner: true } },
       { path: ":taskId/edit", component: EditTask, name: "EditTask", props: true , meta: { requiresOwner: true }},
     ],
@@ -45,6 +48,7 @@ const routes = [
       { path: ':id/edit' , component: EditStatus , name: 'EditStatus', props:true , meta: {requiresOwner : true}}],
     beforeEnter: checkBoardAccess, // Use the permission check function
   },
+  { path: '/board/:boardID/collab' , component: BoardCollab , name : "CollabBoard", props: true , meta: { requiresOwner: true }  }, 
 
   {
     path: "/board",
@@ -59,6 +63,11 @@ const routes = [
     component: NotFound,
     redirect: "/test", // Redirect to Access Denied on not found
   },
+   {
+    path: '/testcollab',
+    name: 'BoardCollab',
+    component : BoardCollab
+   }
 ];
 
 const router = createRouter({
@@ -66,8 +75,6 @@ const router = createRouter({
   routes,
   linkActiveClass: "text-blue-300",
 })
-
-import { useBoardPermissionStore } from "@/stores/BoardPermissionStore"
 
 router.beforeEach(async (to, from, next) => {
   const boardPermissionStore = useBoardPermissionStore();
@@ -78,8 +85,7 @@ router.beforeEach(async (to, from, next) => {
       return next('/test')      
     }
     if(boardPermissionStore.isOwner) {
-      console.log('this is owner');
-      
+      console.log('this is owner')      
       // await boardPermissionStore.fetchBoardById(`/board/${boardID}`, 'GET')
     } else {
       await boardPermissionStore.fetchBoardByIdForPublic(`/board/${boardID}`, 'GET');

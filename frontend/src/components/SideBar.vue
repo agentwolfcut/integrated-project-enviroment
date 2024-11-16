@@ -12,7 +12,11 @@ let currentUser = ref('')
 if (token) {
   authUserStore.checkAccessToken()
   const decoded = VueJwtDecode.decode(token);
+  if (!decoded.name) {
+    currentUser.value = 'Guest user'
+  }
   currentUser.value = decoded.name;
+
 } else {
   currentUser.value = 'Guest user'
 }

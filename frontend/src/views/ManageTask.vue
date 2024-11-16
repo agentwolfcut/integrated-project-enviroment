@@ -335,6 +335,19 @@ const confirmChange = async () => {
                 </button>
 
                 <div class="flex flex-row">
+                  <!-- รอ component  -->
+                  <router-link :to="`/board/${boardIdRoute}/status`">
+                    <div class="rounded-lg ml-4 sm:ml-8">
+                      <buttonSlot
+                        size="sm"
+                        type="light"
+                        class="itbkk-manage-collaborator"
+                      >
+                        <template v-slot:title> collaborator </template>
+                      </buttonSlot>
+                    </div>
+                  </router-link>
+
                   <router-link :to="`/board/${boardIdRoute}/status`">
                     <div class="rounded-lg ml-4 sm:ml-8">
                       <buttonSlot
@@ -365,7 +378,10 @@ const confirmChange = async () => {
                     </div>
                   </router-link>
                 </div>
+
+
               </div>
+              <div>BOARD NAME</div>
               <div class="mt-7 overflow-x-auto rounded-2xl">
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
@@ -533,6 +549,7 @@ const confirmChange = async () => {
         </div>
       </div>
     </div>
+
     <div
       v-show="error || complete"
       :class="[

@@ -8,7 +8,6 @@ async function getItems(url) {
     const authStore = AuthUserStore()
     authStore.checkAccessToken()
     let token = localStorage.getItem('token') || authStore.token
-    console.log(`token from fetch is : ${token}`);
     let headers = {};
     if (token) {
       headers = {
@@ -16,7 +15,6 @@ async function getItems(url) {
         Authorization: "Bearer " + token,
       };
     } else {
-      console.log(token);
       headers = {
         "Content-Type": "application/json",
       };

@@ -23,7 +23,6 @@ export const useStatusStore = defineStore('status' , {
                 )
                 this.statuses = statuses
             } catch (error) {
-                console.log('Error fetching statuses: ' , error);
                 toast.error('Error fetching statuses');
             }
         }

@@ -8,7 +8,6 @@ export async function checkBoardAccess(to, from, next) {
   const boardPermStore = useBoardPermissionStore();
   const toast = useToast();
   const boardID = to.params.boardID;
-
   const authUserStore = AuthUserStore()
   // case 1 problem
   // authUserStore.checkAccessToken()

@@ -25,7 +25,7 @@ public class StatusService {
     @Autowired
     private TaskService taskService;
     @Autowired
-    BoardPermissionService boardPermissionService;
+    CollaboratorsService collaboratorsService;
 
 
 

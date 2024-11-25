@@ -12,7 +12,7 @@ import dev.backendintegratedproject.dtos.task.UpdateTaskDTO;
 import dev.backendintegratedproject.dtos.users.UserDetailsDTO;
 import dev.backendintegratedproject.primarydatasource.entities.Status;
 import dev.backendintegratedproject.primarydatasource.entities.Task;
-import dev.backendintegratedproject.primarydatasource.repositories.BoardPermissionRepository;
+import dev.backendintegratedproject.primarydatasource.repositories.CollaboratorsRepository;
 import dev.backendintegratedproject.primarydatasource.repositories.StatusRepository;
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
@@ -29,7 +29,7 @@ public class TaskService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    BoardPermissionRepository boardPermissionRepository;
+    CollaboratorsRepository collaboratorsRepository;
 
     @Transactional(readOnly = true)
     public List<Task> getTasksByStatuses(String boardID, List<String> statuses) {
@@ -56,7 +56,7 @@ public class TaskService {
         if (status == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
         }
-//        if (!boardPermissionRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
+//        if (!CollaboratorsRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
 //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The status does not exist");
 //        }
         // Check if title, status is empty

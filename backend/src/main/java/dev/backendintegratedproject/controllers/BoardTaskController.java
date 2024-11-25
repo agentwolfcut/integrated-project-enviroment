@@ -2,9 +2,8 @@ package dev.backendintegratedproject.controllers;
 
 import dev.backendintegratedproject.dtos.board.CollaboratorRequest;
 import dev.backendintegratedproject.dtos.board.VisibilityDTO;
-import dev.backendintegratedproject.primarydatasource.entities.BoardPermission;
-import dev.backendintegratedproject.services.BoardPermissionService;
-import dev.backendintegratedproject.services.SharedUserService;
+import dev.backendintegratedproject.primarydatasource.entities.Collaborators;
+import dev.backendintegratedproject.services.CollaboratorsService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,26 +47,18 @@ public class BoardTaskController {
 
     // Board API
     @Autowired
-    private BoardPermissionService boardPermissionService;
-
-    @Autowired
-    private SharedUserService sharedUserService;
-
+    private CollaboratorsService collaboratorsService;
 
     @PostMapping("/{boardID}/collabs")
-    public ResponseEntity<?> addCollaborator(@PathVariable String boardID, @RequestBody CollaboratorRequest request) {
-        try {
-            BoardPermission permission = boardPermissionService.addCollaborator(request.getUserID(), boardID, request.getPermission());
-            return ResponseEntity.status(HttpStatus.CREATED).body(permission);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+    public ResponseEntity<Collaborators> addCollaborator(@PathVariable String boardID, @Valid @RequestBody CollaboratorRequest request) {
+        Collaborators newCollaborator = collaboratorsService.addCollaborator(request.getEmail(), boardID, request.getAccessRight());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCollaborator);
     }
 
     @DeleteMapping("/{boardID}/collabs/{userID}")
     public ResponseEntity<?> removeCollaborator(@PathVariable String boardID, @PathVariable String userID) {
         try {
-            boardPermissionService.removeCollaborator(userID, boardID);
+            collaboratorsService.removeCollaborator(userID, boardID);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -76,17 +67,17 @@ public class BoardTaskController {
 
 
     @GetMapping("/{boardID}/collabs")
-    public ResponseEntity<List<BoardPermission>> getCollaborators(@PathVariable String boardID) {
-        List<BoardPermission> permissions = boardPermissionService.getCollaborators(boardID);
-        return ResponseEntity.ok(permissions);
+    public ResponseEntity<List<Collaborators>> getCollaborators(@PathVariable String boardID) {
+        List<Collaborators> Collaborator = collaboratorsService.getCollaborators(boardID);
+        return ResponseEntity.ok(Collaborator);
     }
 
     //patch
     @PatchMapping("/{boardID}/collabs/{userID}")
     public ResponseEntity<?> updateCollaborator(@PathVariable String boardID, @PathVariable String userID, @RequestBody CollaboratorRequest request) {
         try {
-            BoardPermission permission = boardPermissionService.updateCollaborator(userID, boardID, request.getPermission());
-            return ResponseEntity.ok(permission);
+            Collaborators newCollaborator = collaboratorsService.updateCollaborator(userID, boardID, request.getAccessRight());
+            return ResponseEntity.ok(newCollaborator);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

@@ -7,20 +7,11 @@ import lombok.Data;
 
 @Data
 public class CollaboratorRequest {
-    @Email(message = "Invalid email format")
-    @NotNull(message = "Email is required")
+    @NotNull
+    @Email
     private String email;
-
-    @NotNull(message = "AccessRight is required")
-    @Pattern(regexp = "READ|WRITE", message = "AccessRight must be READ or WRITE")
+    @NotNull
+    @Pattern(regexp = "READ|WRITE")
     private String accessRight;
-
-    public String getUserID() {
-        return email;
-    }
-
-    public String getPermission() {
-        return accessRight;
-    }
 }
 

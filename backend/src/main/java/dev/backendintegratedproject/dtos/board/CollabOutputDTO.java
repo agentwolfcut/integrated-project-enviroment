@@ -9,6 +9,5 @@ public class CollabOutputDTO {
     private String name;
     private String email;
     private AccessRight accessRight;
-    private String createdOn;
-    private String updatedOn;
+    private String AddedOn;
 }

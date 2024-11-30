@@ -1,17 +1,20 @@
 package dev.backendintegratedproject.controllers;
 
-import dev.backendintegratedproject.dtos.board.CollaboratorRequest;
-import dev.backendintegratedproject.dtos.board.VisibilityDTO;
+import dev.backendintegratedproject.dtos.board.*;
+import dev.backendintegratedproject.primarydatasource.entities.AccessRight;
 import dev.backendintegratedproject.primarydatasource.entities.Collaborators;
+import dev.backendintegratedproject.primarydatasource.repositories.BoardRepository;
 import dev.backendintegratedproject.services.CollaboratorsService;
+import dev.backendintegratedproject.util.JwtUtils;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.description.modifier.Visibility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import dev.backendintegratedproject.dtos.board.CreateBoardDTO;
 import dev.backendintegratedproject.dtos.task.CreateTaskDTO;
 import dev.backendintegratedproject.dtos.task.DetailedTaskDTO;
 import dev.backendintegratedproject.dtos.task.SimpleTaskDTO;
@@ -24,8 +27,8 @@ import dev.backendintegratedproject.services.UserBoardService;
 import dev.backendintegratedproject.util.ListMapper;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v3/boards")
@@ -49,45 +52,105 @@ public class BoardTaskController {
     @Autowired
     private CollaboratorsService collaboratorsService;
 
-    @PostMapping("/{boardID}/collabs")
-    public ResponseEntity<Collaborators> addCollaborator(@PathVariable String boardID, @Valid @RequestBody CollaboratorRequest request) {
-        Collaborators newCollaborator = collaboratorsService.addCollaborator(request.getEmail(), boardID, request.getAccessRight());
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCollaborator);
+    @Autowired
+    private JwtUtils jwtTokenUtil;
+
+    @Autowired
+    private BoardRepository repository;
+
+
+
+    private String getOidFromHeader(String header) {
+        if (header == null) return null;
+        String token = header.substring(7);
+        return jwtTokenUtil.getClaimValueFromToken(token, "oid");
     }
 
-    @DeleteMapping("/{boardID}/collabs/{userID}")
-    public ResponseEntity<?> removeCollaborator(@PathVariable String boardID, @PathVariable String userID) {
-        try {
-            collaboratorsService.removeCollaborator(userID, boardID);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    private String getNameFromHeader(String header) {
+        if (header == null) return null;
+        String token = header.substring(7);
+        return jwtTokenUtil.getClaimValueFromToken(token, "name");
+    }
+
+    public Board getBoard(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Board ID cannot be null or empty.");
         }
+        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board doesn't exist"));
     }
 
+    private Board permissionCheck(String authorizationHeader, String bid, String method, Boolean isCollabCanDoOperation) {
+        String userOid = null;
+        if (authorizationHeader != null) userOid = getOidFromHeader(authorizationHeader);
+        Board board = userBoardService.getBoardsDetail(bid);
 
-    @GetMapping("/{boardID}/collabs")
-    public ResponseEntity<List<Collaborators>> getCollaborators(@PathVariable String boardID) {
-        List<Collaborators> Collaborator = collaboratorsService.getCollaborators(boardID);
-        return ResponseEntity.ok(Collaborator);
+        return board;
     }
 
-    //patch
-    @PatchMapping("/{boardID}/collabs/{userID}")
-    public ResponseEntity<?> updateCollaborator(@PathVariable String boardID, @PathVariable String userID, @RequestBody CollaboratorRequest request) {
-        try {
-            Collaborators newCollaborator = collaboratorsService.updateCollaborator(userID, boardID, request.getAccessRight());
-            return ResponseEntity.ok(newCollaborator);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    private AccessRight oidCheck(Board board, String userOid, String method, Visibility visibility, Boolean isCollabCanDoOperation) {
+        boolean isOwner = Objects.equals(board.getOwnerID(), userOid);
+        Collaborators collab = isOwner ? null : collaboratorsService.getCollabOfBoard(board.getId(), userOid, false);
+
+        boolean isWriteAccess = isOwner || (collab != null && collab.getAccessRight() == AccessRight.WRITE);
+        boolean isCanDoOp = Objects.equals(method, "get") || isCollabCanDoOperation;
+
+        if (!Objects.equals(method, "get") && !isWriteAccess && !Objects.equals(board.getId(), "kanbanbase")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission on this board");
         }
+        if (!isOwner && !isCanDoOp && !Objects.equals(board.getId(), "kanbanbase")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission on this board");
+        }
+
+        return isOwner || (collab != null && collab.getAccessRight() == AccessRight.WRITE) ? AccessRight.WRITE : AccessRight.READ;
     }
-    @GetMapping("")
-    public ResponseEntity<List<Board>> getAllBoard(Authentication authentication) {
-        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-        List<Board> boards = userBoardService.getBoardsByUserID(userDetails.getOid());
-        return ResponseEntity.ok(boards);
+
+
+    @GetMapping("/{id}/collabs")
+    public ResponseEntity<Object> getCollab(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable String id) {
+        Board board = permissionCheck(authorizationHeader, id, "get", true);
+
+        List<CollabOutputDTO> collabs = Collections.singletonList(collaboratorsService.mapOutputDTO((Collaborators) collaboratorsService.getAllCollabOfBoard(id)));
+        return ResponseEntity.ok(collabs);
     }
+
+
+    @GetMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> getCollabById(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
+        Board board = permissionCheck(authorizationHeader, id, "get", true);
+
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.getCollabOfBoard(id, UserOid, true));
+        return ResponseEntity.ok(collab);
+    }
+
+    @PostMapping("/{id}/collabs")
+    public ResponseEntity<Object> createCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @Valid @RequestBody(required = false) CollabCreateInputDTO input) throws MessagingException, UnsupportedEncodingException {
+        Board board = permissionCheck(authorizationHeader, id, "post", false);
+
+        CollabOutputDTO newCollab = collaboratorsService.mapOutputDTO(collaboratorsService.createNewCollab(board, input));
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCollab);
+    }
+
+    @PatchMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> updateAccessRight(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid, @RequestBody(required = false) AccessRightDTO input) throws MessagingException, UnsupportedEncodingException {
+        Board board = permissionCheck(authorizationHeader, id, "patch", false);
+        String userName = null;
+        if (authorizationHeader != null) userName = getNameFromHeader(authorizationHeader);
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.updateCollab(id, UserOid, input));
+        return ResponseEntity.ok(collab);
+    }
+
+    @DeleteMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> deleteCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
+        String method = "delete";
+        String oid = getOidFromHeader(authorizationHeader);
+        if (Objects.equals(oid, UserOid)) method = "get";
+
+        Board board = permissionCheck(authorizationHeader, id, method, false);
+
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.deleteCollab(id, UserOid));
+        return ResponseEntity.ok().body(new HashMap<>());
+    }
+
 
 
     @PostMapping("")

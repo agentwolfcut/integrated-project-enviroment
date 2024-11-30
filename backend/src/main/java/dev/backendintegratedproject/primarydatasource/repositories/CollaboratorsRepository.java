@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import dev.backendintegratedproject.primarydatasource.entities.Collaborators;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CollaboratorsRepository extends JpaRepository<Collaborators, CollaboratorsId> {
 
@@ -31,6 +32,8 @@ public interface CollaboratorsRepository extends JpaRepository<Collaborators, Co
 
 
     boolean existsByUserOidAndBoardID(String userOid, String boardID);
+
+    Optional<Object> findByBoardIDAndUserOid(String id, String userOid);
 }
 
 

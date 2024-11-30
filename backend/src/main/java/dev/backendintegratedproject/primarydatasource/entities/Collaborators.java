@@ -38,4 +38,7 @@ public class Collaborators {
     private Board board;
 
 
+    public Object getStatus() {
+        return null;
+    }
 }

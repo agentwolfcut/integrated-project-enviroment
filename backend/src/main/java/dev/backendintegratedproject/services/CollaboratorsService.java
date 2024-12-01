@@ -1,9 +1,14 @@
 package dev.backendintegratedproject.services;
 
+import dev.backendintegratedproject.dtos.board.AccessRightDTO;
+import dev.backendintegratedproject.dtos.board.CollabCreateInputDTO;
+import dev.backendintegratedproject.dtos.board.CollabOutputDTO;
 import dev.backendintegratedproject.primarydatasource.entities.AccessRight;
 import dev.backendintegratedproject.primarydatasource.entities.Board;
 import dev.backendintegratedproject.primarydatasource.entities.Collaborators;
 import dev.backendintegratedproject.primarydatasource.repositories.BoardRepository;
+import dev.backendintegratedproject.userdatasource.entities.User;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import dev.backendintegratedproject.primarydatasource.repositories.CollaboratorsRepository;
@@ -19,6 +24,11 @@ public class CollaboratorsService {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private UserService userService;
 
 
     public Collaborators addCollaborator(String userOid, String boardID, String accessRight) {
@@ -75,8 +85,6 @@ public class CollaboratorsService {
         Board board = boardRepository.findById(boardID).orElseThrow(() -> new IllegalArgumentException("Board not found."));
         return board.getOwnerID().equals(oid);
     }
-<<<<<<< Updated upstream
-=======
 
     public Collaborators getCollabOfBoard(String id, String userOid, boolean b) {
         return (Collaborators) collaboratorsRepository.findByBoardIDAndUserOid(id, userOid).orElseThrow(() -> new IllegalArgumentException("User is not a collaborator for this board."));
@@ -129,7 +137,6 @@ public class CollaboratorsService {
         collaboratorsRepository.delete(collab);
         return collab;
     }
->>>>>>> Stashed changes
 }
 
 

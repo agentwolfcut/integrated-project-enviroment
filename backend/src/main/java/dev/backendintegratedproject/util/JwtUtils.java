@@ -86,5 +86,7 @@ public class JwtUtils implements Serializable {
     }
 
 
-
+    public String getClaimValueFromToken(String token, String oid) {
+        return getClaimFromToken(token, claims -> (String) claims.get(oid));
+    }
 }

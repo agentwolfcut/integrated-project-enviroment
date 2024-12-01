@@ -116,6 +116,10 @@ public class UserBoardService {
     }
 
 
+    public List<Board> getBoards(String oid) {
+        return boardRepository.findAllByOwnerID(oid);
+    }
+
     public List<Board> getAllBoards(String oid) {
         return boardRepository.findAllByOwnerID(oid);
     }

@@ -33,14 +33,9 @@ public class Board {
 
     @JsonProperty("visibility")
     public String getVisibility() {
-<<<<<<< Updated upstream
-        return this.visibility ? "PUBLIC" : "PRIVATE";
-    }
-=======
         return Boolean.TRUE.equals(this.visibility) ? "PUBLIC" : "PRIVATE";
     }
 
->>>>>>> Stashed changes
     @JsonIgnore
     public void setVisibility(String visibility) {
         if ("PUBLIC".equalsIgnoreCase(visibility)) {
@@ -48,12 +43,8 @@ public class Board {
         } else if ("PRIVATE".equalsIgnoreCase(visibility)) {
             this.visibility = false;
         } else {
-            throw new IllegalArgumentException("Invalid visibility value.");
+            throw new IllegalArgumentException("Invalid visibility value. Only 'PUBLIC' or 'PRIVATE' are allowed.");
         }
-    }
-    @JsonIgnore
-    public boolean isPublic() {
-        return this.visibility;
     }
 
     @ManyToOne
@@ -65,5 +56,9 @@ public class Board {
         if (this.id == null || this.id.isEmpty()) {
             this.id = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 10);
         }
+    }
+
+    public boolean isPublic() {
+        return Boolean.TRUE.equals(this.visibility);
     }
 }

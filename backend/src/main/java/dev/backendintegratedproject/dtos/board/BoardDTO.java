@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.dtos.board;
 
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,4 +12,3 @@ public class BoardDTO {
     private String visibility;
     private String ownerID;
 }
-

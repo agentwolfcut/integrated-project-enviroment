@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CollaboratorsRepository extends JpaRepository<Collaborators, CollaboratorsId> {
 
@@ -26,9 +27,6 @@ public interface CollaboratorsRepository extends JpaRepository<Collaborators, Co
     List<Collaborators> findAllByBoardID(String boardID);
 
     boolean existsByUserOidAndBoardID(String userOid, String boardID);
-<<<<<<< Updated upstream
-=======
 
     Optional<Collaborators> findByBoardIDAndUserOid(String boardID, String userOid);
->>>>>>> Stashed changes
 }

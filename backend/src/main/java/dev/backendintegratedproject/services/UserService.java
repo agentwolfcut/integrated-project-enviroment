@@ -60,4 +60,10 @@ public class UserService implements UserDetailsService {
             roles.add(grantedAuthority);
             return new UserDetailsDTO(user.get().getOid(), user.get().getName(), user.get().getEmail(), user.get().getUsername(), user.get().getPassword(), user.get().getRole(), roles);
         }
+
+    public User findByOid(String oid) { return userRepository.findByOid(oid);}
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

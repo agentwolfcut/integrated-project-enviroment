@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.modelmapper.internal.bytebuddy.description.modifier.Visibility;
 
 @Entity
 @Table(name = "boards")
@@ -17,6 +16,7 @@ import org.modelmapper.internal.bytebuddy.description.modifier.Visibility;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board {
+
     @Id
     @Column(name = "boardID", length = 10)
     private String id;
@@ -31,7 +31,10 @@ public class Board {
     @Column(name = "isPublic", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean visibility;
 
-
+    @JsonProperty("visibility")
+    public String getVisibility() {
+        return Boolean.TRUE.equals(this.visibility) ? "PUBLIC" : "PRIVATE";
+    }
 
     @JsonIgnore
     public void setVisibility(String visibility) {

@@ -89,9 +89,10 @@ public class CollaboratorsService {
     public Collaborators getCollabOfBoard(String id, String userOid, boolean b) {
         return (Collaborators) collaboratorsRepository.findByBoardIDAndUserOid(id, userOid).orElseThrow(() -> new IllegalArgumentException("User is not a collaborator for this board."));
     }
-    public List<Collaborators> getAllCollabOfBoard(String bId) {
-        return collaboratorsRepository.findAllByBoardID(bId);
+    public List<Collaborators> getAllCollabOfBoard(String boardID) {
+        return collaboratorsRepository.findAllByBoardID(boardID);
     }
+
     public CollabOutputDTO mapOutputDTO(Collaborators collab) {//input board must have oid!!
         CollabOutputDTO collabOutputDTO = modelMapper.map(collab, CollabOutputDTO.class);
         User user = userService.findByOid(collab.getUserOid());

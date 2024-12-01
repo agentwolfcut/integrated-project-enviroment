@@ -104,14 +104,42 @@ public class BoardTaskController {
         return isOwner || (collab != null && collab.getAccessRight() == AccessRight.WRITE) ? AccessRight.WRITE : AccessRight.READ;
     }
 
+    //get all boards
+    @GetMapping("")
+    public ResponseEntity<List<BoardDTO>> getAllBoard(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        String oid = getOidFromHeader(authorizationHeader);
+
+        // ดึง List<Board> และแปลงเป็น List<BoardDTO>
+        List<Board> boards = userBoardService.getAllBoards(oid);
+        List<BoardDTO> boardDTOs = boards.stream()
+                .map(board -> modelMapper.map(board, BoardDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(boardDTOs);
+    }
+
 
     @GetMapping("/{id}/collabs")
-    public ResponseEntity<Object> getCollab(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable String id) {
+    public ResponseEntity<List<CollabOutputDTO>> getCollab(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable String id) {
+
         Board board = permissionCheck(authorizationHeader, id, "get", true);
 
-        List<CollabOutputDTO> collabs = Collections.singletonList(collaboratorsService.mapOutputDTO((Collaborators) collaboratorsService.getAllCollabOfBoard(id)));
+        // ดึง List<Collaborators>
+        List<Collaborators> collaborators = collaboratorsService.getAllCollabOfBoard(id);
+
+        // แปลง List<Collaborators> เป็น List<CollabOutputDTO>
+        List<CollabOutputDTO> collabs = collaborators.stream()
+                .map(collaboratorsService::mapOutputDTO) // ใช้ mapOutputDTO แปลงแต่ละ Collaborators เป็น CollabOutputDTO
+                .toList();
+
         return ResponseEntity.ok(collabs);
     }
+
+
+
 
 
     @GetMapping("/{id}/collabs/{UserOid}")

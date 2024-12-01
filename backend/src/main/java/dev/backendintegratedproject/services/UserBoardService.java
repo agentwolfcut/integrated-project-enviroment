@@ -96,16 +96,19 @@ public class UserBoardService {
         }
 
         // Check and set the new visibility
-        Boolean newVis = null;
-        switch (visibility.getVisibility().toLowerCase()) {
-            case "public": newVis = true;
-                break;
-            case "private": newVis = false;
-                break;
-            default: throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid visibility value");
+        if (visibility == null || visibility.getVisibility() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility must not be null");
         }
+
+        Boolean newVis = switch (visibility.getVisibility().toLowerCase()) {
+            case "public" -> true;
+            case "private" -> false;
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid visibility value");
+        };
+
         boardRepository.setVisibility(boardID, newVis);
     }
+
     public void checkBoardAccess(Board board, String userID) {
         if (!board.isPublic() && !board.getOwnerID().equals(userID)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
@@ -113,6 +116,7 @@ public class UserBoardService {
     }
 
 
-
-
+    public List<Board> getAllBoards(String oid) {
+        return boardRepository.findAllByOwnerID(oid);
+    }
 }

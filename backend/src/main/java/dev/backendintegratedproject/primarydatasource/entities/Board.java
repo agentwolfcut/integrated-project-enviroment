@@ -16,6 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board {
+
     @Id
     @Column(name = "boardID", length = 10)
     private String id;
@@ -32,8 +33,14 @@ public class Board {
 
     @JsonProperty("visibility")
     public String getVisibility() {
+<<<<<<< Updated upstream
         return this.visibility ? "PUBLIC" : "PRIVATE";
     }
+=======
+        return Boolean.TRUE.equals(this.visibility) ? "PUBLIC" : "PRIVATE";
+    }
+
+>>>>>>> Stashed changes
     @JsonIgnore
     public void setVisibility(String visibility) {
         if ("PUBLIC".equalsIgnoreCase(visibility)) {

@@ -82,6 +82,7 @@ public class BoardTaskController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+<<<<<<< Updated upstream
     @GetMapping("")
     public ResponseEntity<List<Board>> getAllBoard(Authentication authentication) {
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
@@ -90,6 +91,85 @@ public class BoardTaskController {
     }
 
 
+=======
+
+
+    @GetMapping("/{id}/collabs")
+    public ResponseEntity<List<CollabOutputDTO>> getCollab(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable String id) {
+
+        Board board = permissionCheck(authorizationHeader, id, "get", true);
+
+        // ดึง List<Collaborators>
+        List<Collaborators> collaborators = collaboratorsService.getAllCollabOfBoard(id);
+
+        // แปลง List<Collaborators> เป็น List<CollabOutputDTO>
+        List<CollabOutputDTO> collabs = collaborators.stream()
+                .map(collaboratorsService::mapOutputDTO) // ใช้ mapOutputDTO แปลงแต่ละ Collaborators เป็น CollabOutputDTO
+                .toList();
+
+        return ResponseEntity.ok(collabs);
+    }
+
+
+
+
+    @GetMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> getCollabById(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
+        Board board = permissionCheck(authorizationHeader, id, "get", true);
+
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.getCollabOfBoard(id, UserOid, true));
+        return ResponseEntity.ok(collab);
+    }
+
+    @PostMapping("/{id}/collabs")
+    public ResponseEntity<Object> createCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @Valid @RequestBody(required = false) CollabCreateInputDTO input) throws MessagingException, UnsupportedEncodingException {
+        Board board = permissionCheck(authorizationHeader, id, "post", false);
+
+        CollabOutputDTO newCollab = collaboratorsService.mapOutputDTO(collaboratorsService.createNewCollab(board, input));
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCollab);
+    }
+
+    @PatchMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> updateAccessRight(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid, @RequestBody(required = false) AccessRightDTO input) throws MessagingException, UnsupportedEncodingException {
+        Board board = permissionCheck(authorizationHeader, id, "patch", false);
+        String userName = null;
+        if (authorizationHeader != null) userName = getNameFromHeader(authorizationHeader);
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.updateCollab(id, UserOid, input));
+        return ResponseEntity.ok(collab);
+    }
+
+    @DeleteMapping("/{id}/collabs/{UserOid}")
+    public ResponseEntity<Object> deleteCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
+        String method = "delete";
+        String oid = getOidFromHeader(authorizationHeader);
+        if (Objects.equals(oid, UserOid)) method = "get";
+
+        Board board = permissionCheck(authorizationHeader, id, method, false);
+
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.deleteCollab(id, UserOid));
+        return ResponseEntity.ok().body(new HashMap<>());
+    }
+    //get all board
+    @GetMapping("")
+    public ResponseEntity<List<BoardDTO>> getAllBoard(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        String oid = getOidFromHeader(authorizationHeader);
+
+        // ดึง List<Board> และแปลงเป็น List<BoardDTO>
+        List<Board> boards = userBoardService.getAllBoards(oid);
+        List<BoardDTO> boardDTOs = boards.stream()
+                .map(board -> modelMapper.map(board, BoardDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(boardDTOs);
+    }
+
+
+
+
+>>>>>>> Stashed changes
     @PostMapping("")
     public ResponseEntity<Board> createBoard(@Valid @RequestBody CreateBoardDTO board, Authentication authentication) {
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();

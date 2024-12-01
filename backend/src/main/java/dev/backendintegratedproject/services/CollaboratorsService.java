@@ -75,6 +75,61 @@ public class CollaboratorsService {
         Board board = boardRepository.findById(boardID).orElseThrow(() -> new IllegalArgumentException("Board not found."));
         return board.getOwnerID().equals(oid);
     }
+<<<<<<< Updated upstream
+=======
+
+    public Collaborators getCollabOfBoard(String id, String userOid, boolean b) {
+        return (Collaborators) collaboratorsRepository.findByBoardIDAndUserOid(id, userOid).orElseThrow(() -> new IllegalArgumentException("User is not a collaborator for this board."));
+    }
+    public List<Collaborators> getAllCollabOfBoard(String boardID) {
+        return collaboratorsRepository.findAllByBoardID(boardID);
+    }
+
+    public CollabOutputDTO mapOutputDTO(Collaborators collab) {//input board must have oid!!
+        CollabOutputDTO collabOutputDTO = modelMapper.map(collab, CollabOutputDTO.class);
+        User user = userService.findByOid(collab.getUserOid());
+        collabOutputDTO.setName(user.getName());
+        collabOutputDTO.setEmail(user.getEmail());
+        collabOutputDTO.setOid(user.getOid());
+        return collabOutputDTO;
+    }
+
+    public Collaborators updateCollab(String id, String collabOid, AccessRightDTO input) {
+        Collaborators collab = getCollabOfBoard(id, collabOid, true);
+        collab.setAccessRight(input.getAccessRight());
+        return collaboratorsRepository.save(collab);
+    }
+
+    public Collaborators createNewCollab(Board board, CollabCreateInputDTO input) {
+        if (input == null || !input.getAccessRight().equalsIgnoreCase("WRITE") && !input.getAccessRight().equalsIgnoreCase("READ")) {
+            throw new IllegalArgumentException("Request body is missing or unreadable");
+        }
+
+        User user = userService.findByEmail(input.getEmail());
+
+        if (user == null) {
+            throw new IllegalArgumentException("User with specified email not found.");
+        }
+        if (collaboratorsRepository.existsByUserOidAndBoardID(user.getOid(), board.getId())) {
+            throw new IllegalArgumentException("This user is already the collaborator or pending collaborator on this board.");
+        }
+        if (board.getOwnerID().equals(user.getOid())) {
+            throw new IllegalArgumentException("The board owner cannot be added as a collaborator.");
+        }
+
+        Collaborators newCollab = new Collaborators();
+        newCollab.setUserOid(user.getOid());
+        newCollab.setBoardID(board.getId());
+        newCollab.setAccessRight(AccessRight.valueOf(input.getAccessRight()));
+        return collaboratorsRepository.save(newCollab);
+    }
+
+    public Collaborators deleteCollab(String id, String userOid) {
+        Collaborators collab = getCollabOfBoard(id, userOid, true);
+        collaboratorsRepository.delete(collab);
+        return collab;
+    }
+>>>>>>> Stashed changes
 }
 
 

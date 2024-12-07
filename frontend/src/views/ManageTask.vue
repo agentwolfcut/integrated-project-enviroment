@@ -19,7 +19,7 @@ import { useTaskStore } from "@/stores/TaskStore.js";
 import { useStatusStore } from "@/stores/StatusStore";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { useVisibilityStore } from "@/stores/VisibilityStore";
-import { BoardStore, AuthUserStore } from '@/stores/store'
+import { BoardStore, AuthUserStore } from "@/stores/store";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toast = useToast();
@@ -306,11 +306,11 @@ const confirmChange = async () => {
   <div class="flex">
     <SideBar />
     <!-- <div class="flex content flex-col items-center h-screen"> -->
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
+    <div class="flex flex-col w-screen h-screen items-center bg-customBg">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="bg-gray-200 py-2 md:py-4 px-4 md:px-8 xl:px-10">
+          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div class="overflow-x-auto">
               <div class="for-button mb-9 flex flex-row justify-between">
                 <button
@@ -336,29 +336,32 @@ const confirmChange = async () => {
 
                 <div class="flex flex-row">
                   <!-- รอ component  -->
-                  <router-link :to="`/board/${boardIdRoute}/status`">
+
+
+                  <router-link :to="`/board/${boardIdRoute}/collab`">
                     <div class="rounded-lg ml-4 sm:ml-8">
                       <buttonSlot
                         size="sm"
                         type="light"
                         class="itbkk-manage-collaborator"
                       >
-                        <template v-slot:title> collaborator </template>
+                        <template v-slot:title> COLLABORATOR </template>
                       </buttonSlot>
                     </div>
                   </router-link>
 
                   <router-link :to="`/board/${boardIdRoute}/status`">
                     <div class="rounded-lg ml-4 sm:ml-8">
-                      <buttonSlot
+                      <buttonSlot 
                         size="sm"
-                        type="light"
+                        type="dark"
                         class="itbkk-manage-status"
                       >
                         <template v-slot:title> STATUS </template>
                       </buttonSlot>
                     </div>
                   </router-link>
+
                   <router-link :to="`/board/${boardIdRoute}/task/add`">
                     <div class="rounded-lg ml-4 sm:ml-8">
                       <buttonSlot
@@ -378,14 +381,13 @@ const confirmChange = async () => {
                     </div>
                   </router-link>
                 </div>
-
-
               </div>
-              <div>BOARD NAME</div>
+              <div class="text-black text-xl font-bold">BOARD NAME</div>
+
               <div class="mt-7 overflow-x-auto rounded-2xl">
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
-                  <thead class="text-white" style="background-color: #15161a">
+                  <thead class="bg-customYellow text-black">
                     <tr class="focus:outline-none h-16 text-base">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
@@ -427,11 +429,11 @@ const confirmChange = async () => {
                   </thead>
 
                   <!-- body content -->
-                  <tbody class="container">
+                  <tbody class="container bg-white">
                     <tr
                       v-for="(task, index) in sortedTasks"
                       :key="index"
-                      :class="{ 'bg-slate-100': index % 2 === 0 }"
+                      :class="{ 'bg-customBg': index % 2 === 0 }"
                       class="itbkk-item h-16 box ease-in transition-colors"
                     >
                       <td
@@ -565,9 +567,9 @@ const confirmChange = async () => {
       class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
     >
       <div
-        class="itbkk-message bg-gray-600 border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+        class="itbkk-message bg-gray-400 border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
       >
-        <p class="mb-4 text-base font-medium overflow-y-auto">
+        <p class="mb-4 text-base text-black font-medium overflow-y-auto">
           Do you want to delete the task number {{ taskToDelete.id }} ,
           <span
             class="text-red-600 text-lg italic text-wrap hover:text-balance"
@@ -648,22 +650,30 @@ const confirmChange = async () => {
 
 <style scoped>
 .itbkk-button-add {
-  background-color: #260b8a;
+  background-color: #808782;
 }
 
 .itbkk-button-add:hover {
-  background-color: #c7b8ea;
+  background-color: #d5d7d5;
   /* light purple color */
 }
 
 /* itbkk-manage-status */
 .itbkk-manage-status {
-  background-color: #ffcc00;
+  background-color: #db3069;
 }
 
 .itbkk-manage-status:hover {
-  background-color: #f1da7c;
+  background-color: #e6abbe;
   /* light purple color */
+}
+
+.itbkk-manage-collaborator {
+  background-color: #ebebd3;
+}
+
+.itbkk-manage-collaborator:hover {
+  background-color: #4e4e46;
 }
 
 .itbkk-board-visibility {

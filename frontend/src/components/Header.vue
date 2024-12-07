@@ -20,22 +20,9 @@
 </style>
 
 <template>
-  <!-- 
-
-
-<div class="text-center text-4xl ">
-  <p class="font-sans md:font-serif font-bold">IT-Bangmod Kradan Kanban </p>
-</div> -->
-
-  <div
-    class="navbar bg-slate-800"
-    style="background-color: rgb(15, 26, 44, 255)"
-  >
-    <a
-      class="p-2 px-4 text-xl text-white"
-      style="background-color: rgb(14, 21, 39)"
-      >𝙆𝙧𝙖𝙙𝙖𝙣𝙆𝙖𝙣𝙗𝙖𝙣 <img src="../../public/logo.gif" class="p-1 h-10 w-10"
-    /></a>
+  <div class="navbar bg-white">
+    <a class="p-2 px-4 text-3xl text-black"
+      >𝙆𝙧𝙖𝙙𝙖𝙣𝙆𝙖𝙣𝙗𝙖𝙣 </a>
 
     <div class="header-container px-2">
       <img src="../../public/logoSIT.png" class="h-7 w-29" />

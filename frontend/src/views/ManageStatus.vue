@@ -16,7 +16,7 @@ import { useRoute } from "vue-router";
 import VueJwtDecode from "vue-jwt-decode";
 import { createToaster } from "@meforma/vue-toaster";
 import LineMdCloseSmall from "@/assets/icons/LineMdCloseSmall.vue";
-import { post, put } from "@/libs/Utils";
+import { put } from "@/libs/Utils";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore.js";
 
 const toaster = createToaster({
@@ -279,11 +279,11 @@ const handelFail = () => {
 <template>
   <div class="flex">
     <SideBar :user="currentUser" />
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
+    <div class="flex flex-col w-screen h-screen items-center bg-customBg">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-200">
+          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div>
               <!-- button add -->
               <div class="flex justify-end mb-9">
@@ -322,10 +322,10 @@ const handelFail = () => {
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
                   <thead
-                    class="text-slate-50 text"
-                    style="background-color: #15161a"
+                    class="text-slate-50 text bg-customYellow"
+                    
                   >
-                    <tr class="focus:outline-none h-16 text-base">
+                    <tr class="focus:outline-none h-16 text-base text-black">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
                       >
@@ -350,7 +350,7 @@ const handelFail = () => {
                     <tr
                       v-for="(status, index) in statusList"
                       :key="index"
-                      :class="{ 'bg-slate-100': index % 2 === 0 }"
+                      :class="{ 'bg-white': index % 2 === 0 }"
                       class="itbkk-item h-16 box ease-in transition-colors"
                     >
                       <td class="min-w-60">
@@ -569,20 +569,20 @@ const handelFail = () => {
 
 <style scoped>
 .itbkk-button-add {
-  background-color: #260b8a;
+  background-color: #DB3069;
 }
 
 .itbkk-button-add:hover {
-  background-color: #c7b8ea;
+  background-color: #F9DDE6;
   /* light purple color */
 }
 
 .itbkk-manage-task {
-  background-color: #ffcc00;
+  background-color: #ebebd3;
 }
 
 .itbkk-manage-task:hover {
-  background-color: #f1da7c;
+  background-color: #76766A;
 }
 
 table {

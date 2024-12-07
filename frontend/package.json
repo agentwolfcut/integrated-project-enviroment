@@ -19,6 +19,7 @@
     "@vueform/toggle": "^2.1.4",
     "json-server": "^1.0.0-alpha.23",
     "pinia": "^2.2.2",
+    "primeicons": "^7.0.0",
     "vue": "^3.4.21",
     "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.3.0",

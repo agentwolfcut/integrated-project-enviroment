@@ -4,49 +4,71 @@ import { useRoute } from "vue-router";
 import SideBar from "@/components/SideBar.vue";
 import HeaderIT from "@/components/Header.vue";
 import buttonSlot from "@/components/Button.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import VueJwtDecode from "vue-jwt-decode";
 import AddCollab from "@/components/AddCollab.vue";
+import { useCollaboratorStore } from "@/stores/CollaboratorStore";
+import GoBack from "@/assets/icons/GoBack.vue";
 
 const route = useRoute();
 const boardIdRoute = route.params.boardID;
 const currentUser = ref("");
-const showAddModal = ref(false)
+const showAddModal = ref(false);
+const store = useCollaboratorStore();
+
+onMounted(() => {
+  store.fetchCollaborators(boardIdRoute);
+});
+
 const openAddModal = () => {
-  showAddModal.value = true
-  console.log(showAddModal.value);
-}
+  showAddModal.value = true;
+};
 
-const cancleAddCollab = () => {
-  showAddModal.value = false
-}
+const cancelAddCollab = () => {
+  showAddModal.value = false;
+};
 
-const saveAddCollab = () => {
-  console.log('ok');
-  // api 
-  showAddModal.value = false
-}
+const saveAddCollab = async (email) => {
+  await store.addCollaborator(boardIdRoute, email);
+  showAddModal.value = false;
+};
 
+// Computed property to get the list of collaborators
+// const collaborators = computed(() => store.collaborators);
+const collaborators = ref([
+  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
+  { name: "John Doe", email: "john.doe@example.com", access: "read" },
+  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
+  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
+  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
+  { name: "John Doe", email: "john.doe@example.com", access: "read" },
+  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
+  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
+  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
+  { name: "John Doe", email: "john.doe@example.com", access: "read" },
+  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
+  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
+]);
 </script>
 
 <template>
   <div class="flex">
     <SideBar :user="currentUser" />
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
+    <div class="flex flex-col w-screen h-screen items-center bg-customBg">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-200">
+          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div>
-              <!-- button add -->
+              <!-- Header and Add Collaborator button -->
               <div class="flex justify-between mb-9">
                 <header
                   class="flex justify-center items-center text-2xl font-bold text-cyan-700"
                 >
-                  <div>BOARD NAME</div>
+                  <div class="text-black text-xl font-bold">BOARD NAME</div>
                 </header>
 
-                <div class="rounded-lg ml-4 sm:ml-8" @click=openAddModal>
+                <div class="rounded-lg ml-4 sm:ml-8" @click="openAddModal">
                   <buttonSlot
                     size="sm"
                     type="dark"
@@ -57,82 +79,56 @@ const saveAddCollab = () => {
                 </div>
               </div>
 
-              <div class="mt-7 overflow-x-auto rounded-2xl">
+              <!-- Table with scroll behavior -->
+              <div class="mt-7 overflow-auto max-h-[500px] rounded-2xl">
                 <table class="w-full whitespace-nowrap">
-                  <!-- head -->
-                  <thead
-                    class="text-slate-50 text"
-                    style="background-color: #15161a"
-                  >
+                  <!-- Table head -->
+                  <thead class="text-black font-bold bg-customYellow">
                     <tr class="focus:outline-none h-16 text-base">
-                      <th
-                        class="w-1/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
-                      >
+                      <th class="w-1/12 p-3 pl-12 tracking-wide text-left">
                         No
                       </th>
-                      <th
-                        class="w-2/12 p-3 text-base font-medium tracking-wide text-left"
-                      >
-                        Name
-                      </th>
-
-                      <th
-                        class="p-3 w-4/12 text-base font-medium tracking-wide text-left"
-                      >
-                        Email
-                      </th>
-                      <th
-                        class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                      >
+                      <th class="w-2/12 p-3 tracking-wide text-left">Name</th>
+                      <th class="p-3 w-4/12 tracking-wide text-left">Email</th>
+                      <th class="p-3 w-2/12 tracking-wide text-left">
                         Access Right
                       </th>
-                      <th
-                        class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                      >
-                        Action
-                      </th>
+                      <th class="p-3 w-2/12 tracking-wide text-left">Action</th>
                     </tr>
                   </thead>
-                  <!-- body content -->
+                  <!-- Table body -->
                   <tbody class="container">
-                    <!-- <tr
-                        class="itbkk-item itbkk-collab-item h-16 box ease-in transition-colors"
-                        v-for="(board, index) in boards"
-                        :key="index"
-                      > -->
                     <tr
+                      v-for="(collab, index) in collaborators"
+                      :key="index"
+                      :class="{ 'bg-white': index % 2 === 0 }"
                       class="itbkk-item itbkk-collab-item h-16 box ease-in transition-colors"
                     >
                       <td
                         class="w-1/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left"
                       >
-                        <!-- {{ index + 1 }} -->
-                        1
+                        {{ index + 1 }}
                       </td>
-
                       <td class="w-2/12 p-3">
                         <div
                           class="itbkk-name text-base truncate font-medium leading-none text-gray-900 mr-2"
                         >
-                          <!-- {{ board.name }} -->
-                          ITBKK SIAM
+                          {{ collab.name }}
                         </div>
                       </td>
-
                       <td class="w-4/12 p-3">
                         <div
                           class="itbkk-email text-base font-medium leading-none text-gray-700 mr-2"
                         >
-                          itbkk.siam@ad.sit.kmutt.ac.th
+                          {{ collab.email }}
                         </div>
                       </td>
                       <td class="w-3/12 p-3">
-                        <select
-                          class="itbkk-access-right text-base font-medium leading-none text-gray-700 bg-slate-50 mr-2 p-2 rounded-lg px-4"
+                        <div
+                          class="text-base font-medium leading-none text-gray-700 bg-slate-50 p-2 rounded-lg px-4"
                         >
-                          <option value="read" selected>Read</option>
-                          <option value="write">Write</option>
-                        </select>
+                          {{ collab.access }}
+                        </div>
                       </td>
                       <td class="w-2/12 p-3">
                         <div
@@ -141,7 +137,7 @@ const saveAddCollab = () => {
                           <buttonSlot
                             size="sm"
                             type="light"
-                            class="itbkk-collab-remove disabled:cursor-not-allowed bg-blue-200"
+                            class="itbkk-collab-remove disabled:cursor-not-allowed bg-customBeige"
                           >
                             <template v-slot:title> remove </template>
                           </buttonSlot>
@@ -151,6 +147,16 @@ const saveAddCollab = () => {
                   </tbody>
                 </table>
               </div>
+
+              <!-- Go Back Button -->
+              <div class="flex justify-start mt-6">
+                <button
+                  class="itbkk-go-back px-4 py-2 transition-transform transform hover:scale-125 active:scale-95 focus:outline-none"
+                  @click="router.back()"
+                >
+                  <GoBack />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -159,35 +165,32 @@ const saveAddCollab = () => {
   </div>
   <Teleport to="#AddCollab">
     <div v-show="showAddModal">
-        <AddCollab @cancleAddCollab="cancleAddCollab" @saveAddCollab="saveAddCollab"/>
+      <AddCollab
+        @cancleAddCollab="cancelAddCollab"
+        @saveAddCollab="saveAddCollab"
+      />
     </div>
   </Teleport>
 </template>
 
 <style scoped>
 .itbkk-collaborator-add {
-  background-color: #260b8a;
+  background-color: #db3069;
 }
-
 .itbkk-collaborator-add:hover {
-  background-color: #c7b8ea;
-  /* light purple color */
+  background-color: #e6abbe;
 }
 
 .itbkk-collab-remove:hover {
-  background-color: #0b4b8b;
-  /* light purple color */
+  background-color: #4e4e46;
 }
-
 table {
   width: 100%;
   table-layout: fixed;
 }
-
 .box {
   transition: opacity 0.6s ease;
 }
-
 .container:hover > :not(:hover) {
   opacity: 0.2;
 }

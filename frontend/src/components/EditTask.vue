@@ -37,27 +37,6 @@ onMounted(async () => {
     }
 })
 
-// Computed property to find the status id from status name
-// const statusId = computed(() => {
-//     const selectedStatus = props.statusOptions.find(
-//         (status) => status.name === previousTask.value.status
-//     );
-//     return selectedStatus ? selectedStatus.id : null;
-// });
-
-// const saveTask = () => {
-//     try {
-//         const taskToSave = {
-//             ...previousTask.value,
-//             status: statusId.value // Send status id to the backend
-//         };
-//         emit('saveEdit', taskToSave);
-//     } catch (error) {
-//         console.error('Error saving task:', error);
-//         // Handle error as needed
-//     }
-// }
-
 const statusId = computed(() => {
     if (!previousTask.value.status.name) {
         return null;
@@ -151,7 +130,7 @@ const isSaveDisabled = computed(() => {
         <div
             class="itbkk-modal-task px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70">
 
-            <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl">
+            <div class="bg-white w-1/2 h-auto rounded-3xl shadow-xl">
 
                 <p class="font-bold text-3xl text-black flex justify-center m-3">
                     Edit Task
@@ -180,6 +159,7 @@ const isSaveDisabled = computed(() => {
                             }}/500</p>
 
                     </div>
+
                     <div class="flex flex-col w-5/12">
                         <div>
                             <div class="itbkk-assignees">
@@ -192,6 +172,7 @@ const isSaveDisabled = computed(() => {
                                         previousTask.assignees.length }}/30</p>
 
                             </div>
+
                             <div>
                                 <form class="max-w-sm mx-auto">
                                     <label for="status" class="block mb-2 text-base font-medium text-gray-900">

@@ -16,12 +16,12 @@ const setCurrentBoardId = (id) => {
 
 onMounted(async () => {
   await boardStore.getBoard();
-  if (boardStore.getBoards.length > 0) {
-    const boardId = boardStore.getBoards[0].id;
-    setTimeout(() => {
-      router.push(`/board/${boardId}`);
-    }, 700);
-  }
+  // if (boardStore.getBoards.length > 0) {
+  //   const boardId = boardStore.getBoards[0].id;
+  //   setTimeout(() => {
+  //     router.push(`/board/${boardId}`);
+  //   }, 700);
+  // }
 });
 
 const boards = computed(() => boardStore.getBoards);
@@ -30,19 +30,15 @@ const boards = computed(() => boardStore.getBoards);
 <template>
   <div class="flex">
     <SideBar />
-    <div class="flex flex-col w-screen h-screen items-center bg-gray-200">
+    <div class="flex flex-col w-screen h-screen items-center bg-customBg">
       <HeaderIT />
       <div class="flex justify-center overflow-y-scroll">
         <div class="sm:px-20 w-full">
-          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10 bg-gray-200">
+          <div class="py-2 md:py-4 px-4 md:px-8 xl:px-10">
             <div>
               <!-- button add -->
               <div class="flex justify-end mb-9">
-                <input
-                  type="text"
-                  placeholder="Filter by status"
-                  class="input input-bordered w-full max-w-xs"
-                />
+                
                 <div>
                   <router-link to="/board/add" v-if="boards.length === 0">
                     <div class="rounded-lg ml-4 sm:ml-8 w-60">
@@ -60,90 +56,69 @@ const boards = computed(() => boardStore.getBoards);
                 </div>
               </div>
 
-              <div class="pernonal-board py-3">
-                <div>
+              <div class="personal-board py-3">
+                
                   <div
-                    class="flex justify-center font-extrabold text-3xl text-cyan-600"
+                    class="flex justify-center font-extrabold text-2xl text-black"
                   >
                     Personal Boards
                   </div>
-                </div>
+                
 
                 <div class="mt-7 overflow-x-auto rounded-2xl">
-                  <table v-if="boards.length" class="w-full whitespace-nowrap">
+                  <table class="w-full whitespace-nowrap bg">
                     <!-- head -->
                     <thead
-                      class="text-slate-50 text"
-                      style="background-color: #15161a"
+                      class="text-slate-50 bg-customPink"
+                      
                     >
-                      <tr class="focus:outline-none h-16 text-base">
-                        <th
-                          class="w-3/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
-                        >
-                          No
-                        </th>
-                        <th
-                          class="p-3 text-base font-medium tracking-wide text-left"
-                        >
-                          Name
-                        </th>
-
-                        <th
-                          class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                        >
-                          Visibility
-                        </th>
+                      <tr class="focus:outline-none h-16 text-base text-white">
+                        <th class="w-3/12 p-3 pl-12 text-base font-bold tracking-wide text-left">No</th>
+                        <th class="p-3 text-base font-bold tracking-wide text-left">Name</th>
+                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Visibility</th>
                       </tr>
                     </thead>
                     <!-- body content -->
                     <tbody class="container">
                       <tr
-                        class="itbkk-item itbkk-personal-item h-16 box ease-in transition-colors"
+                        v-if="boards.length"
                         v-for="(board, index) in boards"
                         :key="index"
+                        class="itbkk-item itbkk-personal-item h-16 box ease-in transition-colors"
                       >
-                        <td
-                          class="w-3/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left"
-                        >
+                        <td class="w-3/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left">
                           {{ index + 1 }}
                         </td>
-
                         <td class="w-3/12 p-3 pl-5">
                           <router-link
                             :to="`/board/${board.id}`"
                             @click="setCurrentBoardId(board.id)"
                           >
-                            <div
-                              class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2"
-                            >
+                            <div class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2">
                               {{ board.name }}
                             </div>
                           </router-link>
                         </td>
-
                         <td class="w-2/12 p-3">
-                          <div
-                            class="text-base font-medium leading-none text-gray-700 mr-2"
-                          >
+                          <div class="text-base font-medium leading-none text-gray-700 mr-2">
                             {{ board.visibility }}
                           </div>
                         </td>
                       </tr>
+                      <tr v-else>
+                        <td colspan="3" class="text-center text-xl font-bold py-6 text-slate-400">
+                          NO BOARD PROVIDED
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
-
-                  <div
-                    v-else
-                    class="flex justify-center mt-64 text-3xl font-bold"
-                  >
-                    No board provided
-                  </div>
                 </div>
               </div>
+
               <div class="collab-board py-10">
                 <div>
                   <div
-                    class="flex justify-center font-extrabold text-3xl text-teal-600"
+                    class="flex justify-center font-extrabold text-2xl text-black"
                   >
                     Collab Boards
                   </div>
@@ -152,93 +127,56 @@ const boards = computed(() => boardStore.getBoards);
                   <table class="w-full whitespace-nowrap">
                     <!-- head -->
                     <thead
-                      class="text-slate-50 text"
-                      style="background-color: #15161a"
+                      class="text-slate-50 bg-customYellow"
                     >
-                      <tr class="focus:outline-none h-16 text-base">
-                        <th
-                          class="w-3/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
-                        >
-                          No
-                        </th>
-                        <th
-                          class="p-3 text-base font-medium tracking-wide text-left"
-                        >
-                          Name
-                        </th>
-
-                        <th
-                          class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                        >
-                          Owner
-                        </th>
-                        <th
-                          class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                        >
-                          Access Right
-                        </th>
-                        <th
-                          class="p-3 w-2/12 text-base font-medium tracking-wide text-left"
-                        >
-                          Action
-                        </th>
+                      <tr class="focus:outline-none h-16 text-base text-black">
+                        <th class="w-2/12 p-3 pl-12 text-base font-bold tracking-wide text-left">No</th>
+                        <th class="p-3 text-base font-bold tracking-wide text-left">Name</th>
+                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Owner</th>
+                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Access Right</th>
+                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Action</th>
                       </tr>
                     </thead>
                     <!-- body content -->
                     <tbody class="container">
-                      <!-- <tr
-                        class="itbkk-item itbkk-collab-item h-16 box ease-in transition-colors"
-                        v-for="(board, index) in boards"
-                        :key="index"
-                      > -->
-                      <tr
-                        class="itbkk-item itbkk-collab-item h-16 box ease-in transition-colors"
-                      >
-                        <td
-                          class="w-3/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left"
-                        >
-                          <!-- {{ index + 1 }} -->
+                      <tr v-if="boards.length" v-for="(board, index) in boards" :key="index" class="box">
+                        <td class="w-2/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left">
+                          {{ index + 1 }}
                         </td>
-
                         <td class="w-3/12 p-3 pl-5">
-                          
-                            <div
-                              class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2"
-                            >
-                              <!-- {{ board.name }} -->
-                            </div>
+                          <router-link
+                            :to="`/board/${board.id}`"
+                            @click="setCurrentBoardId(board.id)">
+                              <div class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2">
+                                {{ board.name }}
+                              </div>
+                          </router-link>
                         </td>
-
                         <td class="w-2/12 p-3">
-                          <div
-                            class="itbkk-owner-name text-base font-medium leading-none text-gray-700 mr-2"
-                          >
+                          <div class="itbkk-owner-name text-base font-medium leading-none text-gray-700 mr-2">
                             Action
                           </div>
                         </td>
                         <td class="w-3/12 p-3">
-                          <div
-                            class="itbkk-access-right text-base font-medium leading-none text-gray-700 mr-2"
-                          >
+                          <div class="itbkk-access-right text-base font-medium leading-none text-gray-700 mr-2">
                             READ
                           </div>
                         </td>
                         <td class="w-2/12 p-3">
-                          <div
-                            class="text-base font-medium leading-none text-gray-700 mr-2"
+                          <button
+                            class="itbkk-leave-board btn-secondary p-3 font-normal bg-sky-800 text-white rounded-md"
                           >
-                            <button
-                              class="itbkk-leave-board btn-secondary p-3 font-normal bg-sky-800 text-white rounded-md"
-                            >
-                              leave
-                            </button>
-                          </div>
+                            leave
+                          </button>
+                        </td>
+                      </tr>
+                      <tr v-else>
+                        <td colspan="5" class="text-center text-xl font-bold py-6 text-slate-400">
+                          NO BOARD PROVIDED
                         </td>
                       </tr>
                     </tbody>
                   </table>
-
-                  
                 </div>
               </div>
             </div>

@@ -48,7 +48,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           router.push("/login");
           // real BE
         } else if (res.status === 403) {
-          toast.error("You do not have permission to access this board.");
+          console.log("You do not have permission to access this board.");
           router.push("/test");
         } else {
           toast.error("Failed to fetch board details.");
@@ -91,38 +91,6 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
       }
     },
 
-    // async updateVisibility(boardID, newVisibility) {
-    //   const token = localStorage.getItem("token")
-    //   const toast = useToast()
-
-    //   await patchItem(`${import.meta.env.VITE_BASE_URL}/boards` , boardID , newVisibility )
-    //   try {
-    //     const res = await fetch(
-    //       `${import.meta.env.VITE_BASE_URL}/boards/${boardID}`,
-    //       {
-    //         method: "PATCH",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //           Authorization: `Bearer ${token}`,
-    //         },
-    //         body: `"visibility" : "${newVisibility}"`,
-    //       }
-    //     )
-    //     if (res.ok) {
-    //       this.visibility = newVisibility
-    //       toast.success(`Visibility updated to ${newVisibility}`)
-    //     } else if (res.status === 401) {
-    //       router.push("/login")
-    //     } else if (res.status === 403) {
-    //       toast.error("You do not have permission to change visibility.")
-    //     } else {
-    //       toast.error("There was a problem. Please try again later.")
-    //     }
-    //   } catch (error) {
-    //     console.error("Error changing visibility:", error)
-    //     toast.error("An error occurred while changing visibility.")
-    //   }
-    // },
     async updateVisibility(boardID, newVisibility) {
       const toast = useToast();
       const authStore = AuthUserStore()

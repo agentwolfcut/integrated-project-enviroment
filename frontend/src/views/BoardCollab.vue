@@ -14,10 +14,10 @@ const route = useRoute();
 const boardIdRoute = route.params.boardID;
 const currentUser = ref("");
 const showAddModal = ref(false);
-const store = useCollaboratorStore();
+const collabStore = useCollaboratorStore();
 
 onMounted(() => {
-  store.fetchCollaborators(boardIdRoute);
+  collabStore.fetchCollaborators(boardIdRoute);
 });
 
 const openAddModal = () => {
@@ -28,27 +28,18 @@ const cancelAddCollab = () => {
   showAddModal.value = false;
 };
 
-const saveAddCollab = async (email) => {
-  await store.addCollaborator(boardIdRoute, email);
+const saveAddCollab = async (email, accessRight) => {
+  try {
+    await collabStore.addCollaborator(boardIdRoute, email, accessRight);
+  } catch (error) {
+    console.error("Error adding collaborator:", error);
+  }
   showAddModal.value = false;
 };
 
 // Computed property to get the list of collaborators
 // const collaborators = computed(() => store.collaborators);
-const collaborators = ref([
-  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
-  { name: "John Doe", email: "john.doe@example.com", access: "read" },
-  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
-  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
-  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
-  { name: "John Doe", email: "john.doe@example.com", access: "read" },
-  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
-  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
-  { name: "POY", email: "nattaawank51@gmail.com", access: "read" },
-  { name: "John Doe", email: "john.doe@example.com", access: "read" },
-  { name: "Jane Smith", email: "jane.smith@example.com", access: "read" },
-  { name: "Alice Brown", email: "alice.brown@example.com", access: "read" },
-]);
+const collaborators = collabStore.collaborators;
 </script>
 
 <template>
@@ -127,7 +118,7 @@ const collaborators = ref([
                         <div
                           class="text-base font-medium leading-none text-gray-700 bg-slate-50 p-2 rounded-lg px-4"
                         >
-                          {{ collab.access }}
+                          {{ collab.accessRight }}
                         </div>
                       </td>
                       <td class="w-2/12 p-3">

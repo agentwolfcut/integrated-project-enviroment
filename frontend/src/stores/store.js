@@ -211,7 +211,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
   },
 });
 
-export const BoardStore = defineStore("BoardStore", {
+export const BoardStoreOld = defineStore("BoardStore", {
   state: () => ({
     board: [], // Array ของบอร์ดทั้งหมด
     currentBoard: {}, // บอร์ดปัจจุบันที่กำลังจัดการ
@@ -246,36 +246,16 @@ export const BoardStore = defineStore("BoardStore", {
           token
         );
         if (data && Array.isArray(data)) {
-          this.board = data; // อัปเดต array ของบอร์ด
-          // this.visibility = data.visibility
-          // this.visibility = data[0].visibility
+          this.board = data;
         } else {
-          toast.error("Failed to fetch Board or invalid data received.");
+          console.log('Failed to fetch Board or invalid data received.')
+          // toast.error("Failed to fetch Board or invalid data received.");
         }
       } catch (error) {
         console.error("Error fetching boards:", error);
-        toast.error("An error occurred while fetching boards.");
       }
     },
 
-    // async fetchBoardById(id) {
-    //   try {
-    //     const data = await getItems(
-    //       `${import.meta.env.VITE_BASE_URL}/boards/${id}`,
-    //       token
-    //     )
-    //     if (data) {
-    //       return data
-    //     } else {
-    //       toast.error("Failed to fetch Board or invalid data received.")
-    //       return null
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching board:", error)
-    //     toast.error("An error occurred while fetching the board")
-    //     return null
-    //   }
-    // }, // Action สำหรับดึงบอร์ดโดย ID
     async addBoard(name) {
       try {
         const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, {
@@ -319,6 +299,77 @@ export const BoardStore = defineStore("BoardStore", {
       } catch (error) {
         console.error("Error adding task:", error);
         toast.error("An error occurred while adding the task");
+      }
+    },
+  },
+});
+
+export const BoardStore = defineStore("BoardStore", {
+  state: () => ({
+    ownedBoards: [], // Boards owned by the user
+    collabBoards: [], // Boards where the user is a collaborator
+    currentBoard: {}, // The board currently being managed
+    currentBoardId: null,
+    tasks: [],
+    visibility: "private",
+  }),
+  getters: {
+    getOwnedBoards: (state) => state.ownedBoards,
+    getCollabBoards: (state) => state.collabBoards,
+    getCurrentBoard: (state) => state.currentBoard,
+    getBoardById: (state) => (id) => {
+      // Look for the board in both ownedBoards and collabBoards
+      return (
+        state.ownedBoards.find((board) => board.id === id) ||
+        state.collabBoards.find((board) => board.id === id)
+      );
+    },
+  },
+  actions: {
+    setCurrentBoardID(id) {
+      this.currentBoardId = id;
+    },
+    async getBoards() {
+      const authStore = AuthUserStore();
+      authStore.checkAccessToken();
+      const token = localStorage.getItem("token");
+
+      try {
+        const data = await getItems(`${import.meta.env.VITE_BASE_URL}/boards`, token);
+
+        if (data) {
+          // Store the boards in the correct state properties
+          this.ownedBoards = data.ownedBoards || [];
+          this.collabBoards = data.collabBoards || [];
+        } else {
+          console.error("Failed to fetch boards or invalid data received.");
+        }
+      } catch (error) {
+        console.error("Error fetching boards:", error);
+      }
+    },
+    async addBoard(name) {
+      try {
+        const data = await addItem(`${import.meta.env.VITE_BASE_URL}/boards`, {
+          name: name,
+        });
+        if (data.status < 200 || data.status >= 300) {
+          if (data.status === 401) {
+            router.push("/login");
+          } else {
+            toast.error("Failed to add Board");
+          }
+        } else {
+          toast.success("Board added successfully");
+          // Add the new board to ownedBoards
+          this.ownedBoards.push(data);
+          this.currentBoard = data;
+          this.currentBoardId = data.id;
+          router.push(`board/${this.currentBoardId}`);
+        }
+      } catch (error) {
+        console.error("Error adding board:", error);
+        toast.error("An error occurred while adding the board");
       }
     },
   },

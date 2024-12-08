@@ -15,16 +15,12 @@ const setCurrentBoardId = (id) => {
 };
 
 onMounted(async () => {
-  await boardStore.getBoard();
-  // if (boardStore.getBoards.length > 0) {
-  //   const boardId = boardStore.getBoards[0].id;
-  //   setTimeout(() => {
-  //     router.push(`/board/${boardId}`);
-  //   }, 700);
-  // }
+  await boardStore.getBoards();
 });
 
-const boards = computed(() => boardStore.getBoards);
+const ownedBoards = computed(() => boardStore.ownedBoards);
+const collabBoards = computed(() => boardStore.collabBoards);
+
 </script>
 
 <template>
@@ -40,7 +36,7 @@ const boards = computed(() => boardStore.getBoards);
               <div class="flex justify-end mb-9">
                 
                 <div>
-                  <router-link to="/board/add" v-if="boards.length === 0">
+                  <router-link to="/board/add" v-if="ownedBoards.length === 0">
                     <div class="rounded-lg ml-4 sm:ml-8 w-60">
                       <buttonSlot
                         size="sm"
@@ -81,8 +77,8 @@ const boards = computed(() => boardStore.getBoards);
                     <!-- body content -->
                     <tbody class="container">
                       <tr
-                        v-if="boards.length"
-                        v-for="(board, index) in boards"
+                        v-if="ownedBoards.length"
+                        v-for="(board, index) in ownedBoards"
                         :key="index"
                         class="itbkk-item itbkk-personal-item h-16 box ease-in transition-colors"
                       >
@@ -139,7 +135,7 @@ const boards = computed(() => boardStore.getBoards);
                     </thead>
                     <!-- body content -->
                     <tbody class="container">
-                      <tr v-if="boards.length" v-for="(board, index) in boards" :key="index" class="box">
+                      <tr v-if="collabBoards.length" v-for="(board, index) in collabBoards" :key="index" class="box">
                         <td class="w-2/12 p-3 pl-12 text-black text-base font-medium tracking-wide text-left">
                           {{ index + 1 }}
                         </td>

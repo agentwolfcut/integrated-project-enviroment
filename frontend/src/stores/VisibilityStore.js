@@ -15,31 +15,6 @@ export const useVisibilityStore = defineStore("visibility", {
     setVisibility(newVisibility) {
       this.visibility = newVisibility;
     },
-    // async updateVisibility(newVisibility) {
-    //   try {
-    //     // wait to change path and use utils
-    //     const res = await updateItem(
-    //       `${import.meta.env.VITE_BASE_URL}/boards/${this.boardId}/visibility`,
-    //       { visibility: newVisibility },
-    //       token
-    //     )
-    //     if (res.status === 200) {
-    //       this.visibility = newVisibility
-    //       toast.success(`Visibility updated to ${newVisibility}`)
-    //     } else if (res.status === 401) {
-    //       router.push("/login")
-    //     } else if (res.status === 403) {
-    //       toast.error(
-    //         "You do not have permission to change board visibility mode."
-    //       )
-    //     } else {
-    //       toast.error("There is a problem. Please try again later.")
-    //     }
-    //   } catch (error) {
-    //     console.error("Error updating visibility:", error)
-    //     toast.error("An error occurred while updating visibility.")
-    //   }
-    // },
 
     async updateVisibility(newVisibility , boardId) {
       try {

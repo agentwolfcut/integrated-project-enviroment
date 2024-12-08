@@ -18,8 +18,8 @@ export async function checkBoardAccess(to, from, next) {
     // no token
     await boardPermStore.fetchBoardByIdForPublic(`/boards/${boardID}`, "GET");
   }
-  const { hasAccess, isOwner } = boardPermStore
-  if (hasAccess || isOwner) {
+  const { hasAccess, isOwner , isCollab} = boardPermStore
+  if (hasAccess || isOwner || isCollab) {
     next(); // Proceed if the user has access or is the owner
   } else {
     toast.error("Access denied, you do not have permission to view this page.");

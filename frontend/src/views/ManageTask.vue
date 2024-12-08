@@ -66,12 +66,8 @@ const token = useAuthUserStore.token;
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
-    console.log(boardPermissionStore.hasAccess);
-    toast.error(
-      "Access denied. You do not have permission to view this board."
-    );
-
-    router.push("/test"); // Redirect if no permission
+    console.log('boardPermissionStore.hasAccess : '+boardPermissionStore.hasAccess);
+    // router.push("/test"); // Redirect if no permission
   } else {
     visibilitys.value = boardPermissionStore.boardDetails.visibility;
     try {

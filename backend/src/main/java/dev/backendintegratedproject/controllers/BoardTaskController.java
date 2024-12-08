@@ -233,37 +233,46 @@ public class BoardTaskController {
 
     @DeleteMapping("/{id}/collabs/{userOid}")
     public ResponseEntity<Object> deleteCollab(
-            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @PathVariable String id,
             @PathVariable String userOid) {
 
+        // Check if the Authorization header is present
+        if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization token is required.");
+        }
+
         String oid = getOidFromHeader(authorizationHeader);
 
-        // Determine if it's a self-deletion
+        // Determine if the user is deleting themselves
         boolean isSelfDeletion = oid.equals(userOid);
 
-        // Check permissions for non-self-deletion cases
+        // Check if the board exists and verify permissions
         Board board = permissionCheck(authorizationHeader, id, "delete", !isSelfDeletion);
 
-        // Fetch collaborator details (may be missing if collaborator doesn't exist)
+        // Attempt to find the collaborator
         Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, userOid);
 
         if (collabOptional.isEmpty()) {
-            if (isSelfDeletion) {
-                // Allow self-deletion even if the collaborator does not exist
-                return ResponseEntity.ok().body(new HashMap<>());
-            } else {
-                // Non-self-deletion with missing collaborator: return 404
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
-            }
+            // If the collaborator does not exist, return 404
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
         }
 
         Collaborators collab = collabOptional.get();
 
-        // Handle permissions for non-self-deletion
+        // If it's not self-deletion, check if the requester has WRITE access
         if (!isSelfDeletion) {
-            if (!collab.getAccessRight().equals("WRITE")) {
-                // Only WRITE collaborators can remove others
+            // Check the access rights of the requester
+            Optional<Collaborators> requesterCollabOptional = collaboratorsService.getOptionalCollabOfBoard(id, oid);
+
+            if (requesterCollabOptional.isEmpty()) {
+                // If the requester is not a collaborator, deny access
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
+            }
+
+            // If the requester does not have WRITE access, deny access
+            if (!requesterCollabOptional.get().getAccessRight().equals("WRITE")) {
+                // **Step 5-specific logic:** Return 403 Forbidden if requester lacks WRITE access
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
             }
         }
@@ -271,9 +280,11 @@ public class BoardTaskController {
         // Perform deletion
         collaboratorsService.deleteCollab(id, userOid);
 
-        // Return empty response with status 200 OK
+        // Return an empty response with status 200 OK
         return ResponseEntity.ok().body(new HashMap<>());
     }
+
+
 
 
     @PostMapping("")

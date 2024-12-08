@@ -123,4 +123,9 @@ public class UserBoardService {
     public List<Board> getAllBoards(String oid) {
         return boardRepository.findAllByOwnerID(oid);
     }
+
+    public List<Board> getBoardsByOwnerID(String oid) {
+        return boardRepository.findAllByOwnerID(oid);
+
+    }
 }

@@ -29,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/v3/boards")
@@ -72,18 +73,13 @@ public class BoardTaskController {
         return jwtTokenUtil.getClaimValueFromToken(token, "name");
     }
 
-    public Board getBoard(String id) {
-        if (id == null || id.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Board ID cannot be null or empty.");
-        }
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board doesn't exist"));
-    }
-
     private Board permissionCheck(String authorizationHeader, String bid, String method, Boolean isCollabCanDoOperation) {
         String userOid = null;
         if (authorizationHeader != null) userOid = getOidFromHeader(authorizationHeader);
         Board board = userBoardService.getBoardsDetail(bid);
-
+        if ((!Objects.equals(method, "get") && board.getVisibility().equals(Visibility.PUBLIC) && userOid != null) || board.getVisibility().equals(Visibility.PRIVATE)) {
+            oidCheck(board, userOid, method, board.getVisibility(), isCollabCanDoOperation);
+        }
         return board;
     }
 
@@ -106,18 +102,38 @@ public class BoardTaskController {
 
     //get all boards
     @GetMapping("")
-    public ResponseEntity<List<BoardDTO>> getAllBoard(
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        String oid = getOidFromHeader(authorizationHeader);
+    public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        String userOid = getOidFromHeader(authorizationHeader);
 
-        // ดึง List<Board> และแปลงเป็น List<BoardDTO>
-        List<Board> boards = userBoardService.getAllBoards(oid);
-        List<BoardDTO> boardDTOs = boards.stream()
-                .map(board -> modelMapper.map(board, BoardDTO.class))
+        // Fetch boards owned by the user
+        List<Board> ownedBoards = userBoardService.getBoardsByOwnerID(userOid);
+        List<BoardDTO> ownedBoardDTOs = ownedBoards.stream()
+                .map(board -> {
+                    BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+                    boardDTO.setCollaborators(new ArrayList<>()); // Ensure empty collaborators for owned boards
+                    return boardDTO;
+                })
                 .toList();
 
-        return ResponseEntity.ok(boardDTOs);
+        // Fetch boards where the user is a collaborator
+        List<Collaborators> collabs = collaboratorsService.getAllCollabByOid(userOid);
+        List<CollabOutputDTO> collabsBoard = collabs.stream()
+                .map(collab -> {
+                    Board board = userBoardService.getBoardsDetail(collab.getBoardID());
+                    CollabOutputDTO collabOutputDTO = collaboratorsService.mapOutputDTO(collab);
+                    collabOutputDTO.setBoardName(board.getName());
+                    return collabOutputDTO;
+                })
+                .toList();
+
+        // Combine both owned boards and collaborated boards in the response
+        Map<String, Object> response = new HashMap<>();
+        response.put("ownedBoards", ownedBoardDTOs);
+        response.put("collabBoards", collabsBoard);
+
+        return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("/{id}/collabs")
@@ -139,24 +155,47 @@ public class BoardTaskController {
     }
 
 
-
-
-
     @GetMapping("/{id}/collabs/{UserOid}")
-    public ResponseEntity<Object> getCollabById(@RequestHeader(value = "Authorization", required = false) String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
-        Board board = permissionCheck(authorizationHeader, id, "get", true);
+    public ResponseEntity<Object> getCollabById(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable String id,
+            @PathVariable String UserOid) {
+        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
+        permissionCheck(authorizationHeader, id, "get", true);
 
-        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.getCollabOfBoard(id, UserOid, true));
-        return ResponseEntity.ok(collab);
+        // ตรวจสอบว่ามี collaborator สำหรับ board นี้หรือไม่
+        return collaboratorsService.getCollabByBoardIdAndUserOid(id, UserOid)
+                .map(collaboratorsService::mapOutputDTO)
+                .map((Function<? super CollabOutputDTO, ? extends ResponseEntity<Object>>) ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found on this board."));
     }
 
+
     @PostMapping("/{id}/collabs")
-    public ResponseEntity<Object> createCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @Valid @RequestBody(required = false) CollabCreateInputDTO input) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<Object> createCollab(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @PathVariable String id,
+            @Valid @RequestBody(required = false) CollabCreateInputDTO input) throws MessagingException, UnsupportedEncodingException {
+
+        // ตรวจสอบสิทธิ์ของผู้ใช้ (ต้องการสิทธิ์ WRITE หรือเป็นเจ้าของ)
         Board board = permissionCheck(authorizationHeader, id, "post", false);
 
+        // ตรวจสอบว่า request body ถูกต้อง
+        if (input == null || input.getAccessRight() == null || input.getAccessRight().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body or required fields are missing or invalid.");
+        }
+
+        // ตรวจสอบสิทธิ์ (เฉพาะเจ้าของหรือผู้ที่มี WRITE เท่านั้น)
+        String userOid = getOidFromHeader(authorizationHeader);
+        if (!board.getOwnerID().equals(userOid) && !collaboratorsService.hasWriteAccess(userOid, board.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to perform this action.");
+        }
+
+        // ดำเนินการเพิ่ม collaborator
         CollabOutputDTO newCollab = collaboratorsService.mapOutputDTO(collaboratorsService.createNewCollab(board, input));
         return ResponseEntity.status(HttpStatus.CREATED).body(newCollab);
     }
+
 
     @PatchMapping("/{id}/collabs/{UserOid}")
     public ResponseEntity<Object> updateAccessRight(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid, @RequestBody(required = false) AccessRightDTO input) throws MessagingException, UnsupportedEncodingException {
@@ -168,16 +207,30 @@ public class BoardTaskController {
     }
 
     @DeleteMapping("/{id}/collabs/{UserOid}")
-    public ResponseEntity<Object> deleteCollab(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid) {
-        String method = "delete";
+    public ResponseEntity<Object> deleteCollab(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @PathVariable String id,
+            @PathVariable String UserOid) {
+
         String oid = getOidFromHeader(authorizationHeader);
-        if (Objects.equals(oid, UserOid)) method = "get";
 
-        Board board = permissionCheck(authorizationHeader, id, method, false);
+        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
+        Board board = permissionCheck(authorizationHeader, id, "delete", false);
 
-        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.deleteCollab(id, UserOid));
+        // ตรวจสอบว่ามี collaborator หรือไม่
+        Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, UserOid);
+        if (collabOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
+        }
+
+        // ลบ collaborator
+        collaboratorsService.deleteCollab(id, UserOid);
+
+        // คืนค่า response เปล่า
         return ResponseEntity.ok().body(new HashMap<>());
     }
+
+
 
 
 
@@ -188,35 +241,36 @@ public class BoardTaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
     }
 
-    // Allow public access for public boards, but enforce token check for private ones.
     @GetMapping("/{boardID}")
     public ResponseEntity<Board> getBoardDetails(@PathVariable String boardID, Authentication authentication) {
-        // ตรวจสอบว่ามี Board นี้หรือไม่
+        // ตรวจสอบว่า Board มีอยู่จริงหรือไม่
         Board board = userBoardService.getBoardsDetail(boardID);
         if (board == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // ถ้า Board เป็น public, อนุญาตให้เข้าถึงโดยไม่ต้องมี token
+        // หาก Board เป็น Public อนุญาตการเข้าถึงโดยไม่ต้องใช้ token
         if (board.isPublic()) {
             return ResponseEntity.ok(board);
         }
 
-        // ตรวจสอบ token
+        // หาก Board เป็น Private ตรวจสอบ token
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
         }
 
+        // ตรวจสอบสิทธิ์ของผู้ใช้งาน
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-
-        // ถ้า Board เป็น private และผู้ใช้ไม่ได้เป็นเจ้าของ, ส่ง 403
         if (!board.getOwnerID().equals(userDetails.getOid())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+            // ตรวจสอบว่าผู้ใช้เป็น Collaborator ที่มีสิทธิ์หรือไม่
+            boolean isCollaborator = collaboratorsService.hasReadAccess(userDetails.getOid(), boardID);
+            if (!isCollaborator) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+            }
         }
 
         return ResponseEntity.ok(board);
     }
-
 
 
     // Similar logic for tasks
@@ -230,22 +284,23 @@ public class BoardTaskController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // ถ้า Board เป็น public, อนุญาตให้เข้าถึงโดยไม่ต้องมี token
+        // หาก Board เป็น Public
         if (board.isPublic()) {
             List<Task> tasks = taskService.getTasksByStatuses(boardID, filterStatuses);
             return ResponseEntity.ok(listMapper.mapList(tasks, SimpleTaskDTO.class, modelMapper));
         }
 
-        // ตรวจสอบ token
+        // หาก Board เป็น Private ให้ตรวจสอบ token
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
         }
 
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
 
-        // ถ้า Board เป็น private และผู้ใช้ไม่ได้เป็นเจ้าของ, ส่ง 403
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board's tasks.");
+        // ตรวจสอบว่าเป็นเจ้าของหรือ Collaborator ที่มีสิทธิ์หรือไม่
+        if (!board.getOwnerID().equals(userDetails.getOid())
+                && !collaboratorsService.hasReadAccess(userDetails.getOid(), boardID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
         }
 
         List<Task> tasks = taskService.getTasksByStatuses(boardID, filterStatuses);
@@ -254,41 +309,49 @@ public class BoardTaskController {
 
 
 
+
     @GetMapping("/{boardID}/tasks/{taskID}")
     public ResponseEntity<DetailedTaskDTO> getTaskById(@PathVariable Integer taskID,
                                                        @PathVariable String boardID,
                                                        Authentication authentication) {
-        // ตรวจสอบว่ามี Board นี้หรือไม่
+        // ตรวจสอบว่า Board มีอยู่จริง
         Board board = userBoardService.getBoardsDetail(boardID);
         if (board == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // ถ้า Board เป็น public, อนุญาตให้เข้าถึงโดยไม่ต้องมี token
-        if (board.isPublic()) {
-            return ResponseEntity.ok(modelMapper.map(taskService.getTaskById(taskID, boardID), DetailedTaskDTO.class));
+        // ตรวจสอบสิทธิ์การเข้าถึง
+        if (!board.isPublic()) {
+            if (authentication == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
+            }
+
+            UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+            if (!board.getOwnerID().equals(userDetails.getOid())
+                    && !collaboratorsService.hasReadAccess(userDetails.getOid(), boardID)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+            }
         }
 
-        // ตรวจสอบ token
-        if (authentication == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
+        // ตรวจสอบว่ามี Task ใน Board นี้หรือไม่
+        Optional<Task> taskOptional = taskService.getOptionalTaskById(taskID, boardID);
+        if (taskOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
 
-        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-
-        // ถ้า Board เป็น private และผู้ใช้ไม่ได้เป็นเจ้าของ, ส่ง 403
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this task.");
-        }
-
-        return ResponseEntity.ok(modelMapper.map(taskService.getTaskById(taskID, boardID), DetailedTaskDTO.class));
+        Task task = taskOptional.get();
+        return ResponseEntity.ok(modelMapper.map(task, DetailedTaskDTO.class));
     }
+
 
 
 
     @CrossOrigin("*")
     @PatchMapping("/{boardID}")
-    public void changeVisibility(@PathVariable String boardID, @RequestBody(required = false) VisibilityDTO visibility, Authentication authentication) {
+    public ResponseEntity<VisibilityDTO> changeVisibility(
+            @PathVariable String boardID,
+            @RequestBody(required = false) VisibilityDTO visibility,
+            Authentication authentication) {
         // Check if authentication is provided
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
@@ -311,36 +374,49 @@ public class BoardTaskController {
 
         // Set the new visibility
         userBoardService.setVisibility(boardID, visibility, userDetails.getOid());
+
+        // Return the updated visibility in the response
+        return ResponseEntity.ok(visibility);
     }
 
 
 
+
     @PostMapping("{boardID}/tasks")
-    public ResponseEntity<DetailedTaskDTO> createTask(@PathVariable String boardID, @Valid @RequestBody CreateTaskDTO task, Authentication authentication) {
+    public ResponseEntity<DetailedTaskDTO> createTask(@PathVariable String boardID,
+                                                      @Valid @RequestBody(required = false) CreateTaskDTO task,
+                                                      Authentication authentication) {
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
         }
 
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+        Board board = userBoardService.getBoardsDetail(boardID);
 
         // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
-        Board board = userBoardService.getBoardsDetail(boardID);
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
+        if (!board.getOwnerID().equals(userDetails.getOid())
+                && !collaboratorsService.hasWriteAccess(userDetails.getOid(), boardID)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create tasks in this board.");
         }
 
-        // สร้าง task
+        // ตรวจสอบ Body
+        if (task == null || task.getTitle() == null || task.getTitle().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task title is required.");
+        }
+
+        // สร้าง Task
         CreateTaskDTO taskTrim = taskService.trimTask(task);
         Task createdTask = taskService.createTask(taskTrim, boardID, userDetails);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(createdTask, DetailedTaskDTO.class));
     }
 
+
+
     @PutMapping("/{boardID}/tasks/{id}")
-    public ResponseEntity<UpdateTaskDTO> updatedTask(@PathVariable Integer id,
-                                                     @Valid @RequestBody(required = false) UpdateTaskDTO task,
-                                                     @PathVariable String boardID,
-                                                     Authentication authentication) {
+    public ResponseEntity<?> updatedTask(@PathVariable Integer id,
+                                         @Valid @RequestBody(required = false) UpdateTaskDTO task,
+                                         @PathVariable String boardID,
+                                         Authentication authentication) {
         // ตรวจสอบว่า token ถูกส่งมาหรือไม่
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
@@ -350,26 +426,36 @@ public class BoardTaskController {
 
         // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
         Board board = userBoardService.getBoardsDetail(boardID);
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
+        if (!board.getOwnerID().equals(userDetails.getOid())
+                && !collaboratorsService.hasWriteAccess(userDetails.getOid(), boardID)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update tasks in this board.");
         }
 
         // ตรวจสอบว่ามี Task อยู่ในบอร์ดนี้หรือไม่
         Optional<Task> existingTaskOptional = taskService.getOptionalTaskById(id, boardID);
         if (existingTaskOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " not found in this board.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task with ID " + id + " not found in this board.");
+        }
+
+        // ตรวจสอบว่า Body ถูกต้อง
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task data is required for update.");
         }
 
         // อัปเดต task
-        if (task == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task data is required for update.");
+        try {
+            UpdateTaskDTO taskTrim = taskService.trimTask(task);
+            Task updatedTask = taskService.updateTask(id, taskTrim, boardID);
+            return ResponseEntity.ok(modelMapper.map(updatedTask, UpdateTaskDTO.class));
+        } catch (ResponseStatusException e) {
+            // คืนค่าข้อผิดพลาดที่กำหนดเองจาก service layer
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            // จัดการข้อผิดพลาดทั่วไป
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
-
-        UpdateTaskDTO taskTrim = taskService.trimTask(task);
-        Task updatedTask = taskService.updateTask(id, taskTrim, boardID);
-
-        return ResponseEntity.ok(modelMapper.map(updatedTask, UpdateTaskDTO.class));
     }
+
 
 
     @DeleteMapping("/{boardID}/tasks/{id}")
@@ -380,14 +466,22 @@ public class BoardTaskController {
 
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
 
-        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
         Board board = userBoardService.getBoardsDetail(boardID);
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
+
+        if (!board.getOwnerID().equals(userDetails.getOid())
+                && !collaboratorsService.hasWriteAccess(userDetails.getOid(), boardID)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete tasks in this board.");
+        }
+
+        // เช็คว่าทรัพยากร (Task) มีอยู่
+        Optional<Task> taskOptional = taskService.getOptionalTaskById(id, boardID);
+        if (taskOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found.");
         }
 
         taskService.deleteTask(id, boardID);
     }
+
 
     @PutMapping("/{boardID}/tasks/updateAll")
     public List<Task> updatedAllTasks(@Valid @RequestBody List<Task> tasks) {

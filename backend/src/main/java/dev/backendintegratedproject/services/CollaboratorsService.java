@@ -10,10 +10,13 @@ import dev.backendintegratedproject.primarydatasource.repositories.BoardReposito
 import dev.backendintegratedproject.userdatasource.entities.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import dev.backendintegratedproject.primarydatasource.repositories.CollaboratorsRepository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CollaboratorsService {
@@ -87,8 +90,10 @@ public class CollaboratorsService {
     }
 
     public Collaborators getCollabOfBoard(String id, String userOid, boolean b) {
-        return (Collaborators) collaboratorsRepository.findByBoardIDAndUserOid(id, userOid).orElseThrow(() -> new IllegalArgumentException("User is not a collaborator for this board."));
+        return collaboratorsRepository.findByBoardIDAndUserOid(id, userOid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this board."));
     }
+
     public List<Collaborators> getAllCollabOfBoard(String boardID) {
         return collaboratorsRepository.findAllByBoardID(boardID);
     }
@@ -109,27 +114,46 @@ public class CollaboratorsService {
     }
 
     public Collaborators createNewCollab(Board board, CollabCreateInputDTO input) {
-        if (input == null || !input.getAccessRight().equalsIgnoreCase("WRITE") && !input.getAccessRight().equalsIgnoreCase("READ")) {
-            throw new IllegalArgumentException("Request body is missing or unreadable");
+        // ตรวจสอบค่า Access Right ว่า valid หรือไม่
+        if (!input.getAccessRight().equalsIgnoreCase("READ") && !input.getAccessRight().equalsIgnoreCase("WRITE")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid access right. Use READ or WRITE.");
         }
 
+        // ตรวจสอบว่า User มีสิทธิ์หรือไม่
         User user = userService.findByEmail(input.getEmail());
-
         if (user == null) {
-            throw new IllegalArgumentException("User with specified email not found.");
-        }
-        if (collaboratorsRepository.existsByUserOidAndBoardID(user.getOid(), board.getId())) {
-            throw new IllegalArgumentException("This user is already the collaborator or pending collaborator on this board.");
-        }
-        if (board.getOwnerID().equals(user.getOid())) {
-            throw new IllegalArgumentException("The board owner cannot be added as a collaborator.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with specified email not found.");
         }
 
+        if (collaboratorsRepository.existsByUserOidAndBoardID(user.getOid(), board.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This user is already a collaborator or pending collaborator.");
+        }
+
+        if (board.getOwnerID().equals(user.getOid())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The board owner cannot be added as a collaborator.");
+        }
+
+        // เพิ่ม collaborator
         Collaborators newCollab = new Collaborators();
         newCollab.setUserOid(user.getOid());
         newCollab.setBoardID(board.getId());
-        newCollab.setAccessRight(AccessRight.valueOf(input.getAccessRight()));
+        newCollab.setAccessRight(AccessRight.valueOf(input.getAccessRight().toUpperCase()));
         return collaboratorsRepository.save(newCollab);
+    }
+    public boolean hasWriteAccess(String userOid, String boardID) {
+        return collaboratorsRepository.findByBoardIDAndUserOid(boardID, userOid)
+                .map(collaborator -> collaborator.getAccessRight() == AccessRight.WRITE)
+                .orElse(false);
+    }
+
+    // เพิ่มเมธอดตรวจสอบ AccessRight
+    private boolean isValidAccessRight(String accessRight) {
+        return "READ".equalsIgnoreCase(accessRight) || "WRITE".equalsIgnoreCase(accessRight);
+    }
+    public boolean hasReadAccess(String userOid, String boardID) {
+        return collaboratorsRepository.findByBoardIDAndUserOid(boardID, userOid)
+                .map(collaborator -> collaborator.getAccessRight() == AccessRight.READ || collaborator.getAccessRight() == AccessRight.WRITE)
+                .orElse(false);
     }
 
     public Collaborators deleteCollab(String id, String userOid) {
@@ -137,6 +161,20 @@ public class CollaboratorsService {
         collaboratorsRepository.delete(collab);
         return collab;
     }
+
+    public List<Collaborators> getAllCollabByOid(String userOid) {
+        return collaboratorsRepository.findAllByUserOid(userOid);
+    }
+
+    public Optional<Collaborators> getCollabByBoardIdAndUserOid(String boardId, String userOid) {
+        return collaboratorsRepository.findByBoardIDAndUserOid(boardId, userOid);
+    }
+
+    public Optional<Collaborators> getOptionalCollabOfBoard(String id, String userOid) {
+        return collaboratorsRepository.findByBoardIDAndUserOid(id, userOid);
+    }
+
+
 }
 
 

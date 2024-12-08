@@ -29,4 +29,7 @@ public interface CollaboratorsRepository extends JpaRepository<Collaborators, Co
     boolean existsByUserOidAndBoardID(String userOid, String boardID);
 
     Optional<Collaborators> findByBoardIDAndUserOid(String boardID, String userOid);
+
+    List<Collaborators> findAllByUserOid(String userOid);
+
 }

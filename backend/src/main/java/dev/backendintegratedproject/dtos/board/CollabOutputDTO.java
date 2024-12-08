@@ -10,4 +10,8 @@ public class CollabOutputDTO {
     private String email;
     private AccessRight accessRight;
     private String AddedOn;
+
+    public void setBoardName(String name) {
+        this.name = name;
+    }
 }

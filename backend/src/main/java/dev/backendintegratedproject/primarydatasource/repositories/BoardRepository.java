@@ -22,4 +22,5 @@ public interface BoardRepository extends JpaRepository<Board, String> {
     void setVisibility(@Param("bID") String boardID, @Param("vis") Boolean newVis);
 
 
+
 }

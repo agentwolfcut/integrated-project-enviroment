@@ -28,6 +28,7 @@ import dev.backendintegratedproject.util.ListMapper;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -117,12 +118,19 @@ public class BoardTaskController {
 
         // Fetch boards where the user is a collaborator
         List<Collaborators> collabs = collaboratorsService.getAllCollabByOid(userOid);
-        List<CollabOutputDTO> collabsBoard = collabs.stream()
+        List<Map<String, Object>> collabsBoard = collabs.stream()
                 .map(collab -> {
                     Board board = userBoardService.getBoardsDetail(collab.getBoardID());
                     CollabOutputDTO collabOutputDTO = collaboratorsService.mapOutputDTO(collab);
-                    collabOutputDTO.setBoardName(board.getName());
-                    return collabOutputDTO;
+
+                    // Manually convert CollabOutputDTO to a Map
+                    Map<String, Object> collabDetails = new HashMap<>();
+                    collabDetails.put("oid", collab.getUserOid());
+                    collabDetails.put("boardId", collab.getBoardID());
+                    collabDetails.put("accessRight", collab.getAccessRight());
+                    collabDetails.put("name", collabOutputDTO.getName());
+                    collabDetails.put("email", collabOutputDTO.getEmail());
+                    return collabDetails;
                 })
                 .toList();
 
@@ -135,24 +143,36 @@ public class BoardTaskController {
     }
 
 
-
     @GetMapping("/{id}/collabs")
-    public ResponseEntity<List<CollabOutputDTO>> getCollab(
+    public ResponseEntity<Map<String, Object>> getCollab(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @PathVariable String id) {
 
+        // ตรวจสอบ Permission
         Board board = permissionCheck(authorizationHeader, id, "get", true);
 
         // ดึง List<Collaborators>
         List<Collaborators> collaborators = collaboratorsService.getAllCollabOfBoard(id);
 
-        // แปลง List<Collaborators> เป็น List<CollabOutputDTO>
-        List<CollabOutputDTO> collabs = collaborators.stream()
-                .map(collaboratorsService::mapOutputDTO) // ใช้ mapOutputDTO แปลงแต่ละ Collaborators เป็น CollabOutputDTO
+        // แปลง List<Collaborators> เป็น List<CollabOutputDTO> และเพิ่ม boardId
+        List<Map<String, Object>> collabs = collaborators.stream()
+                .map(collaborator -> {
+                    CollabOutputDTO dto = collaboratorsService.mapOutputDTO(collaborator);
+                    Map<String, Object> collabWithBoardId = new HashMap<>();
+                    collabWithBoardId.put("boardId", id);
+                    collabWithBoardId.put("collaborator", dto);
+                    return collabWithBoardId;
+                })
                 .toList();
 
-        return ResponseEntity.ok(collabs);
+        // ใส่ข้อมูลใน Map เพื่อแสดงผล
+        Map<String, Object> response = new HashMap<>();
+        response.put("boardId", id);
+        response.put("collaborators", collabs);
+
+        return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("/{id}/collabs/{UserOid}")

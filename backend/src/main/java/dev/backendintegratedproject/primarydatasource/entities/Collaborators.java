@@ -30,7 +30,7 @@ public class Collaborators {
     private String boardID;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "accessRight", nullable = false)
+    @Column(name = "accessRight")
     private AccessRight accessRight = AccessRight.READ;
 
 

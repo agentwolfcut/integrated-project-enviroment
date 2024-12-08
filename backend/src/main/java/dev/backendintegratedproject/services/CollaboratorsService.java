@@ -1,13 +1,14 @@
 package dev.backendintegratedproject.services;
 
-import dev.backendintegratedproject.dtos.board.AccessRightDTO;
 import dev.backendintegratedproject.dtos.board.CollabCreateInputDTO;
 import dev.backendintegratedproject.dtos.board.CollabOutputDTO;
+import dev.backendintegratedproject.dtos.board.UpdateAccessRightDTO;
 import dev.backendintegratedproject.primarydatasource.entities.AccessRight;
 import dev.backendintegratedproject.primarydatasource.entities.Board;
 import dev.backendintegratedproject.primarydatasource.entities.Collaborators;
 import dev.backendintegratedproject.primarydatasource.repositories.BoardRepository;
 import dev.backendintegratedproject.userdatasource.entities.User;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -107,11 +108,36 @@ public class CollaboratorsService {
         return collabOutputDTO;
     }
 
-    public Collaborators updateCollab(String id, String collabOid, AccessRightDTO input) {
-        Collaborators collab = getCollabOfBoard(id, collabOid, true);
-        collab.setAccessRight(input.getAccessRight());
+    public Collaborators updateCollab(String boardId, String userOid, UpdateAccessRightDTO input) {
+        // Validate input
+        if (input == null || input.getAccessRight() == null || input.getAccessRight().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AccessRight is required and cannot be null or empty.");
+        }
+
+        // Find the collaborator
+        Optional<Collaborators> collabOptional = collaboratorsRepository.findByBoardIDAndUserOid(boardId, userOid);
+        if (collabOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
+        }
+
+        Collaborators collab = collabOptional.get();
+
+        // Validate accessRight values
+        String accessRight = input.getAccessRight().toUpperCase();
+        if (!accessRight.equals("READ") && !accessRight.equals("WRITE")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid accessRight value. Allowed values are 'READ' or 'WRITE'.");
+        }
+
+        // Update accessRight
+        collab.setAccessRight(AccessRight.valueOf(accessRight));
+
+        // Save updated collaborator
         return collaboratorsRepository.save(collab);
     }
+
+
+
+
 
     public Collaborators createNewCollab(Board board, CollabCreateInputDTO input) {
         // ตรวจสอบค่า Access Right ว่า valid หรือไม่
@@ -156,11 +182,23 @@ public class CollaboratorsService {
                 .orElse(false);
     }
 
-    public Collaborators deleteCollab(String id, String userOid) {
-        Collaborators collab = getCollabOfBoard(id, userOid, true);
-        collaboratorsRepository.delete(collab);
-        return collab;
+    public void deleteCollab(String id, String userOid) {
+        Optional<Collaborators> collabOptional = collaboratorsRepository.findByBoardIDAndUserOid(id, userOid);
+
+        if (collabOptional.isEmpty()) {
+            // Let the controller handle the 404 case
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
+        }
+
+        try {
+            collaboratorsRepository.delete(collabOptional.get());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete collaborator.", e);
+        }
     }
+
+
+
 
     public List<Collaborators> getAllCollabByOid(String userOid) {
         return collaboratorsRepository.findAllByUserOid(userOid);

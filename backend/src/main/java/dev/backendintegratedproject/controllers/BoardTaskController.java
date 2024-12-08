@@ -198,40 +198,82 @@ public class BoardTaskController {
 
 
     @PatchMapping("/{id}/collabs/{UserOid}")
-    public ResponseEntity<Object> updateAccessRight(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable String id, @PathVariable String UserOid, @RequestBody(required = false) AccessRightDTO input) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<Object> updateAccessRight(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
+            @PathVariable String id,
+            @PathVariable String UserOid,
+            @Valid @RequestBody(required = false) UpdateAccessRightDTO input) throws MessagingException, UnsupportedEncodingException {
+
+        // Step 1: Check if the Authorization header is missing
+        if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization token is required.");
+        }
+
+        // Step 2: Permission check before validating input
         Board board = permissionCheck(authorizationHeader, id, "patch", false);
+
         String userName = null;
-        if (authorizationHeader != null) userName = getNameFromHeader(authorizationHeader);
-        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(collaboratorsService.updateCollab(id, UserOid, input));
+        if (authorizationHeader != null) {
+            userName = getNameFromHeader(authorizationHeader);
+        }
+
+        // Step 3: Validate input after permission check
+        if (input == null || input.getAccessRight() == null || input.getAccessRight().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AccessRight is required and cannot be null or empty.");
+        }
+
+        // Step 4: Update collaborator
+        CollabOutputDTO collab = collaboratorsService.mapOutputDTO(
+                collaboratorsService.updateCollab(id, UserOid, input)
+        );
+
         return ResponseEntity.ok(collab);
     }
 
-    @DeleteMapping("/{id}/collabs/{UserOid}")
+
+    @DeleteMapping("/{id}/collabs/{userOid}")
     public ResponseEntity<Object> deleteCollab(
             @RequestHeader(value = "Authorization") String authorizationHeader,
             @PathVariable String id,
-            @PathVariable String UserOid) {
+            @PathVariable String userOid) {
 
         String oid = getOidFromHeader(authorizationHeader);
 
-        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
-        Board board = permissionCheck(authorizationHeader, id, "delete", false);
+        // Determine if it's a self-deletion
+        boolean isSelfDeletion = oid.equals(userOid);
 
-        // ตรวจสอบว่ามี collaborator หรือไม่
-        Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, UserOid);
+        // Check permissions for non-self-deletion cases
+        Board board = permissionCheck(authorizationHeader, id, "delete", !isSelfDeletion);
+
+        // Fetch collaborator details (may be missing if collaborator doesn't exist)
+        Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, userOid);
+
         if (collabOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
+            if (isSelfDeletion) {
+                // Allow self-deletion even if the collaborator does not exist
+                return ResponseEntity.ok().body(new HashMap<>());
+            } else {
+                // Non-self-deletion with missing collaborator: return 404
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
+            }
         }
 
-        // ลบ collaborator
-        collaboratorsService.deleteCollab(id, UserOid);
+        Collaborators collab = collabOptional.get();
 
-        // คืนค่า response เปล่า
+        // Handle permissions for non-self-deletion
+        if (!isSelfDeletion) {
+            if (!collab.getAccessRight().equals("WRITE")) {
+                // Only WRITE collaborators can remove others
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
+            }
+        }
+
+        // Perform deletion
+        collaboratorsService.deleteCollab(id, userOid);
+
+        // Return empty response with status 200 OK
         return ResponseEntity.ok().body(new HashMap<>());
     }
-
-
-
 
 
     @PostMapping("")

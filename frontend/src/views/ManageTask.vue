@@ -66,7 +66,13 @@ const token = useAuthUserStore.token;
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
-    console.log('boardPermissionStore.hasAccess : '+boardPermissionStore.hasAccess);
+    console.log(
+      "boardPermissionStore.hasAccess : " + boardPermissionStore.hasAccess
+    );
+    console.log(boardPermissionStore.hasAccess);
+    toast.error(
+      "Access denied. You do not have permission to view this board."
+    );
     router.push("/test"); // Redirect if no permission
   } else {
     visibilitys.value = boardPermissionStore.boardDetails.visibility;
@@ -338,10 +344,7 @@ const confirmChange = async () => {
                       <buttonSlot
                         size="sm"
                         type="light"
-                        class="itbkk-manage-collaborator disabled:cursor-not-allowed"
-                        :disabled="!isOwner"
-                        @mouseenter="showTooltip = !isOwner"
-                        @mouseleave="showTooltip = false"
+                        class="itbkk-manage-collaborator"
                       >
                         <template v-slot:title> COLLABORATOR </template>
                       </buttonSlot>
@@ -372,6 +375,10 @@ const confirmChange = async () => {
                       >
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
+                      <span v-if="showTooltip" class="tooltip"
+                        >You need to be the board owner to perform this
+                        action.</span
+                      >
                     </div>
                   </router-link>
                 </div>
@@ -554,17 +561,6 @@ const confirmChange = async () => {
       ]"
       v-text="textNotify"
     ></div>
-
-    <div>
-      <span
-        v-if="showTooltip"
-        class="tooltip absolute bottom-0 right-0 text-white p-6 rounded-lg font-semibold
-         bg-gray-800 shadow-xl m-12 ease-in transition-all"
-        
-      >
-        You need to be the board owner to perform this action.
-      </span>
-    </div>
   </div>
 
   <div v-if="showDeleteModal" class="itbkk-modal-alert">
@@ -710,7 +706,7 @@ table {
   position: absolute;
   background: #333;
   color: #fff;
-
-
+  padding: 5px;
+  border-radius: 4px;
 }
 </style>

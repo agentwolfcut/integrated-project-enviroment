@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref , computed } from "vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 import { useUserStore } from "@/stores/UserStore";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
@@ -30,14 +30,6 @@ const isEmailValid = computed(() => {
   return emailRegex.test(email.value);
 });
 
-const props = defineProps({
-  boardID: String,
-  currentUserEmail: {
-    type: String,
-    required: true,
-  },
-});
-
 const emits = defineEmits(["saveAddCollab", "cancleAddCollab"]);
 
 const saveAddCollab = (email, accessRight) => {
@@ -49,6 +41,7 @@ const saveAddCollab = (email, accessRight) => {
 const isSaveDisabled = computed(() => {
   return !isEmailValid.value || email.value === formatEmail || email.value === "";
 });
+
 
 
 </script>
@@ -97,9 +90,7 @@ const isSaveDisabled = computed(() => {
 
         <div class="flex justify-end">
           <button
-            @click="
-              $emit('cancleAddCollab', false), (email = ''), (accessRight = '')
-            "
+            @click="$emit('cancleAddCollab', false) , (email='') , (accessRight = '')"
             class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
           >
             Cancel

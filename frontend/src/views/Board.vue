@@ -141,7 +141,7 @@ const collabBoards = computed(() => boardStore.collabBoards);
                         </td>
                         <td class="w-3/12 p-3 pl-5">
                           <router-link
-                            :to="`/board/${board.boardId}`"
+                            :to="`/board/${board.id}`"
                             @click="setCurrentBoardId(board.id)">
                               <div class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2">
                                 {{ board.name }}

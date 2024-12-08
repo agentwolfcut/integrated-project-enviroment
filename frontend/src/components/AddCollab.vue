@@ -1,30 +1,22 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref , computed } from "vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 
 const email = ref("");
 const accessRight = ref("READ");
 
-const props = defineProps({
-  boardID: String,
-  currentUserEmail: {
-    type: String,
-    required: true,
-  },
-});
-
 const emits = defineEmits(["saveAddCollab", "cancleAddCollab"]);
-
-const isEmailValid = computed(() => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.value) && email.value !== currentUserEmail;
-});
 
 const saveAddCollab = (email, accessRight) => {
   emits("saveAddCollab", email, accessRight);
   email.value = ""; // Reset form fields
   accessRight.value = "READ";
 };
+
+const isEmailValid = computed(() =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value) &&
+  email.value.length <= 50
+);
 </script>
 
 <template>
@@ -48,7 +40,6 @@ const saveAddCollab = (email, accessRight) => {
               type="email"
               v-model="email"
               required
-              maxlength="50"
               class="itbkk-collaborator-email bg-white rounded-md border-slate-400 border h-10 w-56"
             />
           </div>
@@ -70,9 +61,7 @@ const saveAddCollab = (email, accessRight) => {
 
         <div class="flex justify-end">
           <button
-            @click="
-              $emit('cancleAddCollab', false), (email = ''), (accessRight = '')
-            "
+            @click="$emit('cancleAddCollab', false)"
             class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
           >
             Cancel
@@ -80,7 +69,7 @@ const saveAddCollab = (email, accessRight) => {
 
           <button
             @click="saveAddCollab(email, accessRight)"
-            class="disabled:opacity-50 itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Confirm
           </button>

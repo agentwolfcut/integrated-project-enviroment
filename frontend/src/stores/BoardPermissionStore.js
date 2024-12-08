@@ -9,7 +9,6 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     boardDetails: null,
     isOwner: false,
     hasAccess: false,
-    isCollab : true
   }),
 
   actions: {
@@ -43,7 +42,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const currentUser = localStorage.getItem("currentUser");
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC" || this.isCollab
+          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");

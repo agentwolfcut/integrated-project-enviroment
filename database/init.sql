@@ -24,25 +24,30 @@ USE `itbkk-kk3` ;
 -- -----------------------------------------------------
 -- Table `itbkk-kk3`.`board_permissions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `itbkk-kk3`.`board_permissions` ;
+DROP TABLE IF EXISTS `itbkk-kk3`.`board_permissions`;
 
-CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`board_permissions` (
-  `userID` CHAR(36) NOT NULL,
+DROP TABLE IF EXISTS `itbkk-kk3`.`board_permissions`;
+
+CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`collaborators` (
+  `id` INT AUTO_INCREMENT,
+  `userOid` CHAR(36) NOT NULL, 
   `boardID` CHAR(10) NOT NULL,
-  `permission` VARCHAR(45) NULL DEFAULT 'user',
-  PRIMARY KEY (`userID`, `boardID`),
-  INDEX `boardID` (`boardID` ASC) VISIBLE,
-  CONSTRAINT `board_permissions_ibfk_1`
-    FOREIGN KEY (`userID`)
-    REFERENCES `itbkk-kk3`.`users` (`userID`)
-    ON DELETE CASCADE,
-  CONSTRAINT `board_permissions_ibfk_2`
+  `accessRight` ENUM('READ', 'WRITE') NOT NULL DEFAULT 'READ',
+  `addedOn` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_board` (`userOid`, `boardID`), -- ?????????????
+  INDEX `boardID_idx` (`boardID`),
+  CONSTRAINT `collaborators_ibfk_1`
     FOREIGN KEY (`boardID`)
     REFERENCES `itbkk-kk3`.`boards` (`boardID`)
-    ON DELETE CASCADE)
+    ON DELETE CASCADE
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
+
+
 
 
 -- -----------------------------------------------------
@@ -135,6 +140,8 @@ CREATE TABLE IF NOT EXISTS `itbkk-kk3`.`users` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

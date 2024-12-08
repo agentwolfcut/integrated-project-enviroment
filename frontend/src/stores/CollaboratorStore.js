@@ -7,6 +7,7 @@ import { AuthUserStore } from "@/stores/store";
 export const useCollaboratorStore = defineStore("collaboratorStore", {
   state: () => ({
     collaborators: [],
+    boardId : ''
   }),
   actions: {
     async fetchCollaborators(boardId) {
@@ -31,7 +32,13 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
     
         if (res.ok) {
           const data = await res.json();
-          this.collaborators = data.sort((a, b) => new Date(a.addedOn) - new Date(b.addedOn)); // Sort by added date
+          // Flatten the data and sort by 'addedOn'
+          this.collaborators = data.collaborators
+            .map((entry) => entry.collaborator) // Extract the `collaborator` object
+            .sort((a, b) => new Date(a.addedOn) - new Date(b.addedOn)); // Sort by added date
+          this.boardId = data.boardId
+          console.log(this.boardId);
+          
         } else {
           console.error(`Failed to fetch collaborators. Status: ${res.status}`);
         }

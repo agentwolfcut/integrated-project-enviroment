@@ -1,9 +1,34 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
+import { useUserStore } from "@/stores/UserStore";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
 
 const email = ref("");
 const accessRight = ref("READ");
+const userStore = useUserStore();
+const collaboratorStore = useCollaboratorStore();
+const boardId = collaboratorStore.boardId;
+const boardPermissionStore = useBoardPermissionStore();
+const currentUser = localStorage.getItem("currentUser");
+
+const nameToEmail = () => {
+  if (!currentUser) return "";
+  const lowercaseName = currentUser.toLocaleLowerCase();
+  const parts = lowercaseName.split(" ");
+  if (parts.length < 2) return "";
+
+  const firstName = parts[0];
+  const lastName = parts[1];
+  return `${firstName}.${lastName}@ad.sit.kmutt.ac.th`;
+};
+
+const formatEmail = nameToEmail(currentUser);
+
+const isEmailValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for valid email
+  return emailRegex.test(email.value);
+});
 
 const props = defineProps({
   boardID: String,
@@ -15,16 +40,17 @@ const props = defineProps({
 
 const emits = defineEmits(["saveAddCollab", "cancleAddCollab"]);
 
-const isEmailValid = computed(() => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.value) && email.value !== currentUserEmail;
-});
-
 const saveAddCollab = (email, accessRight) => {
   emits("saveAddCollab", email, accessRight);
   email.value = ""; // Reset form fields
   accessRight.value = "READ";
 };
+
+const isSaveDisabled = computed(() => {
+  return !isEmailValid.value || email.value === formatEmail || email.value === "";
+});
+
+
 </script>
 
 <template>
@@ -47,6 +73,7 @@ const saveAddCollab = (email, accessRight) => {
             <input
               type="email"
               v-model="email"
+              default=""
               required
               maxlength="50"
               class="itbkk-collaborator-email bg-white rounded-md border-slate-400 border h-10 w-56"
@@ -80,7 +107,8 @@ const saveAddCollab = (email, accessRight) => {
 
           <button
             @click="saveAddCollab(email, accessRight)"
-            class="disabled:opacity-50 itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            :disabled="isSaveDisabled"
+            class="disabled:opacity-50 disabled:cursor-not-allowed itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Confirm
           </button>

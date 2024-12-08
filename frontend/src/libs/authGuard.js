@@ -20,7 +20,7 @@ export async function checkBoardAccess(to, from, next) {
   }
   const { hasAccess, isOwner , isCollab} = boardPermStore
   if (hasAccess || isOwner || isCollab) {
-    next(); // Proceed if the user has access or is the owner
+    next();
   } else {
     toast.error("Access denied, you do not have permission to view this page.");
     next("/test"); // Redirect to Access Denied page if access is denied

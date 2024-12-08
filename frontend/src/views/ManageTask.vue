@@ -67,7 +67,7 @@ onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
     console.log('boardPermissionStore.hasAccess : '+boardPermissionStore.hasAccess);
-    // router.push("/test"); // Redirect if no permission
+    router.push("/test"); // Redirect if no permission
   } else {
     visibilitys.value = boardPermissionStore.boardDetails.visibility;
     try {

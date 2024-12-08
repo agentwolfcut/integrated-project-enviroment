@@ -19,7 +19,7 @@ export const useUserStore = defineStore("user", {
       try {
         const data = await getItems(
             // รอ path
-          `${import.meta.env.VITE_BASE_URL}/user`,
+          `${import.meta.env.VITE_BASE_URL}/users`,
           token
         );
         if (data) {

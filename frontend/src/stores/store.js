@@ -341,6 +341,7 @@ export const BoardStore = defineStore("BoardStore", {
           // Store the boards in the correct state properties
           this.ownedBoards = data.ownedBoards || [];
           this.collabBoards = data.collabBoards || [];
+          
         } else {
           console.error("Failed to fetch boards or invalid data received.");
         }

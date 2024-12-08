@@ -337,13 +337,15 @@ const confirmChange = async () => {
                 <div class="flex flex-row">
                   <!-- รอ component  -->
 
-
                   <router-link :to="`/board/${boardIdRoute}/collab`">
                     <div class="rounded-lg ml-4 sm:ml-8">
                       <buttonSlot
                         size="sm"
                         type="light"
-                        class="itbkk-manage-collaborator"
+                        class="itbkk-manage-collaborator disabled:cursor-not-allowed"
+                        :disabled="!isOwner"
+                        @mouseenter="showTooltip = !isOwner"
+                        @mouseleave="showTooltip = false"
                       >
                         <template v-slot:title> COLLABORATOR </template>
                       </buttonSlot>
@@ -352,7 +354,7 @@ const confirmChange = async () => {
 
                   <router-link :to="`/board/${boardIdRoute}/status`">
                     <div class="rounded-lg ml-4 sm:ml-8">
-                      <buttonSlot 
+                      <buttonSlot
                         size="sm"
                         type="dark"
                         class="itbkk-manage-status"
@@ -374,10 +376,6 @@ const confirmChange = async () => {
                       >
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
-                      <span v-if="showTooltip" class="tooltip"
-                        >You need to be the board owner to perform this
-                        action.</span
-                      >
                     </div>
                   </router-link>
                 </div>
@@ -560,6 +558,17 @@ const confirmChange = async () => {
       ]"
       v-text="textNotify"
     ></div>
+
+    <div>
+      <span
+        v-if="showTooltip"
+        class="tooltip absolute bottom-0 right-0 text-white p-6 rounded-lg font-semibold
+         bg-gray-800 shadow-xl m-12 ease-in transition-all"
+        
+      >
+        You need to be the board owner to perform this action.
+      </span>
+    </div>
   </div>
 
   <div v-if="showDeleteModal" class="itbkk-modal-alert">
@@ -705,7 +714,7 @@ table {
   position: absolute;
   background: #333;
   color: #fff;
-  padding: 5px;
-  border-radius: 4px;
+
+
 }
 </style>

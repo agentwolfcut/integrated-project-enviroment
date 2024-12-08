@@ -9,15 +9,37 @@ import VueJwtDecode from "vue-jwt-decode";
 import AddCollab from "@/components/AddCollab.vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 import GoBack from "@/assets/icons/GoBack.vue";
+import { useUserStore } from "@/stores/UserStore";
 
 const route = useRoute();
 const boardIdRoute = route.params.boardID;
 const currentUser = ref("");
 const showAddModal = ref(false);
 const collabStore = useCollaboratorStore();
+const collaborators = ref([]);
+const showDeleteModal = ref(false);
+const collaboratorToRemove = ref(null);
+const boardID = route.params.boardID;
+const userStore = useUserStore();
+const currentUserEmail = ref("");
+
+const props = defineProps({
+  boardID: {
+    type: String,
+    required: true,
+  },
+});
+
+const fetchCollaborators = async () => {
+  await collabStore.fetchCollaborators(boardIdRoute);
+  collaborators.value = collabStore.collaborators;
+};
 
 onMounted(() => {
-  collabStore.fetchCollaborators(boardIdRoute);
+  fetchCollaborators();
+  if (userStore.currentUser) {
+    currentUser.value = userStore.currentUser.email;
+  }
 });
 
 const openAddModal = () => {
@@ -30,16 +52,44 @@ const cancelAddCollab = () => {
 
 const saveAddCollab = async (email, accessRight) => {
   try {
-    await collabStore.addCollaborator(boardIdRoute, email, accessRight);
+    const succuss = await collabStore.addCollaborator(
+      boardIdRoute,
+      email,
+      accessRight
+    );
+    if (succuss) await fetchCollaborators();
   } catch (error) {
     console.error("Error adding collaborator:", error);
   }
   showAddModal.value = false;
 };
 
-// Computed property to get the list of collaborators
-// const collaborators = computed(() => store.collaborators);
-const collaborators = collabStore.collaborators;
+const confirmRemoveCollab = async () => {
+  if (!collaboratorToRemove.value) return;
+
+  try {
+    const success = await collabStore.removeCollaborator(
+      boardIdRoute,
+      collaboratorToRemove.value.oid
+    );
+    if (success) await fetchCollaborators();
+  } catch (error) {
+    console.error("Error removing collaborator:", error);
+  } finally {
+    showDeleteModal.value = false;
+    collaboratorToRemove.value = null; // Reset
+  }
+};
+
+const openDeleteModal = (collab) => {
+  collaboratorToRemove.value = collab; // Store the selected collaborator
+  showDeleteModal.value = true;
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  collaboratorToRemove.value = null; // Reset
+};
 </script>
 
 <template>
@@ -124,6 +174,7 @@ const collaborators = collabStore.collaborators;
                       <td class="w-2/12 p-3">
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
+                          @click="openDeleteModal(collab)"
                         >
                           <buttonSlot
                             size="sm"
@@ -154,9 +205,48 @@ const collaborators = collabStore.collaborators;
       </div>
     </div>
   </div>
+
+  <div v-if="showDeleteModal">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
+        <span class="text-lg font-semibold text-red-600 italic mb-12"
+          >Remove Collaborator !</span
+        >
+        <p class="my-4 text-base font-medium overflow-y-auto">
+          Do you want to remove
+          <span class="text-cyan-800 italic font-bold">
+            {{ collaboratorToRemove?.name }}
+          </span>
+          from the board ?
+        </p>
+        <div class="flex justify-end">
+          <button
+            @click="cancelDelete"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="confirmRemoveCollab"
+            class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <Teleport to="#AddCollab">
     <div v-show="showAddModal">
       <AddCollab
+        :currentUserEmail="currentUserEmail"
+        :boardID="boardID"
         @cancleAddCollab="cancelAddCollab"
         @saveAddCollab="saveAddCollab"
       />

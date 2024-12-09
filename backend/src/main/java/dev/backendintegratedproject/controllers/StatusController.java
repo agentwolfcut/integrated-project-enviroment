@@ -40,23 +40,29 @@ public class StatusController {
 
     @GetMapping("/{boardID}/statuses")
     public ResponseEntity<List<Status>> getStatuses(@PathVariable String boardID, Authentication authentication) {
-        if (authentication == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
-        }
-
-        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+        // Fetch the board details
         Board board = userBoardService.getBoardsDetail(boardID);
 
-        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
-        if (!board.getOwnerID().equals(userDetails.getOid())
-                && !collaboratorsService.hasReadAccess(userDetails.getOid(), boardID)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to view statuses for this board.");
+        // If the board is private, authentication is required
+        if (!board.isPublic()) {
+            if (authentication == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
+            }
+
+            UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+
+            // Check if the user is the owner or a collaborator
+            if (!board.getOwnerID().equals(userDetails.getOid())
+                    && !collaboratorsService.hasReadAccess(userDetails.getOid(), boardID)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to view statuses for this board.");
+            }
         }
 
-        // ดึงรายการสถานะ
+        // If the board is public, no authentication is required; proceed to fetch statuses
         List<Status> statuses = statusService.getStatusesForBoard(boardID);
         return ResponseEntity.ok(statuses);
     }
+
 
 
     @GetMapping("/{boardID}/statuses/{id}")

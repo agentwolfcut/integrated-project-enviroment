@@ -152,12 +152,13 @@ public class BoardTaskController {
 
 
     @GetMapping("/{id}/collabs")
-    public ResponseEntity<Map<String, Object>> getCollab(
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
-            @PathVariable String id) {
+    public ResponseEntity<Map<String, Object>> getCollab(@PathVariable String id) {
 
-        // ตรวจสอบ Permission
-        Board board = permissionCheck(authorizationHeader, id, "get", true);
+        // ดึงข้อมูลบอร์ด (ไม่ต้องตรวจสอบ Permission)
+        Board board = userBoardService.getBoardsDetail(id);
+        if (board == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
+        }
 
         // ดึง List<Collaborators>
         List<Collaborators> collaborators = collaboratorsService.getAllCollabOfBoard(id);
@@ -180,6 +181,7 @@ public class BoardTaskController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 
@@ -265,52 +267,45 @@ public class BoardTaskController {
             @PathVariable String id,
             @PathVariable String userOid) {
 
-        // Check if the Authorization header is present
+        // ตรวจสอบว่า Authorization header มีอยู่หรือไม่
         if (authorizationHeader == null || authorizationHeader.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization token is required.");
         }
 
-        String oid = getOidFromHeader(authorizationHeader);
+        // ดึง OID ของผู้ร้องขอ
+        String requesterOid = getOidFromHeader(authorizationHeader);
 
-        // Determine if the user is deleting themselves
-        boolean isSelfDeletion = oid.equals(userOid);
+        // ตรวจสอบว่า board มีอยู่จริง
+        Board board = userBoardService.getBoardsDetail(id);
+        if (board == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
+        }
 
-        // Check if the board exists and verify permissions
-        Board board = permissionCheck(authorizationHeader, id, "delete", !isSelfDeletion);
-
-        // Attempt to find the collaborator
+        // ตรวจสอบว่า collaborator ที่จะถูกลบมีอยู่ในบอร์ดหรือไม่
         Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, userOid);
-
         if (collabOptional.isEmpty()) {
-            // If the collaborator does not exist, return 404
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
         }
 
-        Collaborators collab = collabOptional.get();
-
-        // If it's not self-deletion, check if the requester has WRITE access
-        if (!isSelfDeletion) {
-            // Check the access rights of the requester
-            Optional<Collaborators> requesterCollabOptional = collaboratorsService.getOptionalCollabOfBoard(id, oid);
-
-            if (requesterCollabOptional.isEmpty()) {
-                // If the requester is not a collaborator, deny access
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
-            }
-
-            // If the requester does not have WRITE access, deny access
-            if (!requesterCollabOptional.get().getAccessRight().equals("WRITE")) {
-                // **Step 5-specific logic:** Return 403 Forbidden if requester lacks WRITE access
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to remove this collaborator.");
-            }
+        // กรณีลบตัวเองออกจากบอร์ด (leave)
+        if (requesterOid.equals(userOid)) {
+            collaboratorsService.deleteCollab(id, userOid);
+            return ResponseEntity.ok().body(new HashMap<>());
         }
 
-        // Perform deletion
+        // ตรวจสอบสิทธิ์สำหรับการลบ collaborator คนอื่น
+        boolean isOwner = board.getOwnerID().equals(requesterOid);
+        if (!isOwner) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the board owner can remove a collaborator.");
+        }
+
+        // ดำเนินการลบ collaborator คนอื่นโดยเจ้าของบอร์ด
         collaboratorsService.deleteCollab(id, userOid);
 
-        // Return an empty response with status 200 OK
+        // ส่งผลลัพธ์สำเร็จกลับไป
         return ResponseEntity.ok().body(new HashMap<>());
     }
+
 
 
 

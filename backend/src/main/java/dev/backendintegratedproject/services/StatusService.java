@@ -189,4 +189,8 @@ public class StatusService {
     public List<Status> getStatusesForBoard(String boardID) {
         return statusRepository.findAllByBoardID(boardID);
     }
+
+    public boolean existsStatus(Integer id, String boardID) {
+        return statusRepository.existsByIdAndBoardID(id, boardID);
+    }
 }

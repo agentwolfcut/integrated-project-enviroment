@@ -43,6 +43,10 @@ public class StatusController {
         // Fetch the board details
         Board board = userBoardService.getBoardsDetail(boardID);
 
+        if (board == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
+        }
+
         // If the board is private, authentication is required
         if (!board.isPublic()) {
             if (authentication == null) {
@@ -58,10 +62,12 @@ public class StatusController {
             }
         }
 
-        // If the board is public, no authentication is required; proceed to fetch statuses
+        // Fetch statuses for the board
         List<Status> statuses = statusService.getStatusesForBoard(boardID);
+
         return ResponseEntity.ok(statuses);
     }
+
 
 
 
@@ -125,45 +131,76 @@ public class StatusController {
 
 
     @DeleteMapping("/{boardID}/statuses/{id}")
-    public void deleteStatus(@PathVariable Integer id, @PathVariable String boardID, Authentication authentication) {
+    public ResponseEntity<Object> deleteStatus(@PathVariable String boardID,
+                                               @PathVariable Integer id,
+                                               Authentication authentication) {
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
         }
 
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-
         Board board = userBoardService.getBoardsDetail(boardID);
 
+        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด: Owner หรือ WRITE access เท่านั้น
         if (!board.getOwnerID().equals(userDetails.getOid())
                 && !collaboratorsService.hasWriteAccess(userDetails.getOid(), boardID)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete statuses in this board.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete statuses for this board.");
         }
 
-        // เช็คว่าทรัพยากร (Status) มีอยู่
+        // ตรวจสอบว่าสถานะมีอยู่หรือไม่
         Optional<Status> statusOptional = statusService.getOptionalStatusById(id, boardID);
         if (statusOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found.");
         }
 
+        // ดำเนินการลบสถานะ
         statusService.deleteStatus(id, boardID);
+
+        return ResponseEntity.ok().body(Map.of("message", "Status deleted successfully"));
     }
 
 
+
     @DeleteMapping("/{boardID}/statuses/{id}/{replaceId}")
-    public void deleteStatus(@PathVariable Integer id, @PathVariable Integer replaceId, @PathVariable String boardID, Authentication authentication) {
+    public void deleteStatus(
+            @PathVariable Integer id,
+            @PathVariable Integer replaceId,
+            @PathVariable String boardID,
+            Authentication authentication) {
 
         // ตรวจสอบว่าผู้ใช้ได้แนบ token มาหรือไม่
         if (authentication == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
         }
 
-        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
+        // ดึงข้อมูลบอร์ด
         Board board = userBoardService.getBoardsDetail(boardID);
-        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-        userBoardService.checkBoardAccess(board, userDetails.getOid());
+        if (board == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
+        }
 
+        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
+        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+        String userOid = userDetails.getOid();
+
+        // ตรวจสอบสิทธิ์ว่าเป็นเจ้าของหรือ collaborator ที่มี WRITE สิทธิ์
+        if (!board.getOwnerID().equals(userOid) && !collaboratorsService.hasWriteAccess(userOid, boardID)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete statuses for this board.");
+        }
+
+        // ตรวจสอบว่า status ที่ต้องการลบและ replace มีอยู่ในบอร์ดหรือไม่
+        if (!statusService.existsStatus(id, boardID)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status to delete not found.");
+        }
+
+        if (!statusService.existsStatus(replaceId, boardID)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Replacement status not found.");
+        }
+
+        // ดำเนินการลบและแทนที่ status
         statusService.deleteAndReplaceStatus(id, replaceId, boardID);
     }
+
 
     @PutMapping("/{boardID}/statuses/{id}")
     public ResponseEntity<Status> updateStatus(
@@ -176,10 +213,9 @@ public class StatusController {
         }
 
         UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-
         Board board = userBoardService.getBoardsDetail(boardID);
 
-        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด
+        // ตรวจสอบสิทธิ์การเข้าถึงบอร์ด: Owner หรือ WRITE access เท่านั้น
         if (!board.getOwnerID().equals(userDetails.getOid())
                 && !collaboratorsService.hasWriteAccess(userDetails.getOid(), boardID)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update statuses in this board.");

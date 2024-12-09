@@ -284,7 +284,7 @@ public class BoardTaskController {
         // ตรวจสอบว่า collaborator ที่จะถูกลบมีอยู่ในบอร์ดหรือไม่
         Optional<Collaborators> collabOptional = collaboratorsService.getOptionalCollabOfBoard(id, userOid);
         if (collabOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Collaborator not found.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Collaborator not found.");
         }
 
         // กรณีลบตัวเองออกจากบอร์ด (leave)
@@ -305,10 +305,7 @@ public class BoardTaskController {
         // ส่งผลลัพธ์สำเร็จกลับไป
         return ResponseEntity.ok().body(new HashMap<>());
     }
-
-
-
-
+    //get all collaborators
 
     @PostMapping("")
     public ResponseEntity<Board> createBoard(@Valid @RequestBody CreateBoardDTO board, Authentication authentication) {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref , computed } from "vue";
+import { ref, computed } from "vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 import { useUserStore } from "@/stores/UserStore";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
@@ -39,10 +39,10 @@ const saveAddCollab = (email, accessRight) => {
 };
 
 const isSaveDisabled = computed(() => {
-  return !isEmailValid.value || email.value === formatEmail || email.value === "";
+  return (
+    !isEmailValid.value || email.value === formatEmail || email.value === ""
+  );
 });
-
-
 
 </script>
 
@@ -54,7 +54,9 @@ const isSaveDisabled = computed(() => {
       class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70"
     >
       <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl p-6">
-        <span class="text-2xl font-semibold text-red-600 italic mb-12"
+        <span
+          class="text-2xl font-semibold text-red-600 italic mb-12 disabled:cursor-not-allowed"
+          
           >Add Collaborator</span
         >
 
@@ -90,7 +92,9 @@ const isSaveDisabled = computed(() => {
 
         <div class="flex justify-end">
           <button
-            @click="$emit('cancleAddCollab', false) , (email='') , (accessRight = '')"
+            @click="
+              $emit('cancleAddCollab', false), (email = ''), (accessRight = '')
+            "
             class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
           >
             Cancel

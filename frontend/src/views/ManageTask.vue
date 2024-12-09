@@ -280,7 +280,9 @@ const isPrivate = computed(() => visibilitys.value === "PRIVATE");
 const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
 const isOwner = boardPermissionStore.isOwner;
+const isEditor = boardPermissionStore.isEditor
 
+const canAccess = isOwner || isEditor
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
@@ -344,7 +346,7 @@ const confirmChange = async () => {
                       <buttonSlot
                         size="sm"
                         type="light"
-                        class="itbkk-manage-collaborator"
+                        class="itbkk-manage-collaborator disabled:cursor-not-allowed"
                       >
                         <template v-slot:title> COLLABORATOR </template>
                       </buttonSlot>
@@ -369,8 +371,8 @@ const confirmChange = async () => {
                         size="sm"
                         type="dark"
                         class="itbkk-button-add disabled:cursor-not-allowed"
-                        :disabled="!isOwner"
-                        @mouseenter="showTooltip = !isOwner"
+                        :disabled="!canAccess"
+                        @mouseenter="showTooltip = !canAccess"
                         @mouseleave="showTooltip = false"
                       >
                         <template v-slot:title> Add Task </template>
@@ -484,8 +486,8 @@ const confirmChange = async () => {
                           <button
                             @click="editMode(task)"
                             class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
-                            :disabled="!isOwner"
-                            @mouseenter="showTooltip = !isOwner"
+                            :disabled="!canAccess"
+                            @mouseenter="showTooltip = !canAccess"
                             @mouseleave="showTooltip = false"
                           >
                             <Edit />
@@ -497,8 +499,8 @@ const confirmChange = async () => {
                             (showDeleteModal = true), (taskToDelete = task)
                           "
                           class="itbkk-button-delete pr-1 disabled:cursor-not-allowed"
-                          :disabled="!isOwner"
-                          @mouseenter="showTooltip = !isOwner"
+                          :disabled="!canAccess"
+                          @mouseenter="showTooltip = !canAccess"
                           @mouseleave="showTooltip = false"
                         >
                           <Trash />

@@ -24,6 +24,7 @@ export const useUserStore = defineStore("user", {
         );
         if (data) {
           this.users = data;
+          console.log(this.users);
         } else {
           toast.error("Failed to fetch Users OR You're guest user");
         }

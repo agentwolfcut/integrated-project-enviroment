@@ -1,24 +1,46 @@
 import { defineStore } from "pinia";
 import { useToast } from "vue-toast-notification";
 import router from "@/router";
-import { AuthUserStore } from '@/stores/store'
+import { AuthUserStore } from "@/stores/store";
 import { patchItem } from "@/libs/fetchUtils";
+import { useUserStore } from "@/stores/UserStore";
+import { ref } from "vue";
+import { useCollaboratorStore } from "./CollaboratorStore";
 
 export const useBoardPermissionStore = defineStore("boardPermission", {
   state: () => ({
     boardDetails: null,
     isOwner: false,
     hasAccess: false,
+    user: null,
+    collaborators: [],
+    isCollab: false,
+    isEditor: false,
+    realCollab : []
   }),
 
   actions: {
+    transformUserFormat(user) {
+      // Transform "ITBKK SANIT" to "itbkk.sanit"
+      return user.toLowerCase().split(" ").join(".");
+    },
+    isCollaboratorWrite(username) {
+      // Check if the user is a collaborator with 'WRITE' access
+      return this.collaborators.some(
+        (collab) =>
+          collab.username === username && collab.accessRight === "WRITE"
+      );
+    },
+
     async fetchBoardById(path, method) {
       const toast = useToast();
-      const authStore = AuthUserStore()
-      authStore.checkAccessToken()
-      const token = authStore.token
+      const authStore = AuthUserStore();
+      const collabStore = useCollaboratorStore();
+      authStore.checkAccessToken();
+      // const token = authStore.token;
+      const token = localStorage.getItem("token"); // fix problem 1
+      console.log(token);
 
-      // const token = localStorage.getItem('token') // fix problem 1
       try {
         let headers = {};
         if (token) {
@@ -40,9 +62,36 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const boardData = await res.json();
           this.boardDetails = boardData;
           const currentUser = localStorage.getItem("currentUser");
+          console.log(`current user is : ${currentUser}`);
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
+
+          // collab
+          await collabStore.fetchCollaborators(boardData.id);
+          this.collaborators = collabStore.collaborators.map(
+            (collab) => collab.name // Extract only the name
+          );
+          console.log("Collaborators:", this.collaborators);
+          this.realCollab = collabStore.collaborators
+
+          // Check if currentUser exists in collaborators
+          this.isCollab = this.collaborators.includes(currentUser);
+          console.log(`Is Collaborator: ${this.isCollab}`);
+
+          // Check if currentUser is an editor
+          this.isEditor = this.realCollab.some(
+            (collab) =>
+              collab.name === currentUser && collab.accessRight === "WRITE"
+          );
+          console.log(`Is Editor: ${this.isEditor}`);
+          
+
+          this.hasAccess =
+            this.isOwner ||
+            boardData.visibility === "PUBLIC" ||
+            this.isCollab ||
+            this.isEditor
+
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");
@@ -72,9 +121,13 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           const boardData = await res.json();
           this.boardDetails = boardData;
           const currentUser = localStorage.getItem("currentUser");
+          if (currentUser) {
+            const formattedUser = this.transformUserFormat(currentUser);
+            this.user = formattedUser; // Store transformed user
+          }
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC";
+          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC" || this.isCollab;
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");
@@ -93,7 +146,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
 
     async updateVisibility(boardID, newVisibility) {
       const toast = useToast();
-      const authStore = AuthUserStore()
+      const authStore = AuthUserStore();
 
       try {
         const patchData = { visibility: newVisibility }; // Set the data to be patched

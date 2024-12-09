@@ -9,6 +9,7 @@ import VueJwtDecode from "vue-jwt-decode";
 import AddCollab from "@/components/AddCollab.vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 import GoBack from "@/assets/icons/GoBack.vue";
+import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
 
 const route = useRoute();
 const boardIdRoute = route.params.boardID;
@@ -37,9 +38,68 @@ const saveAddCollab = async (email, accessRight) => {
   showAddModal.value = false;
 };
 
-// Computed property to get the list of collaborators
-// const collaborators = computed(() => store.collaborators);
-const collaborators = collabStore.collaborators;
+const collaborators = computed(() => collabStore.collaborators);
+const boardPermissionStore = useBoardPermissionStore();
+const isOwner = boardPermissionStore.isOwner;
+const showChangeModAcc = ref(false);
+
+const selectedOid = ref(null);
+const selectedName = ref("");
+const newAccess = ref("");
+
+const changeAccessRight = (oid, accessRight, name) => {
+  selectedOid.value = oid;
+  newAccess.value = accessRight === "READ" ? "WRITE" : "READ";
+  // const selectedCollab = collabStore.collaborators.find((c) => c.oid === oid);
+  selectedName.value = name;
+  showChangeModAcc.value = true;
+};
+
+const confirmChangeAccess = async () => {
+  try {
+    await collabStore.updateCollaboratorAccess(
+      boardIdRoute,
+      selectedOid.value,
+      newAccess.value
+    );
+    // const collaborator = collabStore.collaborators.find(
+    //   (c) => c.oid === selectedOid.value
+    // );
+    // if (collaborator) {
+    //   collaborator.accessRight = newAccess.value; // Update access right
+    // }
+    showChangeModAcc.value = false;
+    collabStore.fetchCollaborators(boardIdRoute);
+  } catch (error) {
+    console.error("Error updating collaborator access:", error);
+  }
+};
+
+const cancelButton = () => {
+  showChangeModAcc.value = false;
+  showRemoveModal.value = false
+  selectedOid.value = "";
+  selectedName.value = "";
+};
+
+// remove
+const showRemoveModal = ref(false);
+const openRemoveModal = (oid, name) => {
+  selectedOid.value = oid;
+  selectedName.value = name;
+  showRemoveModal.value = true;
+};
+
+const confirmRemove = async () => {
+  const success = await collabStore.removeCollaborator(
+    collabStore.boardId,
+    selectedOid.value
+  );
+  if (success) {
+    showRemoveModal.value = false;
+  }
+};
+
 </script>
 
 <template>
@@ -64,6 +124,9 @@ const collaborators = collabStore.collaborators;
                     size="sm"
                     type="dark"
                     class="itbkk-collaborator-add disabled:cursor-not-allowed"
+                    :disabled="!isOwner "
+                    @mouseenter="showTooltip = !isOwner"
+                    @mouseleave="showTooltip = false"
                   >
                     <template v-slot:title> Add Collaborator </template>
                   </buttonSlot>
@@ -115,11 +178,18 @@ const collaborators = collabStore.collaborators;
                         </div>
                       </td>
                       <td class="w-3/12 p-3">
-                        <div
+                        <button
+                          @click="
+                            changeAccessRight(
+                              collab.oid,
+                              collab.accessRight,
+                              collab.name
+                            )
+                          "
                           class="text-base font-medium leading-none text-gray-700 bg-slate-50 p-2 rounded-lg px-4"
                         >
                           {{ collab.accessRight }}
-                        </div>
+                        </button>
                       </td>
                       <td class="w-2/12 p-3">
                         <div
@@ -129,6 +199,7 @@ const collaborators = collabStore.collaborators;
                             size="sm"
                             type="light"
                             class="itbkk-collab-remove disabled:cursor-not-allowed bg-customBeige"
+                            @click="openRemoveModal(collab.oid , collab.name)"
                           >
                             <template v-slot:title> remove </template>
                           </buttonSlot>
@@ -154,6 +225,81 @@ const collaborators = collabStore.collaborators;
       </div>
     </div>
   </div>
+
+  <div v-if="showChangeModAcc">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
+        <span class="text-lg font-semibold text-red-600 italic mb-12"
+          >Change Access Right
+        </span>
+        <p class="my-4 text-base font-medium overflow-y-auto">
+          Do you want to change access right of
+          <span class="text-cyan-800 italic font-bold">
+            {{ selectedName }}
+          </span>
+          to
+          <span class="text-cyan-800 italic font-bold"> {{ newAccess }} </span>
+        </p>
+        <div class="flex justify-end">
+          <button
+            @click="cancelButton"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="confirmChangeAccess"
+            class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="showRemoveModal">
+    <div
+      class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    >
+      <div
+        class="itbkk-message bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+      >
+        <span class="text-lg font-semibold text-red-600 italic mb-12"
+          >Remove collaborator
+        </span>
+        <p class="my-4 text-base font-medium overflow-y-auto">
+          Do you want to remove 
+          <span class="text-cyan-800 italic font-bold">
+            {{ selectedName }}
+          </span>
+          from the board
+        </p>
+        <div class="flex justify-end">
+          <button
+            @click="cancelButton"
+            class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="confirmRemove"
+            class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <Teleport to="#AddCollab">
     <div v-show="showAddModal">
       <AddCollab

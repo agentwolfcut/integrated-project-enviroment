@@ -7,38 +7,42 @@ import { AuthUserStore } from "@/stores/store";
 export const useCollaboratorStore = defineStore("collaboratorStore", {
   state: () => ({
     collaborators: [],
-    boardId : ''
+    boardId: "",
   }),
+  
   actions: {
     async fetchCollaborators(boardId) {
       const authStore = AuthUserStore();
       authStore.checkAccessToken();
-    
+      let headers = {};
+
       try {
         const token = localStorage.getItem("token") || authStore.token;
         if (!token) {
-          throw new Error("Authorization token is missing.");
+          headers = {
+            "Content-Type": "application/json",
+          };
+          // throw new Error("Authorization token is missing.");
         }
-    
+        headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
         const res = await fetch(
           `${import.meta.env.VITE_BASE_URL}/boards/${boardId}/collabs`,
           {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+            headers: headers,
           }
         );
-    
+
         if (res.ok) {
           const data = await res.json();
           // Flatten the data and sort by 'addedOn'
           this.collaborators = data.collaborators
             .map((entry) => entry.collaborator) // Extract the `collaborator` object
             .sort((a, b) => new Date(a.addedOn) - new Date(b.addedOn)); // Sort by added date
-          this.boardId = data.boardId
+          this.boardId = data.boardId;
           console.log(this.boardId);
-          
         } else {
           console.error(`Failed to fetch collaborators. Status: ${res.status}`);
         }
@@ -135,7 +139,9 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
     async updateCollaboratorAccess(boardId, collaboratorOid, newAccessRight) {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/boards/${boardId}/collabs/${collaboratorOid}`,
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/boards/${boardId}/collabs/${collaboratorOid}`,
           {
             method: "PATCH",
             headers: {
@@ -145,7 +151,7 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
             body: JSON.stringify({ accessRight: newAccessRight }),
           }
         );
-    
+
         if (res.status === 200) {
           const updatedCollaborator = await res.json();
           this.collaborators = this.collaborators.map((collab) =>
@@ -159,7 +165,7 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
       }
     },
 
-    async removeCollaboratorOld(boardId, userOid) {
+    async removeCollaborator(boardId, userOid) {
       const toast = useToast();
       try {
         const token = localStorage.getItem("token");
@@ -177,46 +183,6 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
             },
           }
         );
-    
-        if (res.status === 200) {
-          toast.success("Collaborator removed successfully.");
-          // Update the collaborators list
-          this.collaborators = this.collaborators.filter(
-            (collab) => collab.oid !== userOid
-          );
-          return true;
-        } else if (res.status === 401) {
-          toast.error("Unauthorized. Please login again.");
-        } else if (res.status === 403) {
-          toast.error("You do not have permission to remove this collaborator.");
-        } else if (res.status === 404) {
-          toast.error("Collaborator not found.");
-        } else {
-          toast.error("There is a problem. Please try again later.");
-        }
-        return false;
-      } catch (error) {
-        console.error("Error removing collaborator:", error);
-        toast.error("An error occurred while removing the collaborator.");
-        return false;
-      }
-    } ,
-
-    async removeCollaborator(boardId, userOid) {
-      const toast = useToast();
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Authorization token is missing.");
-        }
-    
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/boards/${boardId}/collabs/${userOid}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
     
         if (res.status === 200) {
           toast.success("Collaborator removed successfully.");

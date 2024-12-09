@@ -1,11 +1,13 @@
 <script setup>
 import SideBar from "@/components/SideBar.vue";
 import HeaderIT from "@/components/Header.vue";
-import { onMounted, computed } from "vue";
+import { onMounted, computed  , ref} from "vue";
 import buttonSlot from "@/components/Button.vue";
 import "vue-toast-notification/dist/theme-sugar.css";
 import { BoardStore, AuthUserStore } from "@/stores/store";
 import router from "@/router";
+import { useCollaboratorStore } from "@/stores/CollaboratorStore";
+import { useToast } from "vue-toast-notification";
 
 const boardStore = BoardStore();
 
@@ -20,6 +22,40 @@ onMounted(async () => {
 
 const ownedBoards = computed(() => boardStore.ownedBoards);
 const collabBoards = computed(() => boardStore.collabBoards);
+
+const boardId = ref('')
+const boardName = ref('')
+const ownOid = ref('')
+const showLeaveModal = ref(false);
+
+const collabStore = useCollaboratorStore();
+const toast = useToast();
+const leaveBoard = (id , name , oid) => {
+  boardId.value = id;
+  boardName.value = name;
+  ownOid.value = oid
+  showLeaveModal.value = true;
+}
+
+const cancelLeave = () => {
+  showLeaveModal.value = false;
+  boardId.value = null;
+  boardName.value = "";
+};
+
+const confirmLeave = async () => {
+  try {
+    const success = await collabStore.removeCollaborator(boardId.value , ownOid.value);
+    if (success) {
+      toast.success("Successfully left the board.");
+      collabStore.fetchCollaborators(); // Refresh collaborator list
+    }
+  } catch (error) {
+    console.error("Error leaving the board:", error);
+    toast.error("There was a problem leaving the board. Please try again later.");
+  }
+  showLeaveModal.value = false;
+};
 
 </script>
 
@@ -128,7 +164,7 @@ const collabBoards = computed(() => boardStore.collabBoards);
                       <tr class="focus:outline-none h-16 text-base text-black">
                         <th class="w-2/12 p-3 pl-12 text-base font-bold tracking-wide text-left">No</th>
                         <th class="p-3 text-base font-bold tracking-wide text-left">Name</th>
-                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Owner</th>
+                        <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left"></th>
                         <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Access Right</th>
                         <th class="p-3 w-2/12 text-base font-bold tracking-wide text-left">Action</th>
                       </tr>
@@ -141,25 +177,25 @@ const collabBoards = computed(() => boardStore.collabBoards);
                         </td>
                         <td class="w-3/12 p-3 pl-5">
                           <router-link
-                            :to="`/board/${board.id}`"
-                            @click="setCurrentBoardId(board.id)">
+                            :to="`/board/${board.boardId}`"
+                            @click="setCurrentBoardId(board.boardId)">
                               <div class="itbkk-board-name text-base truncate font-medium leading-none text-gray-900 mr-2">
-                                {{ board.name }}
+                                {{ board.boardname }}
                               </div>
                           </router-link>
                         </td>
                         <td class="w-2/12 p-3">
                           <div class="itbkk-owner-name text-base font-medium leading-none text-gray-700 mr-2">
-                            Action
+                            <!-- Action -->
                           </div>
                         </td>
                         <td class="w-3/12 p-3">
                           <div class="itbkk-access-right text-base font-medium leading-none text-gray-700 mr-2">
-                            READ
+                            {{ board.accessRight }}
                           </div>
                         </td>
                         <td class="w-2/12 p-3">
-                          <button
+                          <button @click="leaveBoard(board.boardId , board.name , board.oid)"
                             class="itbkk-leave-board btn-secondary p-3 font-normal bg-sky-800 text-white rounded-md"
                           >
                             leave
@@ -181,6 +217,38 @@ const collabBoards = computed(() => boardStore.collabBoards);
       </div>
     </div>
   </div>
+
+  <div v-if="showLeaveModal">
+  <div
+    class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+  >
+    <div
+      class="itbkk-modal-alert bg-white border-2 border-slate-200 shadow-lg rounded-2xl p-8 relative w-1/3"
+    >
+      <span class="itbkk-message text-lg font-semibold text-red-600 italic mb-12">
+        Leave Board
+      </span>
+      <p class="my-4 text-base font-medium overflow-y-auto">
+        Do you want to leave
+        <span class="text-cyan-800 italic font-bold">{{ boardName }}</span> board?
+      </p>
+      <div class="flex justify-end">
+        <button
+          @click="cancelLeave"
+          class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          @click="confirmLeave"
+          class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   <router-view />
 </template>
 

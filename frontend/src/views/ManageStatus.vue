@@ -51,6 +51,8 @@ const props = defineProps({
 const visibilitys = ref("");
 const boardPermissionStore = useBoardPermissionStore();
 const isOwner = boardPermissionStore.isOwner;
+const isEditor = boardPermissionStore.isCollab
+const canAccess = isOwner || isEditor
 const showTooltip = ref(false);
 
 // GET
@@ -304,8 +306,8 @@ const handelFail = () => {
                       size="sm"
                       type="dark"
                       class="itbkk-button-add disabled:cursor-not-allowed"
-                      :disabled="!isOwner"
-                      @mouseenter="showTooltip = !isOwner"
+                      :disabled="!canAccess"
+                      @mouseenter="showTooltip = !canAccess"
                       @mouseleave="showTooltip = false"
                     >
                       <template v-slot:title> Add Status </template>
@@ -404,8 +406,8 @@ const handelFail = () => {
                               <button
                                 class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
                                 @click="openToEdit(status)"
-                                :disabled="!isOwner"
-                            @mouseenter="showTooltip = !isOwner"
+                                :disabled="!canAccess"
+                            @mouseenter="showTooltip = !canAccess"
                             @mouseleave="showTooltip = false"
                               >
                                 <Edit />
@@ -415,8 +417,8 @@ const handelFail = () => {
 
                           <button
                             class="pr-1 itbkk-button-delete disabled:cursor-not-allowed"
-                            :disabled="!isOwner"
-                            @mouseenter="showTooltip = !isOwner"
+                            :disabled="!canAccess"
+                            @mouseenter="showTooltip = !canAccess"
                             @mouseleave="showTooltip = false"
                             @click="
                               (statusDelete = status),

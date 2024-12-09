@@ -5,6 +5,7 @@ import "vue-toast-notification/dist/theme-sugar.css";
 import router from "@/router";
 import jwtDecode from "vue-jwt-decode";
 import VueJwtDecode from "vue-jwt-decode";
+import { useUserStore } from "./UserStore";
 
 const toast = useToast();
 // interface ขึ้นกับ res ของpostman

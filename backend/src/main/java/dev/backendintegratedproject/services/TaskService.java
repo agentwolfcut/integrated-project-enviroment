@@ -12,7 +12,7 @@ import dev.backendintegratedproject.dtos.task.UpdateTaskDTO;
 import dev.backendintegratedproject.dtos.users.UserDetailsDTO;
 import dev.backendintegratedproject.primarydatasource.entities.Status;
 import dev.backendintegratedproject.primarydatasource.entities.Task;
-import dev.backendintegratedproject.primarydatasource.repositories.BoardPermissionRepository;
+import dev.backendintegratedproject.primarydatasource.repositories.CollaboratorsRepository;
 import dev.backendintegratedproject.primarydatasource.repositories.StatusRepository;
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
@@ -29,7 +29,7 @@ public class TaskService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    BoardPermissionRepository boardPermissionRepository;
+    CollaboratorsRepository collaboratorsRepository;
 
     @Transactional(readOnly = true)
     public List<Task> getTasksByStatuses(String boardID, List<String> statuses) {
@@ -56,7 +56,7 @@ public class TaskService {
         if (status == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
         }
-//        if (!boardPermissionRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
+//        if (!CollaboratorsRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
 //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The status does not exist");
 //        }
         // Check if title, status is empty
@@ -104,40 +104,46 @@ public class TaskService {
 
     @Transactional
     public Task updateTask(Integer id, UpdateTaskDTO task, String boardID) {
-        // Check if task exists
+        // ตรวจสอบว่า Task ที่จะอัปเดตมีอยู่หรือไม่
         Task existingTask = taskRepository.findByIdAndBoardID(id, boardID);
         if (existingTask == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist.");
-        } //source for comparison
-        Status newStatus = (statusRepository.findByIdAndBoardID(task.getStatusId(),boardID));
-        if(newStatus == null){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status " + task.getStatusId() + " does not exist."); //Get the new status to upd
-        }
-        // Check updated values is valid
-        if (task.getTitle() == null || task.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
-        } else if (task.getStatusId() == null) {
-            newStatus = (statusRepository.findById(1)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Status 1 does not exist.")));
         }
 
-        // Update title
-        existingTask.setTitle(task.getTitle());
-        // Update description
-        existingTask.setDescription(task.getDescription());
-        // Update assignees
+        // ตรวจสอบว่า Status ใหม่มีอยู่หรือไม่
+        Status newStatus = null;
+        if (task.getStatusId() != null) {
+            newStatus = statusRepository.findByIdAndBoardID(task.getStatusId(), boardID);
+            if (newStatus == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status with ID " + task.getStatusId() + " does not exist.");
+            }
+        } else {
+            // หากไม่มี statusId ให้กำหนดค่าเริ่มต้น
+            newStatus = statusRepository.findById(1)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Default Status 1 does not exist."));
+        }
+
+        // ตรวจสอบว่า Title ถูกต้อง
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
+        }
+
+        // อัปเดตฟิลด์ต่างๆ ของ Task
+        existingTask.setTitle(task.getTitle().trim());
+        existingTask.setDescription(task.getDescription() != null ? task.getDescription().trim() : null);
         existingTask.setAssignees(task.getAssignees());
-        // Update status
         existingTask.setStatus(newStatus);
 
         try {
-            // Save updated task
+            // บันทึก Task ที่ถูกอัปเดต
             return taskRepository.save(existingTask);
         } catch (Exception e) {
-            // Handle any unexpected errors
+            // จัดการข้อผิดพลาดในกรณีที่การบันทึกล้มเหลว
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update task.", e);
         }
     }
+
+
 
     @Transactional
     public List<Task> saveAllTasks(List<Task> tasks) {
@@ -193,6 +199,8 @@ public class TaskService {
     public Optional<Task> getOptionalTaskById(Integer id, String boardID) {
         return Optional.ofNullable(taskRepository.findByIdAndBoardID(id, boardID));
     }
+
+
 
 
 }

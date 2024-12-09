@@ -25,7 +25,7 @@ public class StatusService {
     @Autowired
     private TaskService taskService;
     @Autowired
-    BoardPermissionService boardPermissionService;
+    CollaboratorsService collaboratorsService;
 
 
 
@@ -34,13 +34,14 @@ public class StatusService {
     }
 
     @Transactional(readOnly = true)
-    public Status getStatusById(Integer id, String boardId) {
-        Status status = statusRepository.findByIdAndBoardID(id,boardId);
-        if(status == null){
+    public Status getStatusById(Integer id, String boardId) { // ใช้ Integer
+        Status status = statusRepository.findByIdAndBoardID(id, boardId);
+        if (status == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
         }
         return status;
     }
+
 
     @Transactional
     public Status createStatus(CreateStatusDTO status, String boardID) {
@@ -182,5 +183,14 @@ public class StatusService {
 
     public Optional<Status> getOptionalStatusById(Integer id, String boardID) {
         return Optional.ofNullable(statusRepository.findByIdAndBoardID(id, boardID));
+    }
+
+
+    public List<Status> getStatusesForBoard(String boardID) {
+        return statusRepository.findAllByBoardID(boardID);
+    }
+
+    public boolean existsStatus(Integer id, String boardID) {
+        return statusRepository.existsByIdAndBoardID(id, boardID);
     }
 }

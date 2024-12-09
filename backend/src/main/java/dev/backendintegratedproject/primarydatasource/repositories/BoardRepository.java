@@ -21,4 +21,6 @@ public interface BoardRepository extends JpaRepository<Board, String> {
     @Query("UPDATE Board b SET b.visibility = :vis WHERE b.id = :bID")
     void setVisibility(@Param("bID") String boardID, @Param("vis") Boolean newVis);
 
+
+
 }

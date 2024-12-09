@@ -21,4 +21,6 @@ public class PrimaryUser {
     private String oid;
     @Column(name = "username")
     private String username;
+
+
 }

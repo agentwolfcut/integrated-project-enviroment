@@ -121,16 +121,21 @@ public class BoardTaskController {
         List<Collaborators> collabs = collaboratorsService.getAllCollabByOid(userOid);
         List<Map<String, Object>> collabsBoard = collabs.stream()
                 .map(collab -> {
+                    // Get board details using boardId from Collaborators
                     Board board = userBoardService.getBoardsDetail(collab.getBoardID());
-                    CollabOutputDTO collabOutputDTO = collaboratorsService.mapOutputDTO(collab);
 
-                    // Map collaborator details along with board information
+                    // Fetch owner details using ownerId from Board
+                    String ownerId = board.getOwnerID();
+                    UserDetailsDTO ownerDetails = userBoardService.getUserDetailsById(ownerId);
+
+                    // Map collaborator details along with board and owner information
                     Map<String, Object> collabDetails = new HashMap<>();
-                    collabDetails.put("oid", collab.getUserOid());
+                    collabDetails.put("oid", ownerId); // Owner's OID
                     collabDetails.put("boardId", collab.getBoardID());
                     collabDetails.put("accessRight", collab.getAccessRight());
-                    collabDetails.put("boardname", board.getName()); // Include the board name
-                    collabDetails.put("email", collabOutputDTO.getEmail());
+                    collabDetails.put("boardname", board.getName()); // Board name
+                    collabDetails.put("name", ownerDetails.getName()); // Owner's name
+                    collabDetails.put("email", ownerDetails.getEmail()); // Owner's email
                     return collabDetails;
                 })
                 .toList();
@@ -142,6 +147,8 @@ public class BoardTaskController {
 
         return ResponseEntity.ok(response);
     }
+
+
 
 
     @GetMapping("/{id}/collabs")

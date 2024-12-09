@@ -1,5 +1,6 @@
 package dev.backendintegratedproject.dtos.users;
 
+import dev.backendintegratedproject.primarydatasource.entities.PrimaryUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,3 +34,4 @@ public class UserDetailsDTO extends User implements UserDetails {
         this.role = role;
     }
 }
+

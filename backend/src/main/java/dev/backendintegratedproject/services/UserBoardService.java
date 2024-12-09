@@ -1,6 +1,9 @@
 package dev.backendintegratedproject.services;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import dev.backendintegratedproject.dtos.users.UserDetailsDTO;
+import dev.backendintegratedproject.userdatasource.entities.User;
+import dev.backendintegratedproject.userdatasource.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import dev.backendintegratedproject.primarydatasource.repositories.PrimaryUserRe
 import dev.backendintegratedproject.primarydatasource.repositories.StatusRepository;
 import dev.backendintegratedproject.primarydatasource.repositories.TaskRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,6 +34,9 @@ public class UserBoardService {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<Board> getBoardsByUserID(String userID) {
@@ -127,6 +134,20 @@ public class UserBoardService {
     public List<Board> getBoardsByOwnerID(String oid) {
         return boardRepository.findAllByOwnerID(oid);
 
+    }
+
+    public UserDetailsDTO getUserDetailsById(String oid) {
+        // Fetch user details using the provided OID
+        User user = userRepository.findById(oid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Map User entity to UserDetailsDTO
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.getEmail(), user.getPassword(), Collections.emptyList());
+        userDetailsDTO.setOid(user.getOid());
+        userDetailsDTO.setName(user.getName());
+        userDetailsDTO.setEmail(user.getEmail());
+
+        return userDetailsDTO;
     }
 
 }

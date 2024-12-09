@@ -65,7 +65,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           console.log(`current user is : ${currentUser}`);
           const currentUserId = await authStore.findCurrentUser(currentUser);
           this.isOwner = boardData.ownerID === currentUserId;
-
+          console.log(`isOwner : ${this.isOwner}`);
           // collab
           await collabStore.fetchCollaborators(boardData.id);
           this.collaborators = collabStore.collaborators.map(
@@ -126,7 +126,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
             this.user = formattedUser; // Store transformed user
           }
           const currentUserId = await authStore.findCurrentUser(currentUser);
-          this.isOwner = boardData.ownerID === currentUserId;
+          this.isOwner = boardData.ownerID === currentUserId;          
           this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC" || this.isCollab;
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {

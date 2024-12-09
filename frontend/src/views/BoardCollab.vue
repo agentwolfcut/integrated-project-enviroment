@@ -77,7 +77,7 @@ const confirmChangeAccess = async () => {
 
 const cancelButton = () => {
   showChangeModAcc.value = false;
-  showRemoveModal.value = false
+  showRemoveModal.value = false;
   selectedOid.value = "";
   selectedName.value = "";
 };
@@ -99,6 +99,9 @@ const confirmRemove = async () => {
     showRemoveModal.value = false;
   }
 };
+
+
+const showTooltip = ref(false)
 
 </script>
 
@@ -124,13 +127,21 @@ const confirmRemove = async () => {
                     size="sm"
                     type="dark"
                     class="itbkk-collaborator-add disabled:cursor-not-allowed"
-                    :disabled="!isOwner "
+                    :disabled="!isOwner"
                     @mouseenter="showTooltip = !isOwner"
                     @mouseleave="showTooltip = false"
                   >
                     <template v-slot:title> Add Collaborator </template>
                   </buttonSlot>
                 </div>
+
+                <span
+                        v-if="showTooltip"
+                        class="tooltip fixed bottom-right-tooltip"
+                      >
+                        You need to be board owner or have write access to
+                        perform this action
+                      </span>
               </div>
 
               <!-- Table with scroll behavior -->
@@ -186,7 +197,10 @@ const confirmRemove = async () => {
                               collab.name
                             )
                           "
-                          class="text-base font-medium leading-none text-gray-700 bg-slate-50 p-2 rounded-lg px-4"
+                          class="text-base disabled:cursor-not-allowed font-medium leading-none text-gray-700 bg-slate-50 p-2 rounded-lg px-4"
+                          :disabled="!isOwner"
+                          @mouseenter="showTooltip = !isOwner"
+                          @mouseleave="showTooltip = false"
                         >
                           {{ collab.accessRight }}
                         </button>
@@ -199,7 +213,10 @@ const confirmRemove = async () => {
                             size="sm"
                             type="light"
                             class="itbkk-collab-remove disabled:cursor-not-allowed bg-customBeige"
-                            @click="openRemoveModal(collab.oid , collab.name)"
+                            @click="openRemoveModal(collab.oid, collab.name)"
+                            :disabled="!isOwner"
+                            @mouseenter="showTooltip = !isOwner"
+                            @mouseleave="showTooltip = false"
                           >
                             <template v-slot:title> remove </template>
                           </buttonSlot>
@@ -274,7 +291,7 @@ const confirmRemove = async () => {
           >Remove collaborator
         </span>
         <p class="my-4 text-base font-medium overflow-y-auto">
-          Do you want to remove 
+          Do you want to remove
           <span class="text-cyan-800 italic font-bold">
             {{ selectedName }}
           </span>
@@ -298,7 +315,6 @@ const confirmRemove = async () => {
       </div>
     </div>
   </div>
-
 
   <Teleport to="#AddCollab">
     <div v-show="showAddModal">
@@ -330,5 +346,43 @@ table {
 }
 .container:hover > :not(:hover) {
   opacity: 0.2;
+}
+.tooltip {
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  color: #fff; /* White text */
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+ 
+  transform: translateY(20px); /* Start slightly lower */
+  animation: slideUp 3.5s both; /* Trigger animation */
+
+  
+}
+
+.bottom-right-tooltip {
+  right: 107px; /* Position 20px from the right */
+  bottom: 35px; /* Position 20px from the bottom */
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  9% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
 }
 </style>

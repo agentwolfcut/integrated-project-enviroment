@@ -30,11 +30,12 @@ const showLeaveModal = ref(false);
 
 const collabStore = useCollaboratorStore();
 const toast = useToast();
-const leaveBoard = (id , name , oid) => {
+const leaveBoard = (id , name ) => {
   boardId.value = id;
   boardName.value = name;
-  ownOid.value = oid
-  showLeaveModal.value = true;
+  showLeaveModal.value = true
+  // console.log(ownedBoards.value[0].ownerID);
+  ownOid.value = ownedBoards.value[0].ownerID
 }
 
 const cancelLeave = () => {
@@ -55,6 +56,7 @@ const confirmLeave = async () => {
     toast.error("There was a problem leaving the board. Please try again later.");
   }
   showLeaveModal.value = false;
+  boardStore.getBoards()
 };
 
 </script>

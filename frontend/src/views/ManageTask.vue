@@ -280,9 +280,9 @@ const isPrivate = computed(() => visibilitys.value === "PRIVATE");
 const showModalVis = ref(false);
 const visibilityStore = useVisibilityStore();
 const isOwner = boardPermissionStore.isOwner;
-const isEditor = boardPermissionStore.isEditor
+const isEditor = boardPermissionStore.isEditor;
 
-const canAccess = isOwner || isEditor
+const canAccess = isOwner || isEditor;
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
@@ -377,10 +377,13 @@ const confirmChange = async () => {
                       >
                         <template v-slot:title> Add Task </template>
                       </buttonSlot>
-                      <span v-if="showTooltip" class="tooltip"
-                        >You need to be the board owner to perform this
-                        action.</span
+                      <span
+                        v-if="showTooltip"
+                        class="tooltip fixed bottom-right-tooltip"
                       >
+                        You need to be board owner or have write access to
+                        perform this action
+                      </span>
                     </div>
                   </router-link>
                 </div>
@@ -546,7 +549,7 @@ const confirmChange = async () => {
           </div>
           <button
             @click="toggleFilter"
-            class="itbkk-status-filter inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500"
+            class="itbkk-status-filter fixed right-32 bottom-8 px-4 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-2 focus:ring-red-500"
             style="background-color: #ff5a99"
           >
             << Filter by Status
@@ -703,12 +706,43 @@ table {
 .container:hover > :not(:hover) {
   opacity: 0.2;
 }
-
 .tooltip {
-  position: absolute;
-  background: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  color: #fff; /* White text */
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+ 
+  transform: translateY(20px); /* Start slightly lower */
+  animation: slideUp 3.5s both; /* Trigger animation */
+  margin-right: 107px;
+  margin-bottom: 59px;
+  
+}
+
+.bottom-right-tooltip {
+  right: 20px; /* Position 20px from the right */
+  bottom: 20px; /* Position 20px from the bottom */
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  9% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
 }
 </style>

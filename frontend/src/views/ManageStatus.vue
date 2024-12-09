@@ -51,7 +51,7 @@ const props = defineProps({
 const visibilitys = ref("");
 const boardPermissionStore = useBoardPermissionStore();
 const isOwner = boardPermissionStore.isOwner;
-const isEditor = boardPermissionStore.isCollab
+const isEditor = boardPermissionStore.isCollab;
 const canAccess = isOwner || isEditor
 const showTooltip = ref(false);
 
@@ -71,7 +71,7 @@ onMounted(async () => {
       currentUser.value = decoded.name;
     }
   }
-  visibilitys.value = boardPermissionStore.boardDetails.visibility
+  visibilitys.value = boardPermissionStore.boardDetails.visibility;
 });
 
 const statusList = ref(statusMan.value.getStatuses());
@@ -312,10 +312,13 @@ const handelFail = () => {
                     >
                       <template v-slot:title> Add Status </template>
                     </buttonSlot>
-                    <span v-if="showTooltip" class="tooltip"
-                      >You need to be the board owner to perform this
-                      action.</span
-                    >
+                    <span
+                        v-if="showTooltip"
+                        class="tooltip fixed bottom-right-tooltip"
+                      >
+                        You need to be board owner or have write access to
+                        perform this action
+                      </span>
                   </div>
                 </router-link>
               </div>
@@ -323,10 +326,7 @@ const handelFail = () => {
               <div class="mt-7 overflow-x-auto rounded-2xl">
                 <table class="w-full whitespace-nowrap">
                   <!-- head -->
-                  <thead
-                    class="text-slate-50 text bg-customYellow"
-                    
-                  >
+                  <thead class="text-slate-50 text bg-customYellow">
                     <tr class="focus:outline-none h-16 text-base text-black">
                       <th
                         class="w-5/12 p-3 pl-12 text-base font-medium tracking-wide text-left"
@@ -392,12 +392,9 @@ const handelFail = () => {
                         <div
                           class="text-base font-medium leading-none text-gray-700 mr-2"
                         >
-                          <button
-                            class="itbkk-button-edit "
-                           
-                          >
+                          <button class="itbkk-button-edit">
                             <router-link
-                              class="itbkk-button-edit "
+                              class="itbkk-button-edit"
                               :to="{
                                 name: 'EditStatus',
                                 params: { id: status.id },
@@ -407,8 +404,8 @@ const handelFail = () => {
                                 class="itbkk-button-edit pr-2 disabled:cursor-not-allowed"
                                 @click="openToEdit(status)"
                                 :disabled="!canAccess"
-                            @mouseenter="showTooltip = !canAccess"
-                            @mouseleave="showTooltip = false"
+                                @mouseenter="showTooltip = !canAccess"
+                                @mouseleave="showTooltip = false"
                               >
                                 <Edit />
                               </button>
@@ -571,11 +568,11 @@ const handelFail = () => {
 
 <style scoped>
 .itbkk-button-add {
-  background-color: #DB3069;
+  background-color: #db3069;
 }
 
 .itbkk-button-add:hover {
-  background-color: #F9DDE6;
+  background-color: #f9dde6;
   /* light purple color */
 }
 
@@ -584,7 +581,7 @@ const handelFail = () => {
 }
 
 .itbkk-manage-task:hover {
-  background-color: #76766A;
+  background-color: #76766a;
 }
 
 table {
@@ -601,10 +598,41 @@ table {
 }
 
 .tooltip {
-  position: absolute;
-  background: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  color: #fff; /* White text */
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+ 
+  transform: translateY(20px); /* Start slightly lower */
+  animation: slideUp 3.5s both; /* Trigger animation */
+
+  
+}
+
+.bottom-right-tooltip {
+  right: 107px; /* Position 20px from the right */
+  bottom: 35px; /* Position 20px from the bottom */
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  9% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
 }
 </style>

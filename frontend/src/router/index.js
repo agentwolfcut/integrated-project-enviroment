@@ -127,8 +127,8 @@ router.beforeEach(async (to, from, next) => {
         );
       }
       // Validate access permissions
-      const { isOwner, isCollab } = boardPermissionStore;
-      if (isOwner || isCollab) {
+      const { isOwner, isCollab , isEditor} = boardPermissionStore;
+      if (isOwner || isEditor) {
         console.log("Access granted to board");
         return next(); // Proceed to the route
       } else {

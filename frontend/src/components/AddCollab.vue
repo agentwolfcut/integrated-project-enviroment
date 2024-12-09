@@ -14,7 +14,7 @@ const currentUser = localStorage.getItem("currentUser");
 
 const nameToEmail = () => {
   if (!currentUser) return "";
-  const lowercaseName = currentUser.toLocaleLowerCase();
+  const lowercaseName = currentUser.toLowerCase();
   const parts = lowercaseName.split(" ");
   if (parts.length < 2) return "";
 
@@ -32,10 +32,10 @@ const isEmailValid = computed(() => {
 
 const emits = defineEmits(["saveAddCollab", "cancleAddCollab"]);
 
-const saveAddCollab = (email, accessRight) => {
-  emits("saveAddCollab", email, accessRight);
-  email.value = ""; // Reset form fields
-  accessRight.value = "READ";
+const saveAddCollab = () => {
+  emits("saveAddCollab", email.value, accessRight.value); // Emit the event with the values
+  email.value = ""; // Clear the email field
+  accessRight.value = "READ"; // Reset the access right to its default value
 };
 
 const isSaveDisabled = computed(() => {
@@ -43,7 +43,6 @@ const isSaveDisabled = computed(() => {
     !isEmailValid.value || email.value === formatEmail || email.value === ""
   );
 });
-
 </script>
 
 <template>
@@ -56,7 +55,6 @@ const isSaveDisabled = computed(() => {
       <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl p-6">
         <span
           class="text-2xl font-semibold text-red-600 italic mb-12 disabled:cursor-not-allowed"
-          
           >Add Collaborator</span
         >
 
@@ -68,10 +66,9 @@ const isSaveDisabled = computed(() => {
             <input
               type="email"
               v-model="email"
-              default=""
               required
               maxlength="50"
-              class="itbkk-collaborator-email bg-white rounded-md border-slate-400 border h-10 w-56"
+              class="itbkk-collaborator-email bg-white rounded-md border-slate-400 border h-10 w-56 pl-2"
             />
           </div>
           <div class="flex flex-col">
@@ -93,7 +90,7 @@ const isSaveDisabled = computed(() => {
         <div class="flex justify-end">
           <button
             @click="
-              $emit('cancleAddCollab', false), (email = ''), (accessRight = '')
+              $emit('cancleAddCollab', false); email = ''; accessRight = 'READ';
             "
             class="itbkk-button-cancel transition-all ease-in bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2 hover:bg-gray-400"
           >
@@ -101,7 +98,7 @@ const isSaveDisabled = computed(() => {
           </button>
 
           <button
-            @click="saveAddCollab(email, accessRight)"
+            @click="saveAddCollab"
             :disabled="isSaveDisabled"
             class="disabled:opacity-50 disabled:cursor-not-allowed itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
@@ -112,5 +109,3 @@ const isSaveDisabled = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

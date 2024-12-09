@@ -323,36 +323,55 @@ public class BoardTaskController {
     }
 
     @GetMapping("/{boardID}")
-    public ResponseEntity<Board> getBoardDetails(@PathVariable String boardID, Authentication authentication) {
-        // ตรวจสอบว่า Board มีอยู่จริงหรือไม่
+    public ResponseEntity<Map<String, Object>> getBoardDetails(
+            @PathVariable String boardID,
+            Authentication authentication) {
+        // Fetch board details
         Board board = userBoardService.getBoardsDetail(boardID);
         if (board == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // หาก Board เป็น Public อนุญาตการเข้าถึงโดยไม่ต้องใช้ token
-        if (board.isPublic()) {
-            return ResponseEntity.ok(board);
-        }
+        // Check if the board is public
+        if (!board.isPublic()) {
+            // If the board is private, authentication is required
+            if (authentication == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
+            }
 
-        // หาก Board เป็น Private ตรวจสอบ token
-        if (authentication == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
-        }
+            // Extract the user details
+            UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+            String userOid = userDetails.getOid();
 
-        // ตรวจสอบสิทธิ์ของผู้ใช้งาน
-        UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
-        if (!board.getOwnerID().equals(userDetails.getOid())) {
-            // ตรวจสอบว่าผู้ใช้เป็น Collaborator ที่มีสิทธิ์หรือไม่
-            boolean isCollaborator = collaboratorsService.hasReadAccess(userDetails.getOid(), boardID);
-            if (!isCollaborator) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+            // Check if the user is the owner of the board
+            if (!board.getOwnerID().equals(userOid)) {
+                // If not the owner, check if the user is a collaborator
+                boolean isCollaborator = collaboratorsService.hasReadAccess(userOid, boardID);
+                if (!isCollaborator) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to this board.");
+                }
             }
         }
 
-        return ResponseEntity.ok(board);
-    }
+        // Fetch owner details
+        String ownerID = board.getOwnerID();
+        UserDetailsDTO ownerDetails = userBoardService.getUserDetailsById(ownerID);
 
+        // Prepare response
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", board.getId());
+        response.put("name", board.getName());
+        response.put("ownerID", ownerID);
+        response.put("owner", Map.of(
+                "oid", ownerDetails.getOid(),
+                "username", ownerDetails.getName(),
+                "email", ownerDetails.getEmail() // Include email
+        ));
+        response.put("public", board.isPublic());
+        response.put("visibility", board.getVisibility().name());
+
+        return ResponseEntity.ok(response);
+    }
 
     // Similar logic for tasks
     @GetMapping("/{boardID}/tasks")

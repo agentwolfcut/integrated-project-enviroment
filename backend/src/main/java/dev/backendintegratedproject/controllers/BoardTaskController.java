@@ -104,6 +104,7 @@ public class BoardTaskController {
     //get all boards
     @GetMapping("")
     public ResponseEntity<Object> getAllBoards(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        // Extract user OID from the Authorization header
         String userOid = getOidFromHeader(authorizationHeader);
 
         // Fetch boards owned by the user
@@ -123,18 +124,18 @@ public class BoardTaskController {
                     Board board = userBoardService.getBoardsDetail(collab.getBoardID());
                     CollabOutputDTO collabOutputDTO = collaboratorsService.mapOutputDTO(collab);
 
-                    // Manually convert CollabOutputDTO to a Map
+                    // Map collaborator details along with board information
                     Map<String, Object> collabDetails = new HashMap<>();
                     collabDetails.put("oid", collab.getUserOid());
                     collabDetails.put("boardId", collab.getBoardID());
                     collabDetails.put("accessRight", collab.getAccessRight());
-                    collabDetails.put("name", collabOutputDTO.getName());
+                    collabDetails.put("boardname", board.getName()); // Include the board name
                     collabDetails.put("email", collabOutputDTO.getEmail());
                     return collabDetails;
                 })
                 .toList();
 
-        // Combine both owned boards and collaborated boards in the response
+        // Combine both owned boards and collaborated boards into the response
         Map<String, Object> response = new HashMap<>();
         response.put("ownedBoards", ownedBoardDTOs);
         response.put("collabBoards", collabsBoard);

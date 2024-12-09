@@ -152,18 +152,32 @@ public class BoardTaskController {
 
 
     @GetMapping("/{id}/collabs")
-    public ResponseEntity<Map<String, Object>> getCollab(@PathVariable String id) {
-
-        // ดึงข้อมูลบอร์ด (ไม่ต้องตรวจสอบ Permission)
+    public ResponseEntity<Map<String, Object>> getCollab(@PathVariable String id, Authentication authentication) {
+        // Fetch the board details
         Board board = userBoardService.getBoardsDetail(id);
         if (board == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // ดึง List<Collaborators>
+        // If the board is private, authentication and permission check are required
+        if (!board.isPublic()) {
+            if (authentication == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
+            }
+
+            UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
+
+            // Check if the user is the owner or a collaborator with READ access
+            if (!board.getOwnerID().equals(userDetails.getOid())
+                    && !collaboratorsService.hasReadAccess(userDetails.getOid(), id)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to view collaborators for this board.");
+            }
+        }
+
+        // Fetch collaborators for the board
         List<Collaborators> collaborators = collaboratorsService.getAllCollabOfBoard(id);
 
-        // แปลง List<Collaborators> เป็น List<CollabOutputDTO> และเพิ่ม boardId
+        // Map collaborators to CollabOutputDTO and include board ID
         List<Map<String, Object>> collabs = collaborators.stream()
                 .map(collaborator -> {
                     CollabOutputDTO dto = collaboratorsService.mapOutputDTO(collaborator);
@@ -174,13 +188,14 @@ public class BoardTaskController {
                 })
                 .toList();
 
-        // ใส่ข้อมูลใน Map เพื่อแสดงผล
+        // Prepare and return the response
         Map<String, Object> response = new HashMap<>();
         response.put("boardId", id);
         response.put("collaborators", collabs);
 
         return ResponseEntity.ok(response);
     }
+
 
 
 

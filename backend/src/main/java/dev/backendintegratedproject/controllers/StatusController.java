@@ -42,12 +42,11 @@ public class StatusController {
     public ResponseEntity<List<Status>> getStatuses(@PathVariable String boardID, Authentication authentication) {
         // Fetch the board details
         Board board = userBoardService.getBoardsDetail(boardID);
-
         if (board == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found.");
         }
 
-        // If the board is private, authentication is required
+        // If the board is private, authentication and permission check are required
         if (!board.isPublic()) {
             if (authentication == null) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You must provide a valid token to access this resource.");
@@ -55,18 +54,18 @@ public class StatusController {
 
             UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
 
-            // Check if the user is the owner or a collaborator
+            // Check if the user is the owner or a collaborator with READ access
             if (!board.getOwnerID().equals(userDetails.getOid())
                     && !collaboratorsService.hasReadAccess(userDetails.getOid(), boardID)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to view statuses for this board.");
             }
         }
 
-        // Fetch statuses for the board
+        // Fetch and return the statuses for the board
         List<Status> statuses = statusService.getStatusesForBoard(boardID);
-
         return ResponseEntity.ok(statuses);
     }
+
 
 
 

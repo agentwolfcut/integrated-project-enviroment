@@ -10,12 +10,14 @@ import AddCollab from "@/components/AddCollab.vue";
 import { useCollaboratorStore } from "@/stores/CollaboratorStore";
 import GoBack from "@/assets/icons/GoBack.vue";
 import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
+import { AuthUserStore } from "@/stores/store";
 
 const route = useRoute();
 const boardIdRoute = route.params.boardID;
 const currentUser = ref("");
 const showAddModal = ref(false);
-const collabStore = useCollaboratorStore();
+const collabStore = useCollaboratorStore()
+const authStore = AuthUserStore()
 
 onMounted(() => {
   collabStore.fetchCollaborators(boardIdRoute);
@@ -30,6 +32,7 @@ const cancelAddCollab = () => {
 };
 
 const saveAddCollab = async (email, accessRight) => {
+  authStore.checkAccessToken()
   try {
     await collabStore.addCollaborator(boardIdRoute, email, accessRight);
   } catch (error) {
@@ -61,13 +64,7 @@ const confirmChangeAccess = async () => {
       boardIdRoute,
       selectedOid.value,
       newAccess.value
-    );
-    // const collaborator = collabStore.collaborators.find(
-    //   (c) => c.oid === selectedOid.value
-    // );
-    // if (collaborator) {
-    //   collaborator.accessRight = newAccess.value; // Update access right
-    // }
+    )
     showChangeModAcc.value = false;
     collabStore.fetchCollaborators(boardIdRoute);
   } catch (error) {

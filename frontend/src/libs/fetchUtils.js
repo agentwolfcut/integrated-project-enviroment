@@ -1,8 +1,8 @@
 import { useToast } from "vue-toast-notification";
 import router from "@/router";
 import { AuthUserStore } from "@/stores/store";
-const toast = useToast();
-// async task must wait , inside are promise
+const toast = useToast()
+
 async function getItems(url) {
   try {
     const authStore = AuthUserStore()
@@ -30,7 +30,7 @@ async function getItems(url) {
     return items;
   } catch (error) {
     console.log(`error: ${error}`);
-    throw error; // Re-throw the error to handle it in the calling function
+    throw error;
   }
 }
 
@@ -71,7 +71,7 @@ async function deleteItemById(url, id, token = null) {
       method: "DELETE",
       headers: headers,
     });
-    return res.status; // number of network
+    return res.status
   } catch (error) {
     console.log(`error: ${error}`);
   }
@@ -99,13 +99,13 @@ async function addItem(url, newItem) {
   const token = localStorage.getItem('token')
   try {
     const res = await fetch(url, {
-      method: "POST", // add
+      method: "POST", 
       headers: {
-        "content-type": "application/json", // add contents
+        "content-type": "application/json", 
         Authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        ...newItem, // sent add data . destructuring object
+        ...newItem, 
       }), // js to  json
     });
     const addedItem = await res.json();

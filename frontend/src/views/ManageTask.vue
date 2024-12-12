@@ -63,6 +63,13 @@ const showTooltip = ref(false);
 useAuthUserStore.checkAccessToken();
 const token = useAuthUserStore.token;
 
+// visibility
+const isPrivate = computed(() => visibilitys.value === "PRIVATE");
+const showModalVis = ref(false);
+const isOwner = boardPermissionStore.isOwner;
+const isEditor = boardPermissionStore.isEditor;
+const canAccess = isOwner || isEditor;
+
 onMounted(async () => {
   await boardPermissionStore.fetchBoardById(`/boards/${boardIdRoute}`, "GET");
   if (!boardPermissionStore.hasAccess) {
@@ -73,7 +80,7 @@ onMounted(async () => {
     toast.error(
       "Access denied. You do not have permission to view this board."
     );
-    router.push("/test"); // Redirect if no permission
+    router.push("/access-deny"); // Redirect if no permission
   } else {
     visibilitys.value = boardPermissionStore.boardDetails.visibility;
     try {
@@ -134,9 +141,7 @@ const saveTask = async () => {
         `Failed to add task. Server responded with status ${res.status}`
       );
     }
-    // const res = await boardStore.addTask(selectTask.value, props.id);
     const addedTask = await res.json();
-    // {"title":"zxzxzx","description":null,"assignees":null,"statusId":328}
     const status = statusStore.getStatusById(addedTask.statusId);
     addedTask.statusId = status;
     // sortedTasks.value.push(addedTask);
@@ -274,35 +279,23 @@ const toggleSortOrder = () => {
   }
 };
 
-// visibility
-// const isPrivate = ref(true); // ค่าเริ่มต้นของ visibility (true = private, false = public)
-const isPrivate = computed(() => visibilitys.value === "PRIVATE");
-const showModalVis = ref(false);
-const visibilityStore = useVisibilityStore();
-const isOwner = boardPermissionStore.isOwner;
-const isEditor = boardPermissionStore.isEditor;
-
-const canAccess = isOwner || isEditor;
 const toggleVisibility = async () => {
   if (!boardPermissionStore.isOwner) {
     toast.error("You do not have permission to change visibility.");
     return;
   }
   showModalVis.value = true;
-  console.log(
-    `visible is ${visibilitys.value} and isPrivate is ${isPrivate.value}`
-  );
 };
 
-const confirmChange = async () => {
+const confirmChangeVis = async () => {
+  showModalVis.value = false
   const newVisibility = visibilitys.value === "PRIVATE" ? "PUBLIC" : "PRIVATE";
   try {
     await boardPermissionStore.updateVisibility(boardIdRoute, newVisibility);
-    visibilitys.value = newVisibility;
+    visibilitys.value = newVisibility
   } catch (error) {
-    toast.error("Failed to update visibility.");
+    toast.error(`Failed to update visibility: ${error.message || error}`);
   }
-  showModalVis.value = false;
 };
 </script>
 
@@ -629,7 +622,7 @@ const confirmChange = async () => {
           </button>
 
           <button
-            @click="confirmChange"
+            @click="confirmChangeVis"
             class="itbkk-button-confirm transition-all ease-in bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Confirm

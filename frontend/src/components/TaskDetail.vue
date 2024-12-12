@@ -13,8 +13,15 @@ const props = defineProps({
   },
 });
 
-const taskSelect = computed(() => props.task);
-
+const taskSelect = computed(() => {
+  if (props.task && props.task.status) {
+    return {
+      ...props.task,
+      status: props.task.status.name, // ดึงเฉพาะ name ของ status
+    };
+  }
+  return props.task;
+});
 
 const formatLocalDate = (dateString) => {
   if (!dateString) return "";

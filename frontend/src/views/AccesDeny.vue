@@ -2,6 +2,11 @@
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRouter();
+const takeMe = () => {
+  const token = localStorage.getItem('token')
+  if (token) route.back();
+  else route.push("/login");
+};
 </script>
 
 <template>
@@ -20,12 +25,9 @@ const route = useRouter();
           you do not have permission to view this page.
         </p>
         <div class="flex items-center mt-6 gap-x-3">
-
           <button
-            @click="route.push('/login')"
-            class="itbkk-button-back text-white w-1/2 px-5 py-2 text-sm tracking-wide rounded-md  transition-colors duration-200rounded-lg shrink-0 sm:w-auto
-             hover:bg-customBlue
-             dark:hover:bg-customBeige dark:bg-customBeige bg-customPink dark:text-black"
+            @click="takeMe"
+            class="itbkk-button-back text-white w-1/2 px-5 py-2 text-sm tracking-wide rounded-md transition-colors duration-200rounded-lg shrink-0 sm:w-auto hover:bg-customBlue dark:hover:bg-customBeige dark:bg-customBeige bg-customPink dark:text-black"
           >
             Take me home
           </button>
@@ -36,7 +38,6 @@ const route = useRouter();
 </template>
 
 <style scoped>
-
 .itbkk-button-back:hover {
   background-color: #260b8a;
   color: wheat;

@@ -74,17 +74,7 @@ const saveTask = () => {
         previousTask.value.assignees = null;
     }
     emit('saveUpdateTask', previousTask.value);
-};
-
-// const saveTask = async () => {
-
-//   try {
-//     // เรียกใช้ addTask พร้อมข้อมูล task และ boardID ที่เกี่ยวข้อง
-//     await boardStore.addTask(previousTask.value, props.boardID);
-//   } catch (error) {
-//     console.error('Failed to save task:', error);
-//   }
-// };
+}
 
 
 </script>
@@ -96,15 +86,15 @@ const saveTask = () => {
 
             <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl">
 
-                <p class="font-bold text-3xl text-black flex justify-center m-3">
+                <p class="font-bold text-3xl text-customBlue flex justify-center m-3">
                     {{ taskId === undefined ? 'Add Task' : 'Edit Task' }}
                 </p>
 
                 <!-- head -->
                 <div class="m-4">
-                    <label for="title" class="font-medium text-base">Title</label>
+                    <label for="title" class="font-medium text-base text-customBlue">Title</label>
                     <input v-model="previousTask.title"
-                        class="itbkk-title p-2 w-full bg-slate-100 flex font-semibold text-xl text-black rounded-md border-slate-600"
+                        class="itbkk-title p-2 w-full bg-customBg flex font-semibold text-xl text-black rounded-md border-slate-600"
                         type="text" @input="limitInputLength">
                     </input>
                     <p :class="textColorClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.title.length}}/100</p>
@@ -114,12 +104,11 @@ const saveTask = () => {
                 <!-- center -->
                 <div class="flex flex-row gap-4 m-4">
                     <div class="itbkk-description w-8/12">
-                        <p class="font-medium text-base mb-2">description</p>
-                        <input v-model="previousTask.description" class="text-base rounded-md py-1 h-24 w-full mb-2"
+                        <p class="font-medium text-base mb-2 text-customBlue">description</p>
+                        <input v-model="previousTask.description" class="text-base rounded-md py-1 h-24 w-full mb-2 bg-customBg"
                             style='padding: 10px;' type="text" @input="limitInputLength">
                         </input>
                         <p v-if="previousTask.description" :class="descriptionClass" class="text-end text-sm font-semibold text-blue-600">{{ previousTask.description.length }}/500</p>
-                    <!-- <p v-if="previousTask.description.length === 500" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task description</p> -->
                                           
 
                     </div>
@@ -127,19 +116,19 @@ const saveTask = () => {
                     <div class="flex flex-col w-5/12">
                         <div>
                             <div class="itbkk-assignees">
-                                <p class="font-medium text-base">assignees</p>
+                                <p class="font-medium text-base text-customBlue">assignees</p>
                                 <input v-model="previousTask.assignees"
-                                    class=" w-full text-base rounded-md border p-1" @input="limitInputLength" />
+                                    class=" w-full text-base rounded-md border p-1 bg-customBg" @input="limitInputLength" />
                                     <p v-if="previousTask.assignees" :class="assigneesClass" class="text-end text-blue-600 text-sm font-semibold ">{{ previousTask.assignees.length}}/30</p>
                                     <!-- <p v-if="previousTask.assignees.length === 30" class="text-red-500 text-end text-sm font-semibold ">! you already have limit Maximum field size for task assignees</p> -->
 
                             </div>
                             <div>
                                 <form class="max-w-sm mx-auto">
-                                    <label for="status" class="block mb-2 text-base font-medium text-gray-900">
+                                    <label for="status" class="block mb-2 text-base font-medium text-customBlue">
                                         Status</label>
                                     <select id="status" v-model="previousTask.statusId"
-                                        class="itbkk-status bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
+                                        class="itbkk-status bg-customBg border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ">
                                         <option v-for="status in statusOptions" :key="status.name" :value="status.id">
                                             {{ status.name }}
                                         </option>
@@ -180,7 +169,7 @@ const saveTask = () => {
 }
 
 .itbkk-assignees {
-    background-color: #edf2f7;
+    background-color: #f7f5ed;
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
     margin-bottom: 10px;
@@ -192,7 +181,6 @@ const saveTask = () => {
 
 /* เพิ่มสีพื้นหลังและสีตัวอักษรให้กับ status เพื่อให้ดูเด่น */
 .itbkk-status {
-    background-color: #edf2f7;
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */
     margin-top: 10px;
@@ -200,7 +188,7 @@ const saveTask = () => {
 }
 
 .itbkk-description {
-    border: 2px solid #4a5568;
+    border: 1px solid #4a5568;
     /* เพิ่มเส้นขอบสีเทาให้กับ description */
     padding: 10px;
     /* เพิ่มพื้นที่เว้นระหว่างข้อความและขอบ */

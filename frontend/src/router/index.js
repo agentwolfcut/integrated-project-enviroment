@@ -16,7 +16,7 @@ import BoardCollab from "@/views/BoardCollab.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
-  { path: "/test", name: "AccessDeny", component: AccessDeny },
+  { path: "/access-deny", name: "AccessDeny", component: AccessDeny },
   { path: "/login", name: "Login", component: Login },
 
   // ห้ามลบ
@@ -53,7 +53,7 @@ const routes = [
         meta: { requiresOwner: true },
       },
     ],
-    beforeEnter: checkBoardAccess, // Use the permission check function
+    beforeEnter: checkBoardAccess, 
   },
 
   {
@@ -76,14 +76,13 @@ const routes = [
         meta: { requiresOwner: true },
       },
     ],
-    beforeEnter: checkBoardAccess, // Use the permission check function
+    beforeEnter: checkBoardAccess, 
   },
   {
     path: "/board/:boardID/collab",
     component: BoardCollab,
     name: "CollabBoard",
     props: true,
-    // meta: { requiresOwner: true },
   },
 
   {
@@ -97,7 +96,7 @@ const routes = [
     path: "/:notfoundpath(.*)",
     name: "NotFound",
     component: NotFound,
-    redirect: "/test", // Redirect to Access Denied on not found
+    redirect: "/access-deny", 
   },
 ];
 
@@ -113,10 +112,9 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresOwner) {
     if (!boardID) {
       console.log("Missing board ID, redirecting to Access Denied");
-      return next("/test");
+      return next("/access-deny");
     }
     try {
-      // Use token-based or public fetch to get board permissions
       const token = localStorage.getItem("token");
       if (token) {
         await boardPermissionStore.fetchBoardById(`/boards/${boardID}`, "GET");
@@ -126,18 +124,17 @@ router.beforeEach(async (to, from, next) => {
           "GET"
         );
       }
-      // Validate access permissions
       const { isOwner, isCollab , isEditor} = boardPermissionStore;
       if (isOwner || isEditor) {
         console.log("Access granted to board");
-        return next(); // Proceed to the route
+        return next(); 
       } else {
         console.log("Access denied: Not owner or collaborator");
-        return next("/test"); // Redirect to Access Denied
+        return next("/access-deny"); 
       }
     } catch (error) {
       console.error("Error fetching board permissions:", error);
-      return next("/test"); // Redirect to Access Denied
+      return next("/access-deny"); 
     }
   }
   next();

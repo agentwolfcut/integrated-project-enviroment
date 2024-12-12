@@ -16,16 +16,15 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
     collaborators: [],
     isCollab: false,
     isEditor: false,
-    realCollab : []
+    isPubic: false,
+    realCollab: [],
   }),
 
   actions: {
     transformUserFormat(user) {
-      // Transform "ITBKK SANIT" to "itbkk.sanit"
       return user.toLowerCase().split(" ").join(".");
     },
     isCollaboratorWrite(username) {
-      // Check if the user is a collaborator with 'WRITE' access
       return this.collaborators.some(
         (collab) =>
           collab.username === username && collab.accessRight === "WRITE"
@@ -72,7 +71,7 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
             (collab) => collab.name // Extract only the name
           );
           console.log("Collaborators:", this.collaborators);
-          this.realCollab = collabStore.collaborators
+          this.realCollab = collabStore.collaborators;
 
           // Check if currentUser exists in collaborators
           this.isCollab = this.collaborators.includes(currentUser);
@@ -84,13 +83,12 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
               collab.name === currentUser && collab.accessRight === "WRITE"
           );
           console.log(`Is Editor: ${this.isEditor}`);
-          
 
           this.hasAccess =
             this.isOwner ||
             boardData.visibility === "PUBLIC" ||
             this.isCollab ||
-            this.isEditor
+            this.isEditor;
 
           this.visibility = boardData.visibility;
         } else if (res.status === 401) {
@@ -98,20 +96,18 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
           // real BE
         } else if (res.status === 403) {
           console.log("You do not have permission to access this board.");
-          router.push("/test");
+          router.push("/access-deny");
         } else {
           toast.error("Failed to fetch board details.");
         }
       } catch (error) {
         console.error("Error fetching board details:", error);
-        toast.error("An error occurred while fetching board details.");
       }
     },
 
     async fetchBoardByIdForPublic(path, method) {
       const toast = useToast();
       const authStore = AuthUserStore();
-
       try {
         const res = await fetch(`${import.meta.env.VITE_BASE_URL + path}`, {
           method: method,
@@ -120,47 +116,54 @@ export const useBoardPermissionStore = defineStore("boardPermission", {
         if (res.ok) {
           const boardData = await res.json();
           this.boardDetails = boardData;
-          const currentUser = localStorage.getItem("currentUser");
-          if (currentUser) {
-            const formattedUser = this.transformUserFormat(currentUser);
-            this.user = formattedUser; // Store transformed user
+          const token = localStorage.getItem("token");
+          if (token) {
+            const currentUser = localStorage.getItem("currentUser");
+            if (currentUser) {
+              const formattedUser = this.transformUserFormat(currentUser);
+              this.user = formattedUser; // Store transformed user
+            } else {
+              this.user = null;
+            }
+            const currentUserId = await authStore.findCurrentUser(currentUser);
+            this.isOwner = boardData.ownerID === currentUserId;
           }
-          const currentUserId = await authStore.findCurrentUser(currentUser);
-          this.isOwner = boardData.ownerID === currentUserId;          
-          this.hasAccess = this.isOwner || boardData.visibility === "PUBLIC" || this.isCollab;
-          this.visibility = boardData.visibility;
+          this.hasAccess =
+              this.isOwner ||
+              boardData.visibility === "PUBLIC" ||
+              this.isCollab;
+            this.visibility = boardData.visibility;
         } else if (res.status === 401) {
           router.push("/login");
           // real BE
         } else if (res.status === 403) {
           toast.error("You do not have permission to access this board.");
-          router.push("/test");
+          router.push("/access-deny");
         } else {
           toast.error("Failed to fetch board details.");
         }
       } catch (error) {
         console.error("Error fetching board details:", error);
-        toast.error("An error occurred while fetching board details.");
       }
     },
 
     async updateVisibility(boardID, newVisibility) {
       const toast = useToast();
       const authStore = AuthUserStore();
-
       try {
-        const patchData = { visibility: newVisibility }; // Set the data to be patched
+        const patchData = { visibility: newVisibility };
         const patchedItem = await patchItem(
           `${import.meta.env.VITE_BASE_URL}/boards/${boardID}`,
           patchData
         );
         if (patchedItem) {
-          this.visibility = newVisibility; // Update local visibility
+          this.visibility = newVisibility;
         }
       } catch (error) {
         console.error("Error changing visibility:", error);
         if (error.message.includes("401")) {
-          localStorage.removeItem("token");
+          // localStorage.removeItem("token")
+          authStore.clearTokens();
           router.push("/login");
         } else if (error.message.includes("403")) {
           toast.error("You do not have permission to change visibility.");

@@ -2,7 +2,7 @@
 import router from "@/router";
 import { computed, ref } from "vue";
 import VueJwtDecode from "vue-jwt-decode";
-import { AuthUserStore, BoardStore } from '@/stores/store'
+import { AuthUserStore, BoardStore } from "@/stores/store";
 
 const usrpw = ref({ username: "", password: "" });
 const error = ref(false);
@@ -12,6 +12,8 @@ const textNotify = ref("");
 const authUserStore = AuthUserStore();
 const boardStore = BoardStore();
 const current_user = ref(null);
+const showPassword = ref(false);
+
 localStorage.clear();
 
 const inputUsrpw = async () => {
@@ -31,11 +33,11 @@ const inputUsrpw = async () => {
       authUserStore.setTokens(data.access_token, data.refresh_token);
       decode();
       authUserStore.scheduleTokenRefresh();
-      router.push("/board")
+      router.push("/board");
     } else {
       if (res.status === 400 || res.status === 401) {
         errorNotify("username or Password is incorrect.");
-        console.log(res.status + res.statusText);
+        // console.log(res.status + res.statusText);
       } else {
         errorNotify("There is a problem. Please try again later.");
         console.log(res.status + res.statusText);
@@ -54,7 +56,6 @@ const decode = () => {
     current_user.value = decoded.name; // Store the decoded token
     authUserStore.setUser(current_user.value);
     console.log(decoded.exp);
-    
   } catch (err) {
     console.log("token is null: ", err);
   }
@@ -78,6 +79,10 @@ const canLogin = computed(() => {
     usrpw.value.password.length <= 14
   );
 });
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
+};
 </script>
 
 <template>
@@ -101,10 +106,14 @@ const canLogin = computed(() => {
       >
         <div class="max-w-md w-full">
           <div class="p-8 mockup-window bg-customBeige shadow-xl">
-            <h2 class="text-customBlue text-center text-2xl font-bold">Log in</h2>
+            <h2 class="text-customBlue text-center text-2xl font-bold">
+              Log in
+            </h2>
             <form class="mt-8 space-y-4">
               <div>
-                <label class="text-customBlue text-sm mb-2 block">User name</label>
+                <label class="text-customBlue text-sm mb-2 block"
+                  >User name</label
+                >
                 <div class="relative flex items-center">
                   <input
                     v-model="usrpw.username"
@@ -112,37 +121,88 @@ const canLogin = computed(() => {
                     type="text"
                     required
                     maxlength="50"
-                    class="itbkk-username w-full bg-white text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                    class="itbkk-username w-full bg-white text-gray-600 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
                     placeholder="Enter user name"
                   />
 
                   <!-- icon -->
 
-                  <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4" viewBox="0 0 24 24">
-                    <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
-                    <path d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z" data-original="#000000"></path>
-                  </svg> -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#bbb"
+                    stroke="#bbb"
+                    class="w-4 h-4 absolute right-4"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="10"
+                      cy="7"
+                      r="6"
+                      data-original="#000000"
+                    ></circle>
+                    <path
+                      d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z"
+                      data-original="#000000"
+                    ></path>
+                  </svg>
                 </div>
               </div>
 
               <div>
-                <label class="text-customBlue text-sm mb-2 block">Password</label>
+                <label class="text-customBlue text-sm mb-2 block"
+                  >Password</label
+                >
                 <div class="relative flex items-center">
                   <input
                     v-model="usrpw.password"
                     name="password"
-                    type="password"
+                    :type="showPassword ? 'text' : 'password'"
                     required
                     maxlength="14"
-                    class="itbkk-password bg-white w-full text-gray-300 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
+                    class="itbkk-password bg-white w-full text-gray-800 text-sm border border-gray-300 px-4 py-3 rounded-md outline-blue-600"
                     placeholder="Enter password"
                   />
 
                   <!-- icon -->
 
-                  <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4 cursor-pointer" viewBox="0 0 128 128">
-                    <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
-                  </svg> -->
+                  <svg
+                    v-if="showPassword"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="absolute right-4 w-5 h-5 cursor-pointer text-gray-400"
+                    @click="togglePasswordVisibility"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+
+                  <svg
+                    v-else
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="absolute right-4 w-5 h-5 cursor-pointer text-gray-400"
+                    @click="togglePasswordVisibility"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                    />
+                  </svg>
                 </div>
               </div>
 
@@ -178,8 +238,7 @@ const canLogin = computed(() => {
                   type="button"
                   :disabled="!canLogin"
                   :class="!canLogin ? 'disabled' : ''"
-                  class="itbkk-button-signin disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-900 w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white
-                   bg-customBlue hover:bg-blue-700 focus:outline-none"
+                  class="itbkk-button-signin disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-900 w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-customBlue hover:bg-blue-700 focus:outline-none"
                 >
                   Sign in
                 </button>

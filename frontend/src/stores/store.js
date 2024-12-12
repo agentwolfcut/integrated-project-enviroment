@@ -15,7 +15,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
   state: () => ({
     token: null,
     refreshToken: null,
-    currentUser: null, // String
+    currentUser: null, 
     tokenExpiry: null,
     refreshTokenExpiry : null
   }),
@@ -24,26 +24,25 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     setTokens(accessToken, refreshToken) {
       this.token = accessToken;
       this.refreshToken = refreshToken;
-      //acess token lifetime
+      // 30 mins
       this.tokenExpiry = Date.now() + 30 * 60 * 1000;
-      // Refresh token lifetime (24 hours)
-      this.refreshTokenExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+      // 24 hours
+      this.refreshTokenExpiry = Date.now() + 24 * 60 * 60 * 1000
       localStorage.setItem("token", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("tokenExpiry", this.tokenExpiry);
-      localStorage.setItem("refreshTokenExpiry", this.refreshTokenExpiry); // Store refresh token expiry
-
+      localStorage.setItem("refreshTokenExpiry", this.refreshTokenExpiry)
     },
 
     clearTokens() {
       this.token = null;
       this.refreshToken = null;
       this.tokenExpiry = null;
-      this.refreshTokenExpiry = null; // Clear refresh token expiry
+      this.refreshTokenExpiry = null;
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("tokenExpiry");
-      localStorage.removeItem("refreshTokenExpiry"); // Remove refresh token expiry from localStorage
+      localStorage.removeItem("refreshTokenExpiry"); 
     },
 
     checkTokenValidity2(token) {
@@ -113,59 +112,23 @@ export const AuthUserStore = defineStore("AuthUserStore", {
     },
 
     scheduleTokenRefresh() {
-      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000; // 1 minute before access token expiry
+      const refreshInMs = this.tokenExpiry - Date.now() - 60 * 1000
       if (refreshInMs > 0) {
         setTimeout(this.refreshTokens, refreshInMs);
       }
-      // Optionally, you could also check refresh token expiry here if needed
     },
-
-    // async checkTokenValidity() {
-    //   const token = localStorage.getItem("token");
-    //   const refreshToken = localStorage.getItem("refreshToken");
-    //   if (!token || !refreshToken) {
-    //     this.clearTokens();
-    //     router.push("/login");
-    //     return;
-    //   }
-    //   try {
-    //     // mockup
-    //     const res = await fetch(`${import.meta.env.VITE_BASE_URL}/token`, {
-    //       headers: { Authorization: `Bearer ${token}` },
-    //     });
-
-    //     if (res.status === 200) {
-    //       // Token ยัง valid
-    //       return;
-    //     } else if (res.status === 401) {
-    //       // Token หมดอายุหรือไม่ถูกต้อง, ใช้ refresh token
-    //       toast.info("use refreshToken");
-    //       await this.refreshtoken();
-    //     } else {
-    //       this.clearTokens();
-    //       toast.error("There is a problem. Please try again later.");
-    //       router.push("/login");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error checking token validity:", error);
-    //     this.clearTokens();
-    //     router.push("/login");
-    //   }
-    // },
 
     // ยังไม่เช็ค expiry
     async checkAccessToken() {      
       const storedToken = localStorage.getItem("token");
       const storedExpiry = localStorage.getItem("tokenExpiry");
 
-      if (storedToken !== this.token) {
-        await this.refreshTokens(); // Try refreshing the token
+      if (storedToken !== this.token || storedExpiry !== this.tokenExpiry || !storedToken) {
+        await this.refreshTokens(); 
         
       } else {
-        // console.log(`new is ${storedToken} , old is ${this.token}`);
         this.token = storedToken;
         this.tokenExpiry = storedExpiry;
-        
       }
     },
 
@@ -176,11 +139,8 @@ export const AuthUserStore = defineStore("AuthUserStore", {
 
     async findCurrentUser (username) {
       const useAuthStore = AuthUserStore()
-    
-      // Ensure the access token is checked and refreshed if necessary
-      await useAuthStore.checkAccessToken(); // Wait for the token check to complete
-    
-      const token = useAuthStore.token; // Get the current token after checking
+      await useAuthStore.checkAccessToken()
+      const token = useAuthStore.token
       if (token) {
         try {
           const users = await getItems(`${import.meta.env.VITE_BASE_URL}/users`);
@@ -195,8 +155,8 @@ export const AuthUserStore = defineStore("AuthUserStore", {
           );
     
           if (userFound) {
-            this.currentUser  = userFound.oid; // Store the oid of the matched user
-            return userFound.oid; // Return the oid
+            this.currentUser  = userFound.oid
+            return userFound.oid
           } else {
             toast.error("User  not found");
             return null;
@@ -206,7 +166,7 @@ export const AuthUserStore = defineStore("AuthUserStore", {
           return null;
         }
       } else {
-        return null; // If no token, return null
+        return null; 
       }
     }
   },
@@ -307,9 +267,9 @@ export const BoardStoreOld = defineStore("BoardStore", {
 
 export const BoardStore = defineStore("BoardStore", {
   state: () => ({
-    ownedBoards: [], // Boards owned by the user
-    collabBoards: [], // Boards where the user is a collaborator
-    currentBoard: {}, // The board currently being managed
+    ownedBoards: [],
+    collabBoards: [], 
+    currentBoard: {}, 
     currentBoardId: null,
     tasks: [],
     visibility: "private",
@@ -319,7 +279,6 @@ export const BoardStore = defineStore("BoardStore", {
     getCollabBoards: (state) => state.collabBoards,
     getCurrentBoard: (state) => state.currentBoard,
     getBoardById: (state) => (id) => {
-      // Look for the board in both ownedBoards and collabBoards
       return (
         state.ownedBoards.find((board) => board.id === id) ||
         state.collabBoards.find((board) => board.id === id)
@@ -339,7 +298,6 @@ export const BoardStore = defineStore("BoardStore", {
         const data = await getItems(`${import.meta.env.VITE_BASE_URL}/boards`, token);
 
         if (data) {
-          // Store the boards in the correct state properties
           this.ownedBoards = data.ownedBoards || [];
           this.collabBoards = data.collabBoards || [];
         } else {

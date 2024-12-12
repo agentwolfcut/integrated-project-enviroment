@@ -37,10 +37,9 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
 
         if (res.ok) {
           const data = await res.json();
-          // Flatten the data and sort by 'addedOn'
           this.collaborators = data.collaborators
-            .map((entry) => entry.collaborator) // Extract the `collaborator` object
-            .sort((a, b) => new Date(a.addedOn) - new Date(b.addedOn)); // Sort by added date
+            .map((entry) => entry.collaborator) 
+            .sort((a, b) => new Date(a.addedOn) - new Date(b.addedOn))
           this.boardId = data.boardId;
           console.log(this.boardId);
         } else {
@@ -51,50 +50,12 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
       }
     },
 
-    // async fetchCollaborators(boardId) {
-    //   const authStore = AuthUserStore();
-    //   authStore.checkAccessToken();
-
-    //   try {
-    //     const token = localStorage.getItem("token") || authStore.token;
-    //     if (!token) {
-    //       throw new Error("Authorization token is missing.");
-    //     }
-
-    //     const res = await fetch(
-    //       `${import.meta.env.VITE_BASE_URL}/boards/${boardId}/collabs`,
-    //       {
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //           Authorization: `Bearer ${token}`,
-    //         },
-    //       }
-    //     );
-
-    //     if (!res.ok) {
-    //       const errorText = await res.text(); // Inspect response text for debugging
-    //       console.error("Error response:", errorText);
-    //       throw new Error(`HTTP error! Status: ${res.status}`);
-    //     }
-
-    //     try {
-    //       const data = await res.json();
-    //       this.collaborators = data;
-    //       console.log(this.collaborators[0]);
-    //       // console.log(res.json());
-    //     } catch (jsonError) {
-    //       console.error("Failed to parse JSON:", jsonError);
-    //       console.log("Response body might be:", await res.text());
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching collaborators:", error);
-    //   }
-    // },
-
     async addCollaborator(boardId, email, accessRight) {
+      const authStore = AuthUserStore();
+      authStore.checkAccessToken()
+      const token = localStorage.getItem('token') || authStore.token
       const toast = useToast();
       try {
-        const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("Authorization token is missing.");
         }
@@ -137,6 +98,10 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
     },
 
     async updateCollaboratorAccess(boardId, collaboratorOid, newAccessRight) {
+      const toast = useToast();
+      const authStore = AuthUserStore();
+      authStore.checkAccessToken()
+      const token = localStorage.getItem('token') || authStore.token
       try {
         const res = await fetch(
           `${
@@ -146,17 +111,18 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ accessRight: newAccessRight }),
           }
         );
 
         if (res.status === 200) {
-          const updatedCollaborator = await res.json();
+          toast.success("updateed access right successfully.")
+          const updatedCollaborator = await res.json()
           this.collaborators = this.collaborators.map((collab) =>
             collab.oid === collaboratorOid ? updatedCollaborator : collab
-          );
+          )
         } else {
           throw new Error("Failed to update collaborator access.");
         }
@@ -166,9 +132,11 @@ export const useCollaboratorStore = defineStore("collaboratorStore", {
     },
 
     async removeCollaborator(boardId, userOid) {
+      const authStore = AuthUserStore();
+      authStore.checkAccessToken()
+      const token = localStorage.getItem('token') || authStore.token
       const toast = useToast();
       try {
-        const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("Authorization token is missing.");
         }

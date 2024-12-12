@@ -6,10 +6,6 @@ import { useBoardPermissionStore } from "@/stores/BoardPermissionStore";
 
 const email = ref("");
 const accessRight = ref("READ");
-const userStore = useUserStore();
-const collaboratorStore = useCollaboratorStore();
-const boardId = collaboratorStore.boardId;
-const boardPermissionStore = useBoardPermissionStore();
 const currentUser = localStorage.getItem("currentUser");
 
 const nameToEmail = () => {
@@ -26,16 +22,16 @@ const nameToEmail = () => {
 const formatEmail = nameToEmail(currentUser);
 
 const isEmailValid = computed(() => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for valid email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
   return emailRegex.test(email.value);
 });
 
 const emits = defineEmits(["saveAddCollab", "cancleAddCollab"]);
 
 const saveAddCollab = () => {
-  emits("saveAddCollab", email.value, accessRight.value); // Emit the event with the values
-  email.value = ""; // Clear the email field
-  accessRight.value = "READ"; // Reset the access right to its default value
+  emits("saveAddCollab", email.value, accessRight.value)
+  email.value = ''
+  accessRight.value = "READ"
 };
 
 const isSaveDisabled = computed(() => {
@@ -54,13 +50,13 @@ const isSaveDisabled = computed(() => {
     >
       <div class="bg-white w-1/2 h-auto rounded-2xl shadow-xl p-6">
         <span
-          class="text-2xl font-semibold text-red-600 italic mb-12 disabled:cursor-not-allowed"
+          class="text-3xl font-bold text-customBlue mb-12 disabled:cursor-not-allowed"
           >Add Collaborator</span
         >
 
-        <div class="flex flex-row my-4 justify-between">
+        <div class="flex flex-row my-4 justify-between mt-10">
           <div class="flex flex-col">
-            <span class="text-base font-medium text-slate-800"
+            <span class="text-base font-medium text-customBlue "
               >Collaborator-Email</span
             >
             <input
@@ -68,11 +64,11 @@ const isSaveDisabled = computed(() => {
               v-model="email"
               required
               maxlength="50"
-              class="itbkk-collaborator-email bg-white rounded-md border-slate-400 border h-10 w-56 pl-2"
+              class="itbkk-collaborator-email bg-white text-slate-700 rounded-md border-slate-400 border h-10 w-56 pl-2"
             />
           </div>
           <div class="flex flex-col">
-            <span class="text-base font-medium text-slate-800"
+            <span class="text-base font-medium text-customBlue"
               >Access Right</span
             >
             <select

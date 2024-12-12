@@ -8,7 +8,6 @@ import { BoardStore , AuthUserStore } from '@/stores/store'
 
 const boardStore = BoardStore();
 const newBoardName = ref('')
-const toast = useToast();
 const currentUser = ref("");
 const authUserStore = AuthUserStore()
 const token = authUserStore.token
@@ -25,8 +24,6 @@ const addBoard = () => {
   router.push('/board')
 };
 
-
-// can't add
 </script>
 
 <template>
@@ -37,7 +34,7 @@ const addBoard = () => {
       class="px-3 lg:flex-none fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-70"
     >
       <div class="bg-white w-1/2 h-auto p-2 rounded-2xl shadow-xl">
-        <p class="font-bold text-3xl text-black flex justify-center m-5">
+        <p class="font-bold text-3xl text-customBlue flex justify-center m-5">
           New Board
         </p>
 
@@ -45,7 +42,7 @@ const addBoard = () => {
         <div class="m-4">
           <label for="title" class="font-medium text-base">Name</label>
           <input
-            class="itbkk-board-name p-2 w-full bg-slate-100 flex font-medium text-xl text-black rounded-md border-slate-600 text-slate-600"
+            class="itbkk-board-name p-2 w-full bg-slate-100 flex font-medium text-xlrounded-md border-slate-600 text-slate-600"
             type="text"
             maxlength="50"
             placeholder="Enter board name"

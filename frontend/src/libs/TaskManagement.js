@@ -9,20 +9,6 @@ class TaskManagement {
       )
     )
   }
-  // addtasks(newtasks) {
-  //   newtasks.forEach((newtask) =>
-  //     this.addtask(
-  //       newtask.id,
-  //       newtask.title,
-  //       newtask.description,
-  //       newtask.assignees,
-  //       newtask.status,
-  //       newtask.createdOn,
-  //       newtask.updatedOn
-  //     )
-  //   )
-  // }
-  // push
   addtask(newTask) {
     this.tasks.push({
       id: newTask.id,

@@ -7,7 +7,6 @@ import { AuthUserStore } from '@/stores/store';
 import Logout from '@/assets/icons/Logout.vue';
 
 const authUserStore = AuthUserStore()
-
 const token = localStorage.getItem('token')
 let currentUser = ref('')
 
@@ -24,8 +23,8 @@ if (token) {
 }
 
 const signout = () => {
-  currentUser.value = ''; 
-  router.push('/login'); 
+  currentUser.value = ''
+  router.push('/login') 
   authUserStore.clearTokens
 }
 </script>

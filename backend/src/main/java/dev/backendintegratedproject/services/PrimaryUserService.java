@@ -14,15 +14,13 @@ public class PrimaryUserService {
     PrimaryUserRepository primaryUserRepository;
 
 
-    // Find all users
     public List<PrimaryUser> getAllUsers() {
         return primaryUserRepository.findAll();
     }
 
-    // Find user by username
     public PrimaryUser findUserByUsername(String username) {
         Optional<PrimaryUser> user = primaryUserRepository.findByUsername(username);
-        return user.orElse(null); // Return the user or null if not found
+        return user.orElse(null);
     }
 
     public Boolean checkUserExist(String userID){

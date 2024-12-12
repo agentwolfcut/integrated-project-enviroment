@@ -18,14 +18,14 @@ public class PrimaryUserController {
     @Autowired
     private PrimaryUserService primaryUserService;
 
-    // Fetch all users
+
     @GetMapping("")
     public ResponseEntity<List<PrimaryUser>> getAllUsers() {
         List<PrimaryUser> users = primaryUserService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    // Fetch user by username
+
     @GetMapping("/name/{username}")
     public ResponseEntity<PrimaryUser> getUserByUsername(@PathVariable String username) {
         PrimaryUser user = primaryUserService.findUserByUsername(username);

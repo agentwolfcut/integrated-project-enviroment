@@ -91,16 +91,8 @@ public class StatusService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found please check both status ID");
         }
 
-
-        // fetch all tasks with deleteStatus
-
-
-
-
         try {
-            // Replace all deleteStatus in tasks with replaceStatus
             taskRepository.transferStatusTasks(deleteStatus.getId(), replaceStatus.getId());
-            // after replacing all deleteStatus in tasks, delete deleteStatus
             statusRepository.deleteById(deleteId);
         } catch (Exception e) {
             throw e;
@@ -112,29 +104,23 @@ public class StatusService {
 
     @Transactional
     public Status updateStatus(Integer id, Status updateStatus, String boardId) {
-        // Check if status exists
         Status existingStatus = statusRepository.findByIdAndBoardID(id, boardId);
         if(existingStatus == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status to update not found");
         }
-        // set existing status value
 
-        // check if name is empty
         if (updateStatus.getName() == null || updateStatus.getName().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required.");
         }
-//        if (statusRepository.existsByName(updateStatus.getName()) && !updateStatus.getId().equals(existingStatus.getId())) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name (" + updateStatus.getName() + ") already exists.");
-//        }
+
         if(statusRepository.findAllByName(updateStatus.getName()).stream().anyMatch(status -> !status.getId().equals(updateStatus.getId()))){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name (" + updateStatus.getName() + ") already exists.");
         }
-        // set updated values
+
         existingStatus.setName(updateStatus.getName());
         existingStatus.setDescription(updateStatus.getDescription());
 
         try {
-            // save updated status
             return statusRepository.save(existingStatus);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update status.", e);
@@ -150,17 +136,6 @@ public class StatusService {
     }
 
     public CreateStatusDTO trimStatus(CreateStatusDTO status) {
-        if (status.getName() == null || status.getName().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name is required");
-        }
-        String trimmedName = status.getName().trim();
-        String trimmedDescription = status.getDescription() != null ? status.getDescription().trim() : null;
-        status.setName(trimmedName);
-        status.setDescription(trimmedDescription);
-        return status;
-    }
-
-    public Status trimStatusUpdate(Status status) {
         if (status.getName() == null || status.getName().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status name is required");
         }

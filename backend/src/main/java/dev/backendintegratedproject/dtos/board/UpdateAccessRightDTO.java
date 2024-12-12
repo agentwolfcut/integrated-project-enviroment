@@ -9,7 +9,6 @@ public class UpdateAccessRightDTO {
 
     private String accessRight;
 
-    // Getter and Setter
     public String getAccessRight() {
         return accessRight;
     }

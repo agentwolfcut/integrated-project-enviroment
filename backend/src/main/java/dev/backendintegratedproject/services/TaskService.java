@@ -56,10 +56,6 @@ public class TaskService {
         if (status == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Status not found");
         }
-//        if (!CollaboratorsRepository.checkBoardAccess(userDetailsDTO.getOid(), status.getBoardID()) || !boardID.equals(status.getBoardID())) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The status does not exist");
-//        }
-        // Check if title, status is empty
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
         }
@@ -73,13 +69,10 @@ public class TaskService {
 
 
         try {
-            // Save task
             return taskRepository.save(newTask);
         } catch (DataIntegrityViolationException e) {
-            // Handle specific constraint violation (e.g., unique constraint)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to save task. Ensure data integrity.");
         } catch (Exception e) {
-            // Handle any other unexpected errors
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
@@ -87,7 +80,6 @@ public class TaskService {
 
     @Transactional
     public Task deleteTask(Integer id, String boardID) {
-        // Check if task exists
         Task existingtask = taskRepository.findByIdAndBoardID(id, boardID);
         if (existingtask == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist.");
@@ -97,20 +89,18 @@ public class TaskService {
             taskRepository.delete(existingtask);
             return existingtask;
         } catch (Exception e) {
-            // Handle any unexpected errors
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete task.", e);
         }
     }
 
     @Transactional
     public Task updateTask(Integer id, UpdateTaskDTO task, String boardID) {
-        // ตรวจสอบว่า Task ที่จะอัปเดตมีอยู่หรือไม่
+        // ตรวจสอบว่า Task
         Task existingTask = taskRepository.findByIdAndBoardID(id, boardID);
         if (existingTask == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task with ID " + id + " does not exist.");
         }
 
-        // ตรวจสอบว่า Status ใหม่มีอยู่หรือไม่
         Status newStatus = null;
         if (task.getStatusId() != null) {
             newStatus = statusRepository.findByIdAndBoardID(task.getStatusId(), boardID);
@@ -118,32 +108,23 @@ public class TaskService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status with ID " + task.getStatusId() + " does not exist.");
             }
         } else {
-            // หากไม่มี statusId ให้กำหนดค่าเริ่มต้น
             newStatus = statusRepository.findById(1)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Default Status 1 does not exist."));
         }
-
-        // ตรวจสอบว่า Title ถูกต้อง
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
         }
 
-        // อัปเดตฟิลด์ต่างๆ ของ Task
         existingTask.setTitle(task.getTitle().trim());
         existingTask.setDescription(task.getDescription() != null ? task.getDescription().trim() : null);
         existingTask.setAssignees(task.getAssignees());
         existingTask.setStatus(newStatus);
 
         try {
-            // บันทึก Task ที่ถูกอัปเดต
             return taskRepository.save(existingTask);
-        } catch (Exception e) {
-            // จัดการข้อผิดพลาดในกรณีที่การบันทึกล้มเหลว
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update task.", e);
+        } catch (Exception e) {throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update task.", e);
         }
     }
-
-
 
     @Transactional
     public List<Task> saveAllTasks(List<Task> tasks) {

@@ -29,9 +29,4 @@ public class Status {
     @Column(name = "boardID")
     private String boardID;
 
-//    @ManyToOne
-//    @JoinColumn(name = "boardID" , insertable = false, updatable = false)
-//    private Board board;
-
-
 }

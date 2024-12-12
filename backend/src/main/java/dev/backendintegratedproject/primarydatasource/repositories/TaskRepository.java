@@ -21,7 +21,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
 
     @Query(value = "select count(*) from tasks where taskStatus = :id ", nativeQuery = true)
     Integer countByStatus(Integer id);
-//    List<Task> findByCreatedOnBetween(ZonedDateTime startDate, ZonedDateTime endDate);
 
     @Modifying
     @Query(value = "update tasks set taskStatus = :newStat where taskStatus = :delStat", nativeQuery = true)

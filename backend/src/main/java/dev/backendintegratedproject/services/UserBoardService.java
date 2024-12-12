@@ -94,7 +94,6 @@ public class UserBoardService {
 
     @Transactional
     public void setVisibility(String boardID, VisibilityDTO visibility, String userID) {
-        // Check board existence and if the user is the owner
         Board board = boardRepository.findById(boardID)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found"));
 
@@ -102,7 +101,6 @@ public class UserBoardService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to change this board's visibility.");
         }
 
-        // Check and set the new visibility
         if (visibility == null || visibility.getVisibility() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Visibility must not be null");
         }
@@ -137,11 +135,10 @@ public class UserBoardService {
     }
 
     public UserDetailsDTO getUserDetailsById(String oid) {
-        // Fetch user details using the provided OID
+
         User user = userRepository.findById(oid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Map User entity to UserDetailsDTO
         UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.getEmail(), user.getPassword(), Collections.emptyList());
         userDetailsDTO.setOid(user.getOid());
         userDetailsDTO.setName(user.getName());

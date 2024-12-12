@@ -10,7 +10,4 @@ public class SimpleTaskDTO {
     private String Assignees;
     private Status Status;
 
-//    public String getStatus(){
-//        return Status.getName();
-//    }
 }

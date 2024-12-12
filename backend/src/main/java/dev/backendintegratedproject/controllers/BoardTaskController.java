@@ -89,12 +89,13 @@ public class BoardTaskController {
         boolean isWriteAccess = isOwner || (collab != null && collab.getAccessRight() == AccessRight.WRITE);
         boolean isCanDoOp = Objects.equals(method, "get") || isCollabCanDoOperation;
 
-        if (!Objects.equals(method, "get") && !isWriteAccess && !Objects.equals(board.getId(), "kanbanbase")) {
+        if (!Objects.equals(method, "get") && !isWriteAccess) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission on this board");
         }
-        if (!isOwner && !isCanDoOp && !Objects.equals(board.getId(), "kanbanbase")) {
+        if (!isOwner && !isCanDoOp) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission on this board");
         }
+
 
         return isOwner || (collab != null && collab.getAccessRight() == AccessRight.WRITE) ? AccessRight.WRITE : AccessRight.READ;
     }
